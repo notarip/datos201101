@@ -11,13 +11,16 @@
 
 #include "Definiciones.h"
 
+
+#pragma pack (1)
+
+
 class Elemento {
 public:
 	Elemento();
-	virtual ~Elemento();
-	#pragma pack(push,1)
+	~Elemento();
 	unsigned int clave;
-//	char dato;
+	char dato;
 };
 
 #endif /* ELEMENTO_H_ */
