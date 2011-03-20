@@ -7,11 +7,14 @@
 
 #include "Elemento.h"
 
+
 Elemento::Elemento() {
 	// TODO Auto-generated constructor stub
 
 }
 
+
 Elemento::~Elemento() {
 	// TODO Auto-generated destructor stub
 }
+
