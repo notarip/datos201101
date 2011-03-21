@@ -14,7 +14,9 @@
 
 #include "Definiciones.h"
 #include "Elemento.h"
-#include "Nodo.h"
+#include "NodoH.h"
+#include "NodoI.h"
+
 using namespace std;
 
 #define TN 16 //el tamaño en bytes del nodo
@@ -26,7 +28,7 @@ public:
 	virtual ~ArbolB();
 	/*Crea un ArbolB vacio inicializa una raiz vacia y la almacena en un archivo
 	* nuevo, creando tambien un archivo de nodos libres vacios*/
-	void Crear();
+	void Crear(string nombre);
 	/*Abre el archivo de almacenamiento del arbol y el de referencia
 	 * a nodos libres y lee la raiz */
 	void Abrir();

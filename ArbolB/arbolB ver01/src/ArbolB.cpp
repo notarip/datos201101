@@ -22,8 +22,23 @@ ArbolB::~ArbolB() {
 }
 
 
-void ArbolB::Crear()
+void ArbolB::Crear(string nombre)
 {
+	fstream arbolArc;
+	string rutaArbol = nombre + ".b";
+	fstream nodosArc;
+	string rutaNodos = nombre + ".el";
+	NodoH raiz;
+
+
+	arbolArc.open(rutaArbol.c_str(),ios::binary | ios::out);
+	//aca hay que guardar el nodo en el archivo
+	//ojo con los tamaños
+
+	arbolArc.close();
+
+	nodosArc.open(rutaNodos.c_str(),ios::binary | ios::out);
+	nodosArc.close();
 
 }
 
