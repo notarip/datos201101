@@ -52,6 +52,13 @@ public:
 	 * levanto del archivo
 	 */
 	void listarStopWords();
+	/*
+	 * Metodo para pruebas
+	 * lista por consola los
+	 * atributos del libro que parseo
+	 *
+	 */
+	void listarLibro();
 
 private:
 	string autor;
@@ -64,7 +71,18 @@ private:
 	 * del archivo de stopWords y las guarda en la
 	 * lista.
 	 */
-	void levantarPalabras(fstream *archStopW);
+	void levantarStopWords(fstream *archStopW);
+	/*
+	 * Metodo privado que levanta la informacion
+	 * del libro.
+	 */
+	void procesarLibro(fstream *archLibro);
+	/*
+	 * Metodo provado que se encarga de
+	 * generar una lista de palabras filtrando
+	 * las stop words
+	 */
+	list<string> *procesarPalabras();
 };
 
 #endif /* PARSER_H_ */

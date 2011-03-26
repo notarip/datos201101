@@ -31,6 +31,21 @@ int main (int argc, char** argv)
 	 * PRUEBA DEL PARSEO DEL ARCHIVO DE STOP WORDS
 	 */
 
+	/*
+	 * PRUEBA DEL PARSEO DEL LIBRO
+	 */
+	Parser *parser2 = new Parser();
+
+	parser2->parsear("./archivos/libros/libro1.txt");
+
+	parser2->listarLibro();
+
+	parser2->~Parser();
+
+	/*
+	 * PRUEBA DEL PARSEO DEL LIBRO
+	 */
+
 
 	return 0;
 }
