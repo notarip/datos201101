@@ -7,20 +7,6 @@
 
 #include "Parametros.h"
 
-//
-//Parametros::~Parametros() {
-//	// TODO Auto-generated destructor stub
-//}
-//
-//Parametros* Parametros::pInstancia = 0;
-//Parametros* Parametros::getInstancia()
-//{
-//        if (!pInstancia)
-//                pInstancia = new Parametros();
-//
-//        return pInstancia;
-//}
-
 
 string Parametros::getParametro(string idParametro)
 {
