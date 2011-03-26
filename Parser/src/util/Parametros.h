@@ -8,6 +8,7 @@
 #ifndef PARAMETROS_H_
 #define PARAMETROS_H_
 
+#define RUTA_CONFIG "./archivos/conf/config.propiedades"
 #include <string>
 #include <iostream>
 #include <fstream>
