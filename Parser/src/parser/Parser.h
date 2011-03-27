@@ -14,11 +14,14 @@
 #define SIN_TITULO 4
 
 #define TAG_PATH_STOP_WORDS "path_stopWords"
+#define INVALIDOS ".:,;¡!'?¿""“”(){}[]-\n\r"
+
 
 #include <string>
 #include <list>
 #include <fstream>
 #include "../util/Parametros.h"
+#include "../util/Util.h"
 using namespace std;
 
 
@@ -45,6 +48,16 @@ public:
 	 * si se pudo parsear correctamente retorna 0
 	 */
 	int parsear(string archivo);
+
+	/*
+	 * Retorna la lista de palabras que
+	 * contiene el libro con las siguentes
+	 * restricciones:
+	 * -todas la palabras estan en minusculas
+	 * -no estan las stop words
+	 * -puede haber duplicadas
+	 */
+	list<string>* obtenerPalabras();
 
 	/*
 	 * Metodo para pruebas
@@ -93,12 +106,28 @@ private:
 	 */
 	void procesarPalabra(string palabra, list<string>* palabras);
 
+
+	/*
+	 * Guarda una palabra en la lista de palabras
+	 * siempre que no este en la lista de stop words
+	 */
+
+	void guardarPalabra(string palabra, list<string> *palabras);
+
+
 	/*
 	 * Desde @posIni busca en el texto
 	 * del libro donde termina la siguiente palabra
 	 *
 	 */
 	unsigned int encontrarFinPalabra(unsigned int posIni);
+
+	/*
+	 * Busca una @palabra dentro de la lista
+	 * de stop words si la encuentra
+	 * retorna true sino false
+	 */
+	bool buscarStopWord(string palabra);
 };
 
 #endif /* PARSER_H_ */

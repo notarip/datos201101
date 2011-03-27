@@ -62,10 +62,14 @@ int main (int argc, char** argv)
 
 	if (prueba4)
 	{
+		Parser *parser3 = new Parser();
 
+		parser3->parsear("./archivos/libros/libro1.txt");
 
+		list<string> *lista = parser3->obtenerPalabras();
 
-
+		for (list<string>::iterator it = lista->begin(); it != lista->end(); it++)
+			cout << (*it).c_str() << endl;
 	}
 
 

@@ -43,6 +43,13 @@ int Parser::parsear(string archivo)
 }
 
 
+list<string> *Parser::obtenerPalabras()
+{
+
+	return this->procesarPalabras();
+
+}
+
 void Parser::procesarLibro(fstream *archLibro)
 {
 
@@ -115,11 +122,73 @@ list<string> *Parser::procesarPalabras()
 
 void Parser::procesarPalabra(string palabra, list<string>* palabras)
 {
-	//.:,;¡!'?¿"'(){}[]-
+
+	//sin tildes
+	//	palabra = Util().sinTilde(palabra);
+
+	//reemplaza los inavalidos por espacios
+	unsigned int pos = palabra.find_first_of(INVALIDOS);
+	while (pos != string::npos)
+	{
+		palabra[pos] = ' ';
+		pos = palabra.find_first_of(INVALIDOS, pos+1);
+	}
+
+	//a minuscula
+	palabra = Util().toLower(palabra);
 
 
 
+	//analiza si quedaron dos palabras (ejemplo: potter dragon)
 
+	unsigned int posIni = 0;
+	unsigned int posFin = palabra.find(' ',posIni);
+
+	//eliminar los del principio
+	while (posFin != string::npos && posFin == posIni)
+	{
+		palabra.erase(posFin,1);
+		posFin = palabra.find(' ',posIni);
+	}
+
+	//elimina los del final
+	posFin = palabra.find_last_of(' ');
+	while (posFin != string::npos && posFin == palabra.length()-1)
+	{
+		palabra.erase(posFin,1);
+		posFin = palabra.find_last_of(' ');
+	}
+
+	//quedo un espacio en el medio ?
+	posFin = palabra.find(' ',0);
+	string palabraLimpia;
+
+	if (posFin != string::npos)
+	{
+		palabraLimpia = palabra.substr(0,posFin-1);
+		this->guardarPalabra(palabraLimpia, palabras);
+		palabra.erase(0,posFin-1);
+	}
+
+	this->guardarPalabra(palabra, palabras);
+
+}
+
+
+void Parser::guardarPalabra(string palabra, list<string> *palabras)
+{
+	if(!this->buscarStopWord(palabra))
+		palabras->push_back(palabra);
+}
+
+bool Parser::buscarStopWord(string palabra)
+{
+
+	for (list<string>::iterator it = this->stopWords.begin(); it != this->stopWords.end(); it++)
+		if ((*it).compare(palabra.c_str()) == 0)
+			return true;
+
+	return false;
 }
 
 unsigned int Parser::encontrarFinPalabra(unsigned int posIni)
@@ -183,7 +252,6 @@ void Parser::levantarStopWords(fstream *archStopW)
 
 void Parser::listarStopWords()
 {
-	/* PARA PROBAR LA LISTA DE STOP WORDS*/
 
 	for (list<string>::iterator it = stopWords.begin(); it != stopWords.end(); it++)
 		cout << (*it).c_str() << endl;
