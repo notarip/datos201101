@@ -95,17 +95,52 @@ list<string> *Parser::procesarPalabras()
 {
 	list<string> *palabras = new list<string>();
 
-//	unsigned int posIni = 0;
-	//unsigned int posFin;
+	unsigned int posIni = 0;
+	unsigned int posFin;
+	unsigned int largo = this->texto.length();
+	string palabra;
 
 
-
-
-
+	while (posFin <= largo)
+	{
+		posFin = encontrarFinPalabra(posIni);
+		palabra = this->texto.substr(posIni,posFin - posIni);
+		procesarPalabra(palabra, palabras);
+		posIni = posFin + 1;
+	}
 
 	return palabras;
 }
 
+
+void Parser::procesarPalabra(string palabra, list<string>* palabras)
+{
+	//.:,;¡!'?¿"'(){}[]-
+
+
+
+
+}
+
+unsigned int Parser::encontrarFinPalabra(unsigned int posIni)
+{
+
+	unsigned int posFinEspacio = this->texto.find(' ',posIni);
+	unsigned int posFinEndL = this->texto.find('\n',posIni);
+	unsigned int posFinEndF = this->texto.find('\0',posIni);
+
+	if (posFinEspacio != string::npos && posFinEndL != string::npos)
+		return posFinEspacio < posFinEndL ? posFinEspacio:posFinEndL;
+	else
+		if (posFinEspacio != string::npos)
+			return posFinEspacio;
+		else
+			if (posFinEndL != string::npos )
+				return posFinEndL;
+			else
+				return posFinEndF;
+
+}
 
 void Parser::levantarStopWords(fstream *archStopW)
 {

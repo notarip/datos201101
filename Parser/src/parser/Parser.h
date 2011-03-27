@@ -83,6 +83,22 @@ private:
 	 * las stop words
 	 */
 	list<string> *procesarPalabras();
+
+
+	/*
+	 * Retira los caracteres invalidos
+	 * de @palabra, comprueba la no existencia
+	 * como stop word y la agrega en la lista
+	 * de palabras
+	 */
+	void procesarPalabra(string palabra, list<string>* palabras);
+
+	/*
+	 * Desde @posIni busca en el texto
+	 * del libro donde termina la siguiente palabra
+	 *
+	 */
+	unsigned int encontrarFinPalabra(unsigned int posIni);
 };
 
 #endif /* PARSER_H_ */
