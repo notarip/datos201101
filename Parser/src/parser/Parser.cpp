@@ -123,8 +123,12 @@ list<string> *Parser::procesarPalabras()
 void Parser::procesarPalabra(string palabra, list<string>* palabras)
 {
 
+	/*Ver aca problema con los tildes
+	 *
+	 */
 	//sin tildes
 	//	palabra = Util().sinTilde(palabra);
+
 
 	//reemplaza los inavalidos por espacios
 	unsigned int pos = palabra.find_first_of(INVALIDOS);
@@ -133,6 +137,32 @@ void Parser::procesarPalabra(string palabra, list<string>* palabras)
 		palabra[pos] = ' ';
 		pos = palabra.find_first_of(INVALIDOS, pos+1);
 	}
+
+
+/* Ver aca poblema con los \n
+ *
+	//reemplaza los  \n por espacios
+	pos = palabra.find('\n', 0);
+	while (pos != string::npos)
+	{
+		palabra[pos] = ' ';
+		pos = palabra.find('\n',pos +1);
+	}
+
+	for (int i =0 ; i < palabra.length();i++)
+	{
+		if (palabra[i] == '\n')
+			palabra[i] == ' ';
+	}
+
+	//reemplaza los  \n por espacios
+	pos = palabra.find('\r', 0);
+	while (pos != string::npos)
+	{
+		palabra[pos] = ' ';
+		pos = palabra.find('\r',pos +1);
+	}
+*/
 
 	//a minuscula
 	palabra = Util().toLower(palabra);

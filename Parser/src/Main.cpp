@@ -63,14 +63,29 @@ int main (int argc, char** argv)
 	if (prueba4)
 	{
 		Parser *parser3 = new Parser();
+		fstream salida;
 
+		salida.open("./archivos/libros/salida_libro1.txt",ios::out);
 		parser3->parsear("./archivos/libros/libro1.txt");
 
 		list<string> *lista = parser3->obtenerPalabras();
 
 		for (list<string>::iterator it = lista->begin(); it != lista->end(); it++)
+		{
 			cout << (*it).c_str() << endl;
+			salida.write((*it).c_str(),(*it).size());
+			salida.write("\n",1);
+		}
+		salida.close();
 	}
+
+
+	cout << "linea 1";
+	cout << '\n';
+	cout << "linea 2";
+	cout << '\r';
+	cout << "linea 3";
+
 
 
 	return 0;
