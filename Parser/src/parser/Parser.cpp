@@ -50,7 +50,7 @@ list<string> *Parser::obtenerPalabras()
 
 }
 
-void Parser::procesarLibro(fstream *archLibro)
+void Parser::procesarLibro(fstream *archLibro, string archivo)
 {
 
     string linea;
@@ -67,6 +67,8 @@ void Parser::procesarLibro(fstream *archLibro)
 	unsigned int posIni = 0;
 	unsigned int posTag;
 	unsigned int posFin;
+
+
 
 	//levanta el autor
 	posTag = linea.find("AUTOR:",posIni);
@@ -297,3 +299,15 @@ void Parser::listarLibro()
 	cout << this->texto << endl;
 
 }
+
+void Parser::obtenerAutorTitulo(string nombre)
+{
+}
+
+
+
+void Parser::obtenerEditorial()
+{
+}
+
+

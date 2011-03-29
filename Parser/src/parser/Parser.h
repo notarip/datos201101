@@ -89,7 +89,7 @@ private:
 	 * Metodo privado que levanta la informacion
 	 * del libro.
 	 */
-	void procesarLibro(fstream *archLibro);
+	void procesarLibro(fstream *archLibro, string archivo);
 	/*
 	 * Metodo provado que se encarga de
 	 * generar una lista de palabras filtrando
@@ -128,6 +128,20 @@ private:
 	 * retorna true sino false
 	 */
 	bool buscarStopWord(string palabra);
+
+	/*
+	 * Separa del nombre del archivo el autor
+	 * y el titulo del libro desde @nombre
+	 * del archivo
+	 */
+	void obtenerAutorTitulo(string nombre);
+
+	/*
+	 * Obtiene del listado de editoriales
+	 * la editorial del libro, el autor
+	 * debe estar cargado
+	 */
+	void obtenerEditorial();
 };
 
 #endif /* PARSER_H_ */
