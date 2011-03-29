@@ -39,7 +39,6 @@ string Util::sinTilde(string cadena)
 	string invalidos("áéíóú");
 	string parejas("áaéeíióoúu");
 	string reemp;
-	int i = 0;
 
 
 	unsigned int pos = cadena.find_first_of(invalidos);
@@ -48,9 +47,44 @@ string Util::sinTilde(string cadena)
 		pos = cadena.find_first_of(invalidos, pos+1);
 	}
 
-
-
-
 	return cadena;
+}
+
+
+list<string>* Util::getArchivos(string carpeta)
+{
+
+	DIR *directorio;
+	struct dirent *elemento;
+	list<string> *archivos = new list<string>();
+
+	directorio = opendir(carpeta.c_str());
+
+	while (elemento = readdir(directorio))
+	{
+		if (elemento->d_type == DT_REG)
+			archivos->push_back(elemento->d_name);
+	}
+
+	return archivos;
+
+}
+
+list<string>* Util::getCarpetas(string carpeta)
+{
+	DIR *directorio;
+	struct dirent *elemento;
+	list<string> *carpetas = new list<string>();
+
+	directorio = opendir(carpeta.c_str());
+
+	while (elemento = readdir(directorio))
+	{
+		if (elemento->d_type == DT_DIR)
+			carpetas->push_back(elemento->d_name);
+	}
+
+	return carpetas;
+
 }
 

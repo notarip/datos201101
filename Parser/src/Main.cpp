@@ -1,6 +1,9 @@
 
 
 #include <iostream>
+
+
+
 #include "util/Parametros.h"
 #include "parser/Parser.h"
 
@@ -14,7 +17,8 @@ int main (int argc, char** argv)
 	bool prueba1 = false;
 	bool prueba2 = false;
 	bool prueba3 = false;
-	bool prueba4 = true;
+	bool prueba4 = false;
+	bool prueba5 = true;
 
 	if (prueba1)
 	{
@@ -79,13 +83,17 @@ int main (int argc, char** argv)
 		salida.close();
 	}
 
+	if (prueba5)
+	{
 
-	cout << "linea 1";
-	cout << '\n';
-	cout << "linea 2";
-	cout << '\r';
-	cout << "linea 3";
+		list<string> *archivos= Util().getCarpetas(".");
 
+		for (list<string>::iterator it= archivos->begin(); it != archivos->end();it++)
+			cout << (*it).c_str() << endl;
+
+		archivos->clear();
+		delete archivos;
+	}
 
 
 	return 0;
