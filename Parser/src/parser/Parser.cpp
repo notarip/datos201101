@@ -35,7 +35,7 @@ int Parser::parsear(string archivo)
 	archLibro.open(archivo.c_str(), ios::binary | ios::in);
 	if (archLibro.is_open())
 	{
-		procesarLibro(&archLibro);
+		procesarLibro(&archLibro,archivo);
 		archLibro.close();
 
 	}
