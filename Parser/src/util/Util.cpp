@@ -32,6 +32,22 @@ string Util::toLower(string cadena)
     return cadenaLower;
 }
 
+
+string Util::trim(string cadena)
+{
+
+	//borra los del principio
+	while (cadena.at(0) == ' ')
+		cadena.erase(0,1);
+
+	//borra los del final
+	while (cadena.at(cadena.length()-1) == ' ')
+		cadena.erase(cadena.length()-1,1);
+
+	return cadena;
+
+}
+
 string Util::sinTilde(string cadena)
 {
 

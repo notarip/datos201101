@@ -15,7 +15,7 @@ Parser::Parser() {
 	archStopW.open(path_stopW.c_str(), ios::binary | ios::in);
 	if (archStopW.is_open())
 	{
-		levantarStopWords(&archStopW);
+		levantarCSV(&archStopW,&stopWords);
 		archStopW.close();
 	}
 
@@ -99,6 +99,35 @@ void Parser::procesarLibro(fstream *archLibro, string archivo)
 }
 
 
+void Parser::obtenerAutorTitulo(string nombre)
+{
+	unsigned int  posGuion = nombre.find('-',0);
+	string autor = nombre.substr(0,posGuion - 1);
+	string titulo = nombre.substr(posGuion + 1, nombre.length() - posGuion - 4);
+
+	this->autor = Util().trim(autor);
+	this->titulo = Util().trim(titulo);
+
+}
+
+
+
+void Parser::obtenerEditorial()
+{
+	//TODO sacar a otra clase por que sino levanta
+	//las editoriales para cada libro
+
+	string rutaEd = Parametros().getParametro("path_editoriales");
+	list<string> editoriales;
+	fstream arcEd;
+
+	arcEd.open(rutaEd.c_str(), ios::binary | ios::in);
+	if (arcEd.is_open())
+	{
+		levantarCSV(&arcEd,&editoriales);
+	}
+
+}
 
 list<string> *Parser::procesarPalabras()
 {
@@ -243,25 +272,25 @@ unsigned int Parser::encontrarFinPalabra(unsigned int posIni)
 
 }
 
-void Parser::levantarStopWords(fstream *archStopW)
-{
 
+void Parser::levantarCSV(fstream *archivo, list<string> *lista)
+{
     string linea;
     int tamanio;
-
-    archStopW->seekg(0, ios::end);
-    tamanio = archStopW->tellg();
-    archStopW->seekg(0);
+    archivo->seekg(0, ios::end);
+    tamanio = archivo->tellg();
+    archivo->seekg(0);
 
     char* buff = new char[tamanio];
-    archStopW->read(buff, tamanio);
+    archivo->read(buff, tamanio);
     linea.assign(buff);
+    delete [] buff;
 
 
     unsigned int posIni = 0;
     unsigned int posFin;
     bool fin = false;
-    string stopWord;
+    string palabra;
 
     while (!fin)
     {
@@ -272,15 +301,13 @@ void Parser::levantarStopWords(fstream *archStopW)
 			fin = true;
 		}
 
-		stopWord = linea.substr(posIni, posFin - posIni); //string a almacenar
-		this->stopWords.push_back(stopWord);
+		palabra = linea.substr(posIni, posFin - posIni); //string a almacenar
+		lista->push_back(palabra);
 		posIni = posFin + 1;
     }
 
-    delete [] buff;
 
 }
-
 
 void Parser::listarStopWords()
 {
@@ -300,14 +327,5 @@ void Parser::listarLibro()
 
 }
 
-void Parser::obtenerAutorTitulo(string nombre)
-{
-}
-
-
-
-void Parser::obtenerEditorial()
-{
-}
 
 

@@ -79,12 +79,14 @@ private:
 	string titulo;
 	string texto;
 	list<string> stopWords;
+
 	/*
 	 * Metodo privado que levanta las palabras
-	 * del archivo de stopWords y las guarda en la
-	 * lista.
+	 * del archivo de un csv y las guarda en la
+	 * @lista.
 	 */
-	void levantarStopWords(fstream *archStopW);
+	void levantarCSV(fstream *archivo, list<string> *lista);
+
 	/*
 	 * Metodo privado que levanta la informacion
 	 * del libro.
