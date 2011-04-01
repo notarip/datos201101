@@ -28,9 +28,17 @@ public:
 	 * Retorna @cadena en minusculas
 	 */
 	static string toLower (string cadena);
+
+	/*
+	 * Retorna @cadena sin espacios
+	 * al principo ni al final
+	 */
+	static string trim(string cadena);
+
 	/*
 	 * Retorna @cadena sin tilde
 	 */
+
 	static string sinTilde(string cadena);
 
 	/*
