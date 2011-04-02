@@ -16,6 +16,7 @@ Parser::Parser() {
 	if (archStopW.is_open())
 	{
 		levantarCSV(&archStopW,&stopWords);
+		this->stopWords.sort();
 		archStopW.close();
 	}
 
@@ -65,17 +66,13 @@ void Parser::procesarLibro(fstream *archLibro, string archivo)
 	linea.assign(buff);
 	delete [] buff;
 
-	unsigned int posIni = 0;
-	unsigned int posTag;
-	unsigned int posFin;
-
 
 	this->obtenerAutorTitulo(archivo);
 	this->obtenerEditorial();
 
 	//levanta texto
-	posFin = linea.find('\0',posTag);
-	this->texto = linea.substr(posIni, posFin - posIni);
+
+	this->texto = linea;
 
 
 }
@@ -153,10 +150,7 @@ list<string> *Parser::procesarPalabras()
 void Parser::procesarPalabra(string palabra, list<string>* palabras)
 {
 
-	/*Ver aca problema con los tildes
-	 *
-	 */
-	//sin tildes
+
 	//	palabra = Util().sinTilde(palabra);
 
 
@@ -169,13 +163,11 @@ void Parser::procesarPalabra(string palabra, list<string>* palabras)
 	}
 
 
-// Ver aca poblema con los \n
-
 	//reemplaza los  \n por espacios
-	for (int j = 0; j < palabra.size();j++)
+	for (unsigned int j = 0; j < palabra.size();j++)
 			if (palabra.at(j) == '\n' || palabra.at(j) == '\r' || palabra.at(j) == '\0')
 					palabra[j] = ' ';
-//-----------------
+
 
 	//a minuscula
 	palabra = Util().toLower(palabra);
@@ -233,6 +225,10 @@ bool Parser::buscarStopWord(string palabra)
 	for (list<string>::iterator it = this->stopWords.begin(); it != this->stopWords.end(); it++)
 		if ((*it).compare(palabra.c_str()) == 0)
 			return true;
+		else
+			if ((*it).compare(palabra.c_str()) > 0 ) //el que pase es mas "grande"
+				return false;
+
 
 	return false;
 }
