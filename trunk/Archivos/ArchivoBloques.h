@@ -2,7 +2,7 @@
  * ArchivoBloques.h
  *
  *  Created on: 01/04/2011
- *      Author: rjc
+ *      Author: rjc(prueba)
  */
 
 #ifndef ARCHIVOBLOQUES_H_
