@@ -9,16 +9,6 @@
 
 Parser::Parser() {
 
-	fstream archStopW;
-	string path_stopW = Parametros().getParametro(TAG_PATH_STOP_WORDS);
-
-	archStopW.open(path_stopW.c_str(), ios::binary | ios::in);
-	if (archStopW.is_open())
-	{
-		levantarCSV(&archStopW,&stopWords);
-		this->stopWords.sort();
-		archStopW.close();
-	}
 
 }
 
@@ -44,8 +34,19 @@ int Parser::parsear(string archivo)
 }
 
 
-list<string> *Parser::obtenerPalabras()
+set<string> *Parser::obtenerPalabras()
 {
+
+	fstream archStopW;
+	string path_stopW = Parametros().getParametro(TAG_PATH_STOP_WORDS);
+
+	archStopW.open(path_stopW.c_str(), ios::binary | ios::in);
+	if (archStopW.is_open())
+	{
+		levantarCSV(&archStopW,&stopWords);
+		archStopW.close();
+	}
+
 
 	return this->procesarPalabras();
 
@@ -57,13 +58,15 @@ void Parser::procesarLibro(fstream *archLibro, string archivo)
     string linea;
     int tamanio;
 
-	archLibro->seekg(0, ios::end);
+    archLibro->seekg(0, ios::end);
 	tamanio = archLibro->tellg();
 	archLibro->seekg(0);
 
 	char* buff = new char[tamanio];
 	archLibro->read(buff, tamanio);
+
 	linea.assign(buff);
+
 	delete [] buff;
 
 
@@ -73,8 +76,6 @@ void Parser::procesarLibro(fstream *archLibro, string archivo)
 	//levanta texto
 
 	this->texto = linea;
-
-
 }
 
 
@@ -111,7 +112,6 @@ void Parser::obtenerEditorial()
 	}
 
 
-
 	unsigned int nroEditorial = ((unsigned int)(this->autor.at(0))) - 97; // en ascii a = 97
 	unsigned int i = 0;
 	for (list<string>::iterator it = editoriales.begin(); it != editoriales.end(); it++ )
@@ -125,15 +125,14 @@ void Parser::obtenerEditorial()
 	}
 }
 
-list<string> *Parser::procesarPalabras()
+set<string> *Parser::procesarPalabras()
 {
-	list<string> *palabras = new list<string>();
+	set<string> *palabras = new set<string>();
 
 	unsigned int posIni = 0;
 	unsigned int posFin;
 	unsigned int largo = this->texto.length();
 	string palabra;
-
 
 	while (posFin <= largo)
 	{
@@ -147,11 +146,8 @@ list<string> *Parser::procesarPalabras()
 }
 
 
-void Parser::procesarPalabra(string palabra, list<string>* palabras)
+void Parser::procesarPalabra(string palabra, set<string>* palabras)
 {
-
-
-	//	palabra = Util().sinTilde(palabra);
 
 
 	//reemplaza los inavalidos por espacios
@@ -162,15 +158,16 @@ void Parser::procesarPalabra(string palabra, list<string>* palabras)
 		pos = palabra.find_first_of(INVALIDOS, pos+1);
 	}
 
-
 	//reemplaza los  \n por espacios
 	for (unsigned int j = 0; j < palabra.size();j++)
 			if (palabra.at(j) == '\n' || palabra.at(j) == '\r' || palabra.at(j) == '\0')
 					palabra[j] = ' ';
 
-
 	//a minuscula
 	palabra = Util().toLower(palabra);
+
+	//cambia tilde
+	palabra = Util().sinTilde(palabra);
 
 	//saco espacios al pricipio y al final
 	palabra = Util().trim(palabra);
@@ -178,27 +175,8 @@ void Parser::procesarPalabra(string palabra, list<string>* palabras)
 	if (palabra.size() != 0)
 	{
 		//analiza si quedaron dos palabras (ejemplo: potter dragon)
-
-		unsigned int posIni = 0;
-		unsigned int posFin = palabra.find(' ',posIni);
-
-		//eliminar los del principio
-		while (posFin != string::npos && posFin == posIni)
-		{
-			palabra.erase(posFin,1);
-			posFin = palabra.find(' ',posIni);
-		}
-
-		//elimina los del final
-		posFin = palabra.find_last_of(' ');
-		while (posFin != string::npos && posFin == palabra.length()-1)
-		{
-			palabra.erase(posFin,1);
-			posFin = palabra.find_last_of(' ');
-		}
-
 		//quedo un espacio en el medio ?
-		posFin = palabra.find(' ',0);
+		unsigned int posFin = palabra.find(' ',0);
 		string palabraLimpia;
 
 		if (posFin != string::npos)
@@ -213,24 +191,15 @@ void Parser::procesarPalabra(string palabra, list<string>* palabras)
 }
 
 
-void Parser::guardarPalabra(string palabra, list<string> *palabras)
+void Parser::guardarPalabra(string palabra, set<string> *palabras)
 {
 	if(!this->buscarStopWord(palabra))
-		palabras->push_back(palabra);
+		palabras->insert(palabra);
 }
 
 bool Parser::buscarStopWord(string palabra)
 {
-
-	for (list<string>::iterator it = this->stopWords.begin(); it != this->stopWords.end(); it++)
-		if ((*it).compare(palabra.c_str()) == 0)
-			return true;
-		else
-			if ((*it).compare(palabra.c_str()) > 0 ) //el que pase es mas "grande"
-				return false;
-
-
-	return false;
+	return (bool)this->stopWords.count(palabra);
 }
 
 unsigned int Parser::encontrarFinPalabra(unsigned int posIni)
@@ -287,13 +256,47 @@ void Parser::levantarCSV(fstream *archivo, list<string> *lista)
 		posIni = posFin + 1;
     }
 
+}
+
+void Parser::levantarCSV(fstream *archivo, set<string> *set)
+{
+    string linea;
+    int tamanio;
+    archivo->seekg(0, ios::end);
+    tamanio = archivo->tellg();
+    archivo->seekg(0);
+
+    char* buff = new char[tamanio];
+    archivo->read(buff, tamanio);
+    linea.assign(buff);
+    delete [] buff;
+
+
+    unsigned int posIni = 0;
+    unsigned int posFin;
+    bool fin = false;
+    string palabra;
+
+    while (!fin)
+    {
+		posFin = linea.find(',',posIni);
+		if (posFin == string::npos) //no encontro la coma (caso de ultima palabra)
+		{
+			posFin = linea.find('\n',posIni);
+			fin = true;
+		}
+
+		palabra = linea.substr(posIni, posFin - posIni); //string a almacenar
+		set->insert(palabra);
+		posIni = posFin + 1;
+    }
 
 }
 
 void Parser::listarStopWords()
 {
 
-	for (list<string>::iterator it = stopWords.begin(); it != stopWords.end(); it++)
+	for (set<string>::iterator it = stopWords.begin(); it != stopWords.end(); it++)
 		cout << (*it).c_str() << endl;
 
 }

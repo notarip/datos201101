@@ -1,10 +1,47 @@
+//TODO terminar tildes mayusculas
+//TODO problema ñ
+//TODO impresión de libro entero
+
 
 
 #include <iostream>
 #include "util/Parametros.h"
 #include "parser/Parser.h"
 
+void ascii()
+{
 
+	int i;
+
+	printf("C%cdigo\t-\tLetra\n\n", 162);
+
+	for(i=0; i<256; i++)
+	{
+		printf("%d\t-\t%c\n", i, i);
+	}
+
+}
+
+void ascii2()
+{
+ string a = "áéíóú-aeiou";
+ char* pc = new char[a.size()];
+ string b;
+ string c;
+
+ cout << a.c_str() << endl;
+
+ for(int i= 0; i<a.size();i++)
+ {
+	 //cout << a[i] << "-" << (int)(a[i]) <<endl;
+	 b.append(1,a[i]);
+	 pc[i] = a.at(i);
+ }
+
+ cout << b.c_str() <<endl;
+ cout << pc << endl;
+
+}
 
 void pausa()
 {
@@ -12,6 +49,31 @@ void pausa()
 	cin >> a;
 }
 
+
+void pruebaTilde()
+{
+	fstream arc;
+	string linea;
+
+	arc.open("./archivos/pruebas/prueba1.txt");
+
+	arc.seekg(0, ios::end);
+	int tamanio = arc.tellg();
+	arc.seekg(0);
+
+	//char* buff = new char[tamanio];
+	char* buff = new char[1];
+//	arc.read(buff, tamanio);
+	while (!arc.eof())
+	{
+		arc.read(buff, 1);
+		linea.append(buff);
+	}
+
+	Util().sinTilde(linea);
+
+	delete [] buff;
+}
 
 int main (int argc, char** argv)
 {
@@ -25,19 +87,14 @@ int main (int argc, char** argv)
 //
 //	unsigned int pos = enter.find('\n');
 
+	//ascii2();
+	//pruebaTilde();
 
 	if (true)
 	{
-		bool prueba1 = false;
-		bool prueba2 = false;
-		bool prueba3 = false;
-		bool prueba4 = false;
-		bool prueba5 = false;
-		bool prueba6 = true;
 
 
-
-		if (prueba1)
+		if (false)
 		{
 			/*
 				 * PRUEBAS DE PARSEO DELA ARCHIVO DE PROPIEDADES
@@ -57,13 +114,17 @@ int main (int argc, char** argv)
 		/*
 		 * PRUEBA DEL PARSEO DEL ARCHIVO DE STOP WORDS
 		 */
-		if (prueba2)
+		if (false)
 		{
 			Parser *parser = new Parser();
 
 			parser->listarStopWords();
 
+			pausa();
+
 			parser->~Parser();
+
+			pausa();
 		}
 		/*
 		 * PRUEBA DEL PARSEO DEL ARCHIVO DE STOP WORDS
@@ -72,13 +133,14 @@ int main (int argc, char** argv)
 		/*
 		 * PRUEBA DEL PARSEO DEL LIBRO
 		 */
-		if (prueba3)
+		if (false)
 		{
 			Parser *parser2 = new Parser();
 
-			parser2->parsear("./archivos/libros/libro1.txt");
+			parser2->parsear("./archivos/pruebas/libro1.txt");
 
 			parser2->listarLibro(true);
+
 
 			parser2->~Parser();
 		}
@@ -86,17 +148,17 @@ int main (int argc, char** argv)
 		 * PRUEBA DEL PARSEO DEL LIBRO
 		 */
 
-		if (prueba4)
+		if (true)
 		{
 			Parser *parser3 = new Parser();
 			fstream salida;
 
-			salida.open("./archivos/libros/salida_libro1.txt",ios::out);
-			parser3->parsear("./archivos/libros/libro1.txt");
+			salida.open("./archivos/pruebas/salida_libro1.txt",ios::out);
+			parser3->parsear("./archivos/pruebas/libro1.txt");
 
-			list<string> *lista = parser3->obtenerPalabras();
+			set<string> *lista = parser3->obtenerPalabras();
 
-			for (list<string>::iterator it = lista->begin(); it != lista->end(); it++)
+			for (set<string>::iterator it = lista->begin(); it != lista->end(); it++)
 			{
 				cout << (*it).c_str() << endl;
 				salida.write((*it).c_str(),(*it).size());
@@ -105,7 +167,7 @@ int main (int argc, char** argv)
 			salida.close();
 		}
 
-		if (prueba5)
+		if (false)
 		{
 
 			list<string> *archivos= Util().getArchivos("./archivos/libros/");
@@ -123,7 +185,7 @@ int main (int argc, char** argv)
 
 
 
-		if (prueba6)
+		if (false)
 		{
 			string rutaLibros = Parametros().getParametro(CARPETA_LIBROS);
 			list<string> *archivos2 = Util().getArchivos(rutaLibros);
@@ -140,8 +202,8 @@ int main (int argc, char** argv)
 
 				if (cont == 0)
 				{
-					list<string> *listap = parser4->obtenerPalabras();
-					for (list<string>::iterator it2 = listap->begin(); it != listap->end(); it2++)
+					set<string> *listap = parser4->obtenerPalabras();
+					for (set<string>::iterator it2 = listap->begin(); it2 != listap->end(); it2++)
 						cout << (*it2).c_str() << endl;
 					listap->clear();
 					break;
@@ -155,9 +217,6 @@ int main (int argc, char** argv)
 
 			parser4->~Parser();
 			archivos2->clear();
-
-
-
 
 			cout << "Fin de listar libro" << endl;
 			pausa();
