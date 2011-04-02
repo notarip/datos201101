@@ -52,20 +52,45 @@ string Util::sinTilde(string cadena)
 {
 
 
-	string invalidos("áéíóú");
+	string invalidos("\341\351\355\363\372");
 	string parejas("áaéeíióoúu");
 	string reemp;
 
 
 	unsigned int pos = cadena.find_first_of(invalidos);
-	while (pos != string::npos)
+	if (pos != string::npos)
 	{
-		pos = cadena.find_first_of(invalidos, pos+1);
+		reemp.append(cadena.substr(0,pos));
+		reemp.append(convertir(cadena[pos]));
+		reemp.append(cadena.substr(pos+1,cadena.size() - pos - 1));
+		cadena  = reemp;
 	}
+
+
 
 	return cadena;
 }
 
+string Util::convertir(char letra)
+{
+	if (letra == '\341') //a
+		return "á";
+
+	if (letra == '\351') //e
+		return "é";
+
+	if (letra == '\355') //i
+		return "í";
+
+	if (letra == '\363') //o
+		return "ó";
+
+	if (letra == '\372') //u
+		return "ú";
+
+
+
+}
 
 list<string>* Util::getArchivos(string carpeta)
 {

@@ -20,6 +20,7 @@
 
 #include <string>
 #include <list>
+#include <set>
 #include <fstream>
 #include "../util/Parametros.h"
 #include "../util/Util.h"
@@ -56,9 +57,9 @@ public:
 	 * restricciones:
 	 * -todas la palabras estan en minusculas
 	 * -no estan las stop words
-	 * -puede haber duplicadas
+	 * -sin duplicados
 	 */
-	list<string>* obtenerPalabras();
+	set<string>* obtenerPalabras();
 
 	/*
 	 * Metodo para pruebas
@@ -79,7 +80,7 @@ private:
 	string editorial;
 	string titulo;
 	string texto;
-	list<string> stopWords;
+	set<string> stopWords;
 
 	/*
 	 * Metodo privado que levanta las palabras
@@ -89,16 +90,24 @@ private:
 	void levantarCSV(fstream *archivo, list<string> *lista);
 
 	/*
+	 * Metodo privado que levanta las palabras
+	 * del archivo de un csv y las guarda en la
+	 * @set.
+	 */
+	void levantarCSV(fstream *archivo, set<string> *set);
+
+
+	/*
 	 * Metodo privado que levanta la informacion
 	 * del libro.
 	 */
 	void procesarLibro(fstream *archLibro, string archivo);
 	/*
 	 * Metodo provado que se encarga de
-	 * generar una lista de palabras filtrando
+	 * generar un set de palabras filtrando
 	 * las stop words
 	 */
-	list<string> *procesarPalabras();
+	set<string> *procesarPalabras();
 
 
 	/*
@@ -107,7 +116,7 @@ private:
 	 * como stop word y la agrega en la lista
 	 * de palabras
 	 */
-	void procesarPalabra(string palabra, list<string>* palabras);
+	void procesarPalabra(string palabra, set<string>* palabras);
 
 
 	/*
@@ -115,7 +124,7 @@ private:
 	 * siempre que no este en la lista de stop words
 	 */
 
-	void guardarPalabra(string palabra, list<string> *palabras);
+	void guardarPalabra(string palabra, set<string> *palabras);
 
 
 	/*

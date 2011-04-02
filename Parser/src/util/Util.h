@@ -7,7 +7,7 @@
 
 #ifndef UTIL_H_
 #define UTIL_H_
-
+#include <iostream>
 #include <string>
 #include <list>
 #include <sys/types.h>
@@ -54,6 +54,8 @@ public:
 	 */
 	static list<string>* getCarpetas(string carpeta);
 
+private:
+	static string convertir(char letra);
 };
 
 #endif /* UTIL_H_ */
