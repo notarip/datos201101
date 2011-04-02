@@ -37,11 +37,11 @@ string Util::trim(string cadena)
 {
 
 	//borra los del principio
-	while (cadena.at(0) == ' ')
+	while (cadena.size() > 0 && cadena.at(0) == ' ')
 		cadena.erase(0,1);
 
 	//borra los del final
-	while (cadena.at(cadena.length()-1) == ' ')
+	while (cadena.size() > 0 && cadena.at(cadena.length()-1) == ' ')
 		cadena.erase(cadena.length()-1,1);
 
 	return cadena;
