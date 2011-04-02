@@ -15,7 +15,7 @@
 #define SIN_TITULO 4
 
 #define TAG_PATH_STOP_WORDS "path_stopWords"
-#define INVALIDOS ".:,;¡!'?¿""“”(){}[]-"
+#define INVALIDOS ".:,;¡!'?¿\"“”(){}[]-"
 
 
 #include <string>
