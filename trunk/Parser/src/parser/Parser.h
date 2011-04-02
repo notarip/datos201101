@@ -8,6 +8,7 @@
 #ifndef PARSER_H_
 #define PARSER_H_
 
+#define EXITOSO 0
 #define ARCHIVO_INVALIDO 1
 #define SIN_AUTOR 2
 #define SIN_EDITORIAL 3
@@ -71,7 +72,7 @@ public:
 	 * atributos del libro que parseo
 	 *
 	 */
-	void listarLibro();
+	void listarLibro(bool conTexto);
 
 private:
 	string autor;

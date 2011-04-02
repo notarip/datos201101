@@ -37,7 +37,7 @@ int Parser::parsear(string archivo)
 	{
 		procesarLibro(&archLibro,archivo);
 		archLibro.close();
-
+		return EXITOSO;
 	}
 	return ARCHIVO_INVALIDO;
 }
@@ -63,50 +63,35 @@ void Parser::procesarLibro(fstream *archLibro, string archivo)
 	char* buff = new char[tamanio];
 	archLibro->read(buff, tamanio);
 	linea.assign(buff);
+	delete [] buff;
 
 	unsigned int posIni = 0;
 	unsigned int posTag;
 	unsigned int posFin;
 
 
-
-	//levanta el autor
-	posTag = linea.find("AUTOR:",posIni);
-	posTag += 6; //lenght de AUTOR:
-	posFin = linea.find('\n',posTag);
-	this->autor = linea.substr(posTag, posFin - posTag);
-	posIni = posFin + 1;
-
-	//levanta la editorial
-	posTag = linea.find("EDITORIAL:",posIni);
-	posTag += 10; //lenght de EDITORIAL:
-	posFin = linea.find('\n',posTag);
-	this->editorial = linea.substr(posTag, posFin - posTag);
-	posIni = posFin + 1;
-
-	//levanta el titulo
-	posTag = linea.find("TITULO:",posIni);
-	posTag += 7; //lenght de TITULO:
-	posFin = linea.find('\n',posTag);
-	this->titulo = linea.substr(posTag, posFin - posTag);
-	posIni = posFin + 1;
+	this->obtenerAutorTitulo(archivo);
+	this->obtenerEditorial();
 
 	//levanta texto
 	posFin = linea.find('\0',posTag);
 	this->texto = linea.substr(posIni, posFin - posIni);
 
-    delete [] buff;
+
 }
 
 
 void Parser::obtenerAutorTitulo(string nombre)
 {
+	unsigned int posBarra = nombre.find_last_of("/\\");
+	nombre.erase(0, posBarra+1);
+
 	unsigned int  posGuion = nombre.find('-',0);
 	string autor = nombre.substr(0,posGuion - 1);
-	string titulo = nombre.substr(posGuion + 1, nombre.length() - posGuion - 4);
+	string titulo = nombre.substr(posGuion + 1, nombre.length() - posGuion - 5);
 
-	this->autor = Util().trim(autor);
-	this->titulo = Util().trim(titulo);
+	this->autor = Util().toLower(Util().trim(autor));
+	this->titulo = Util().toLower(Util().trim(titulo));
 
 }
 
@@ -125,8 +110,22 @@ void Parser::obtenerEditorial()
 	if (arcEd.is_open())
 	{
 		levantarCSV(&arcEd,&editoriales);
+		arcEd.close();
 	}
 
+
+
+	unsigned int nroEditorial = ((unsigned int)(this->autor.at(0))) - 97; // en ascii a = 97
+	unsigned int i = 0;
+	for (list<string>::iterator it = editoriales.begin(); it != editoriales.end(); it++ )
+	{
+		if (i == nroEditorial)
+		{
+			this->editorial = Util().toLower((*it));
+			break;
+		}else
+			i++;
+	}
 }
 
 list<string> *Parser::procesarPalabras()
@@ -170,69 +169,55 @@ void Parser::procesarPalabra(string palabra, list<string>* palabras)
 	}
 
 
-/* Ver aca poblema con los \n
- *
-	//reemplaza los  \n por espacios
-	pos = palabra.find('\n', 0);
-	while (pos != string::npos)
-	{
-		palabra[pos] = ' ';
-		pos = palabra.find('\n',pos +1);
-	}
-
-	for (int i =0 ; i < palabra.length();i++)
-	{
-		if (palabra[i] == '\n')
-			palabra[i] == ' ';
-	}
+// Ver aca poblema con los \n
 
 	//reemplaza los  \n por espacios
-	pos = palabra.find('\r', 0);
-	while (pos != string::npos)
-	{
-		palabra[pos] = ' ';
-		pos = palabra.find('\r',pos +1);
-	}
-*/
+	for (int j = 0; j < palabra.size();j++)
+			if (palabra.at(j) == '\n' || palabra.at(j) == '\r' || palabra.at(j) == '\0')
+					palabra[j] = ' ';
+//-----------------
 
 	//a minuscula
 	palabra = Util().toLower(palabra);
 
+	//saco espacios al pricipio y al final
+	palabra = Util().trim(palabra);
 
-
-	//analiza si quedaron dos palabras (ejemplo: potter dragon)
-
-	unsigned int posIni = 0;
-	unsigned int posFin = palabra.find(' ',posIni);
-
-	//eliminar los del principio
-	while (posFin != string::npos && posFin == posIni)
+	if (palabra.size() != 0)
 	{
-		palabra.erase(posFin,1);
-		posFin = palabra.find(' ',posIni);
-	}
+		//analiza si quedaron dos palabras (ejemplo: potter dragon)
 
-	//elimina los del final
-	posFin = palabra.find_last_of(' ');
-	while (posFin != string::npos && posFin == palabra.length()-1)
-	{
-		palabra.erase(posFin,1);
+		unsigned int posIni = 0;
+		unsigned int posFin = palabra.find(' ',posIni);
+
+		//eliminar los del principio
+		while (posFin != string::npos && posFin == posIni)
+		{
+			palabra.erase(posFin,1);
+			posFin = palabra.find(' ',posIni);
+		}
+
+		//elimina los del final
 		posFin = palabra.find_last_of(' ');
-	}
+		while (posFin != string::npos && posFin == palabra.length()-1)
+		{
+			palabra.erase(posFin,1);
+			posFin = palabra.find_last_of(' ');
+		}
 
-	//quedo un espacio en el medio ?
-	posFin = palabra.find(' ',0);
-	string palabraLimpia;
+		//quedo un espacio en el medio ?
+		posFin = palabra.find(' ',0);
+		string palabraLimpia;
 
-	if (posFin != string::npos)
-	{
-		palabraLimpia = palabra.substr(0,posFin-1);
-		this->guardarPalabra(palabraLimpia, palabras);
-		palabra.erase(0,posFin-1);
-	}
+		if (posFin != string::npos)
+		{
+			palabraLimpia = palabra.substr(0,posFin-1);
+			this->guardarPalabra(palabraLimpia, palabras);
+			palabra.erase(0,posFin-1);
+		}
 
-	this->guardarPalabra(palabra, palabras);
-
+		this->guardarPalabra(palabra, palabras);
+	} //palabra.size() != 0
 }
 
 
@@ -318,12 +303,13 @@ void Parser::listarStopWords()
 }
 
 
-void Parser::listarLibro()
+void Parser::listarLibro(bool conTexto)
 {
 	cout << this->autor << endl;
 	cout << this->editorial << endl;
 	cout << this->titulo << endl;
-	cout << this->texto << endl;
+	if (conTexto)
+		cout << this->texto << endl;
 
 }
 

@@ -1,6 +1,7 @@
 P1=prueba 1;
 P2=prueba 2;
 p3=prueba3;
-path_datos=./archivos/datos;
+path_datos=./archivos/datos/;
+path_libros=./archivos/libros/;
 path_stopWords=./archivos/conf/stopWords.csv;
 path_editoriales=./archivos/conf/editoriales.csv;

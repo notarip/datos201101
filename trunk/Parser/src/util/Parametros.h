@@ -9,6 +9,12 @@
 #define PARAMETROS_H_
 
 #define RUTA_CONFIG "./archivos/conf/config.propiedades"
+#define CARPETA_DATOS "path_datos"
+#define CARPETA_LIBROS "path_libros"
+#define ARCHIVO_STOPWORDS "path_stopWords"
+#define ARCHIVO_EDITORIALES "path_editoriales"
+
+
 #include <string>
 #include <iostream>
 #include <fstream>
