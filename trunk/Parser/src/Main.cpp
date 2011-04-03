@@ -1,7 +1,5 @@
-//TODO terminar tildes mayusculas
-//TODO problema ñ
-//TODO impresión de libro entero
-
+//TODO impresión de libro entero, cuando sale por pantalla chotea las ñ y los tides.
+//TODO definir factor para que varios libros caigan en la misma editorial
 
 
 #include <iostream>

@@ -167,7 +167,7 @@ void Parser::procesarPalabra(string palabra, set<string>* palabras)
 	palabra = Util().toLower(palabra);
 
 	//cambia tilde
-	palabra = Util().sinTilde(palabra);
+	//palabra = Util().sinTilde(palabra);
 
 	//saco espacios al pricipio y al final
 	palabra = Util().trim(palabra);
