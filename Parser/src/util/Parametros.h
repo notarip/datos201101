@@ -13,6 +13,7 @@
 #define CARPETA_LIBROS "path_libros"
 #define ARCHIVO_STOPWORDS "path_stopWords"
 #define ARCHIVO_EDITORIALES "path_editoriales"
+#define FACTOR_EDITORIALES "factor_editoriales"
 
 
 #include <string>
