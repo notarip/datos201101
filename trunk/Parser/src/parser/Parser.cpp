@@ -97,8 +97,7 @@ void Parser::obtenerAutorTitulo(string nombre)
 
 void Parser::obtenerEditorial()
 {
-	//TODO sacar a otra clase por que sino levanta
-	//las editoriales para cada libro
+
 
 	string rutaEd = Parametros().getParametro(ARCHIVO_EDITORIALES);
 	list<string> editoriales;
