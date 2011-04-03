@@ -1,4 +1,5 @@
 //TODO impresión de libro entero, cuando sale por pantalla chotea las ñ y los tides.
+//TODO sacar a otra clase por que sino levanta las editoriales para cada libro
 
 
 
