@@ -100,7 +100,7 @@ void Parser::obtenerEditorial()
 	//TODO sacar a otra clase por que sino levanta
 	//las editoriales para cada libro
 
-	string rutaEd = Parametros().getParametro("path_editoriales");
+	string rutaEd = Parametros().getParametro(ARCHIVO_EDITORIALES);
 	list<string> editoriales;
 	fstream arcEd;
 
@@ -111,8 +111,12 @@ void Parser::obtenerEditorial()
 		arcEd.close();
 	}
 
+	unsigned int factor = atoi(Parametros().getParametro(FACTOR_EDITORIALES).c_str());
+	if (factor == 0)
+		factor = 1;
 
-	unsigned int nroEditorial = ((unsigned int)(this->autor.at(0))) - 97; // en ascii a = 97
+
+	unsigned int nroEditorial = (((unsigned int)(this->autor.at(0))) - 97)/factor; // en ascii a = 97
 	unsigned int i = 0;
 	for (list<string>::iterator it = editoriales.begin(); it != editoriales.end(); it++ )
 	{

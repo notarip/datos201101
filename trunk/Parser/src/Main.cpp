@@ -1,5 +1,5 @@
 //TODO impresión de libro entero, cuando sale por pantalla chotea las ñ y los tides.
-//TODO definir factor para que varios libros caigan en la misma editorial
+
 
 
 #include <iostream>
@@ -146,7 +146,7 @@ int main (int argc, char** argv)
 		 * PRUEBA DEL PARSEO DEL LIBRO
 		 */
 
-		if (true)
+		if (false)
 		{
 			Parser *parser3 = new Parser();
 			fstream salida;
@@ -183,10 +183,11 @@ int main (int argc, char** argv)
 
 
 
-		if (false)
+		if (true)
 		{
 			string rutaLibros = Parametros().getParametro(CARPETA_LIBROS);
 			list<string> *archivos2 = Util().getArchivos(rutaLibros);
+			archivos2->sort();
 			string libro;
 			Parser *parser4 = new Parser();
 			int cont = 10;
@@ -198,7 +199,7 @@ int main (int argc, char** argv)
 				parser4->listarLibro(false);
 				cout << "--------------------------" << endl;
 
-				if (cont == 0)
+				if (cont == 99)
 				{
 					set<string> *listap = parser4->obtenerPalabras();
 					for (set<string>::iterator it2 = listap->begin(); it2 != listap->end(); it2++)

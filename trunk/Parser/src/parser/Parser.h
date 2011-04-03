@@ -17,7 +17,8 @@
 #define TAG_PATH_STOP_WORDS "path_stopWords"
 #define INVALIDOS ".:,;¡!'?¿\"“”(){}[]-"
 
-
+#include <stdio.h>
+#include <stdlib.h>
 #include <string>
 #include <list>
 #include <set>
