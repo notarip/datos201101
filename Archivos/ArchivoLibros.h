@@ -19,7 +19,7 @@ public:
 
 	void agregarLibro(Libro* unLibro);
 	void suprimirLibro(unsigned int id);
-	Libro* recuperarLibro(unsigned int id);
+	Libro* recuperarLibro(unsigned int id); // ¿se recupera por id o por offset?
 	list<Libro>* recuperacionComprensiva();
 
 	void reestructurar();

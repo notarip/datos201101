@@ -8,14 +8,22 @@
 #ifndef BLOQUE_H_
 #define BLOQUE_H_
 #include <string>
+#include <list>
+#include "Registro.h"
 
 using namespace std;
 
 class Bloque {
 public:
-	Bloque();
+	Bloque(unsigned int tamanio);
 	virtual ~Bloque();
-	virtual string Serializar()=0;  // faltaria definir como se devuelve la tira de bytes
+	void agregarRegistro(Registro unRegistro);
+	Registro* recuperarRegistro(unsigned int id);
+	Registro* recuperarRegistro(string palabra);
+
+private:
+	list<Registro> listaRegistros;
+
 };
 
 #endif /* BLOQUE_H_ */
