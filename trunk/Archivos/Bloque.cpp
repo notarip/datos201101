@@ -7,7 +7,7 @@
 
 #include "Bloque.h"
 
-Bloque::Bloque() {
+Bloque::Bloque(unsigned int tamanio) {
 	// TODO Auto-generated constructor stub
 
 }

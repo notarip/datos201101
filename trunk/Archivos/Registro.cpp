@@ -1,17 +1,17 @@
 /*
- * BloqueRef.cpp
+ * Registro.cpp
  *
- *  Created on: 01/04/2011
+ *  Created on: 05/04/2011
  *      Author: rjc
  */
 
-#include "BloqueRef.h"
+#include "Registro.h"
 
-BloqueRef::BloqueRef() {
+Registro::Registro() {
 	// TODO Auto-generated constructor stub
 
 }
 
-BloqueRef::~BloqueRef() {
+Registro::~Registro() {
 	// TODO Auto-generated destructor stub
 }
