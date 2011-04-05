@@ -10,6 +10,10 @@
 
 #include <fstream>
 #include "Bloque.h"
+#include <list>
+
+
+
 
 /*ArchivoBloques
 *
@@ -18,12 +22,19 @@
 
 class ArchivoBloques {
 public:
-	ArchivoBloques(string path, unsigned int tamanoBloque); //tamaño en Bytes;
+	ArchivoBloques(string path, unsigned int tamanio); //tamaño en Bytes;
 	virtual ~ArchivoBloques();
 	void grabarBloque(Bloque* unBloque, unsigned int nroBloque);
 	Bloque* recuperarBloque(unsigned int nroBloque);
 	float getOcupacionBloque(Bloque* unBloque);// devuelve el grado de ocupacion de dicho bloque
+	unsigned int getBytesOcupados(Bloque* unBloque);
 
+private:
+	string miPath;
+	unsigned int tamanioBloque;
+
+	unsigned int getLongBytes(Registro* unRegistro); //devuelve longitud en bytes de un registro
+	unsigned int getBytesLibres(Bloque* unBloque);
 
 };
 
