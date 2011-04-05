@@ -15,11 +15,13 @@ using namespace std;
 
 class Bloque {
 public:
-	Bloque(unsigned int tamanio);
+	Bloque();
+	Bloque(Registro unRegistro);
 	virtual ~Bloque();
 	void agregarRegistro(Registro unRegistro);
 	Registro* recuperarRegistro(unsigned int id);
 	Registro* recuperarRegistro(string palabra);
+	list<Registro>* obtenerRegistros();
 
 private:
 	list<Registro> listaRegistros;
