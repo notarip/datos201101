@@ -15,6 +15,7 @@ using namespace std;
 class Registro {
 
 public:
+  Registro(string unString);
 	Registro(unsigned int id, unsigned short int unaReferencia);
 	Registro (string unString, unsigned int id);
 	virtual ~Registro();
@@ -23,6 +24,8 @@ public:
 	bool buscarID(unsigned int idBuscado);
 	list<unsigned int>* getIdentificadores();
 	list<unsigned short int>* getReferencias();
+	void agregarId (unsigned int id);
+	void agregarReferencia(unsigned short int);
 
 
 

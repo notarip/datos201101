@@ -7,6 +7,10 @@
 
 #include "Registro.h"
 
+Registro::Registro(string unString) {
+  this->miString= unString;
+}
+
 Registro::Registro(unsigned int id, unsigned short int unaReferencia) {
 	this->identificadores.push_back(id);
 	this->referencias.push_back(unaReferencia);
@@ -37,6 +41,14 @@ list<unsigned int>* Registro::getIdentificadores(){
 
 list<unsigned short int>* Registro::getReferencias(){
 	return &this->referencias;
+}
+
+void Registro::agregarId (unsigned int id){
+  this->identificadores.push_back(id);
+}
+
+void Registro::agregarReferencia(unsigned short int ref) {
+  this->referencias.push_back(ref);
 }
 
 
