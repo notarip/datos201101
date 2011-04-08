@@ -25,7 +25,6 @@ public:
 
 private:
 	list<Registro> listaRegistros;
-
 };
 
 #endif /* BLOQUE_H_ */

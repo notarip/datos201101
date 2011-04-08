@@ -52,5 +52,5 @@ list<Registro>* Bloque::obtenerRegistros(){
 }
 
 Bloque::~Bloque() {
-	// TODO Auto-generated destructor stub
+
 }

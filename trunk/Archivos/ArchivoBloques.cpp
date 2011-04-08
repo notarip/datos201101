@@ -6,6 +6,10 @@
  */
 
 #include "ArchivoBloques.h"
+#include "string.h"
+#include <iostream>
+
+using namespace std;
 
 ArchivoBloques::ArchivoBloques(string path, unsigned int tamanio) {
 	miPath = path;
@@ -13,22 +17,20 @@ ArchivoBloques::ArchivoBloques(string path, unsigned int tamanio) {
 }
 
 ArchivoBloques::~ArchivoBloques() {
-	// TODO Auto-generated destructor stub
 }
 
 void ArchivoBloques::grabarBloque(Bloque* unBloque, unsigned int nroBloque){
-
-	/*faltaria verificacion si entra en donde la quiero poner(usar getOcupacionBloque)*/
 
 	//comienzo armado de la tira de bytes
 
 	char tiraBytes[this->tamanioBloque];
 	int i = 0; //representa la posicion en la tira de bytes
 
-	//inserto tamaño libre del bloque;
-	tiraBytes[0] = getBytesLibres(unBloque);
+	//inserto tamaño ocupado del bloque;
+	unsigned int bytesOcupados= this->getBytesOcupados(unBloque);
+
+  memcpy (tiraBytes+i, &bytesOcupados, 4);
 	i= i+4;
-	//file.write((char*)getBytesLibres(unBloque),4);
 
 	list<Registro>* registrosDelBloque = unBloque->obtenerRegistros();
 	list<Registro>::iterator itRegistros = registrosDelBloque->begin();
@@ -38,36 +40,34 @@ void ArchivoBloques::grabarBloque(Bloque* unBloque, unsigned int nroBloque){
 		Registro* unRegistro = &(*itRegistros);
 		//escribo la long del registro
 
-		tiraBytes[i] = getLongBytes(unRegistro);
+		unsigned int longReg= getLongBytes(unRegistro);
+		memcpy(tiraBytes+i, &longReg, 4);
 		i = i+4;
-		//file.write((char*)this->getLongBytes(unRegistro),4);
 
 		//escribo el registro estrictamente
 		//primero el string
 		unsigned int tamanioString = unRegistro->getString().size();
-
-		tiraBytes[i] = tamanioString;
+    memcpy(tiraBytes+i, &tamanioString, 4);
 		i=i+4;
-		tiraBytes[12] = *unRegistro->getString().c_str();
+		string unString= (*unRegistro).getString();
+		char cstr [unString.size()];
+    strcpy (cstr, unString.c_str());
+		memcpy(tiraBytes+i, cstr, strlen(cstr));
 		i=i+tamanioString;
-		//file.write((char*)tamanioString,4);
-		//file.write((char*)unRegistro->getString().c_str(),tamanioString);
 
 		//despues los identificadores
 		list<unsigned int>* Ids = unRegistro->getIdentificadores();
 		unsigned int tamanioIds = Ids->size() * 4;
 
-		tiraBytes[i] = tamanioIds;
+    memcpy(tiraBytes+i, &tamanioIds, 4);
 		i = i+4;
-		//file.write((char*)tamanioIds,4);
 
 		list<unsigned int>::iterator itIds = Ids->begin();
 		while(itIds != Ids->end()){
 
-			tiraBytes[i] = *itIds;
+			unsigned int id= *itIds;
+			memcpy(tiraBytes+i, &id, 4);
 			i = i+4;
-			//file.write((char*)*itIds,4);
-
 			itIds++;
 		}
 
@@ -75,45 +75,83 @@ void ArchivoBloques::grabarBloque(Bloque* unBloque, unsigned int nroBloque){
 		list<unsigned short int>* referencias = unRegistro->getReferencias();
 		unsigned int tamanioReferencias = referencias->size() * 2;
 
-		tiraBytes[i] = tamanioReferencias;
+    memcpy(tiraBytes+i, &tamanioReferencias, 4);
 		i = i+4;
-		//file.write((char*)tamanioReferencias,4);
 
 		list<unsigned short int>::iterator itReferencias = referencias->begin();
 		while(itReferencias != referencias->end()){
 
-			tiraBytes[i] = *itReferencias;
+			unsigned int ref= *itReferencias;
+			memcpy(tiraBytes+i, &ref, 2);
 			i= i+2;
-			//file.write((char*)*itReferencias,2);
 			itReferencias++;
 		}
 
 		itRegistros++;
 	}
 
-
-
-	fstream file(miPath.c_str(),ios::binary);
+	fstream archivo(miPath.c_str(),ios::binary|ios::out);
 
 	//posiciono el puntero del archivo al principio del bloque que necesito (primer bloque = bloque0)
-	file.seekp(nroBloque*tamanioBloque);
+
+  archivo.seekp(nroBloque*tamanioBloque,ios::beg);
 
 	//plancho la tira de bytes:
-	file.write(tiraBytes,tamanioBloque);
+  archivo.write(tiraBytes, tamanioBloque);
 
-	file.close();
-
+	archivo.close();
 }
 
 Bloque* ArchivoBloques::recuperarBloque(unsigned int nroBloque){
-	fstream file(miPath.c_str(),ios::binary);
+	fstream file(miPath.c_str(),ios::binary|ios::in);
+	char tiraBytes[this->tamanioBloque];
+	int i = 0; //representa la posicion en la tira de bytes
 
-	/******************************IMPLEMENTAR*************************************/
-
-
+  file.seekg (tamanioBloque*nroBloque, ios::beg);
+  file.read(tiraBytes, tamanioBloque);
 	file.close();
 
+	unsigned int bytesOcupados;
 
+  memcpy (&bytesOcupados, tiraBytes+i, 4);
+	i= i+4;
+	Bloque* block= new Bloque();
+
+  while ((bytesOcupados-i)>0) {
+    i= i+4; //salteo long reg
+    unsigned int tamanioString;
+    memcpy(&tamanioString, tiraBytes+i, 4);
+    i=i+4;
+    char cadena [tamanioString];
+    memcpy(cadena, tiraBytes+i, tamanioString);
+    cadena[tamanioString]='\0';
+    i=i+tamanioString;
+    string unString= string(cadena);
+    Registro reg (unString);
+
+    unsigned int tamanioIds;
+    memcpy(&tamanioIds, tiraBytes+i, 4);
+    i=i+4;
+    for(unsigned int j=0; j<tamanioIds/4; j++) {
+      unsigned int id;
+      memcpy(&id, tiraBytes+i, 4);
+      i=i+4;
+      reg.agregarId(id);
+    }
+
+    unsigned int tamanioRef;
+    memcpy(&tamanioRef, tiraBytes+i, 4);
+    i=i+4;
+    for(unsigned int j=0; j<tamanioRef/2; j++) {
+      unsigned short int ref;
+      memcpy(&ref, tiraBytes+i, 2);
+      i=i+2;
+      reg.agregarReferencia(ref);
+    }
+    block->agregarRegistro(reg);
+  }
+
+  return block;
 }
 
 float ArchivoBloques::getOcupacionBloque(Bloque* unBloque){
@@ -125,10 +163,8 @@ float ArchivoBloques::getOcupacionBloque(Bloque* unBloque){
 
 unsigned int ArchivoBloques::getBytesOcupados(Bloque* unBloque){
 
-	unsigned int tamanioRegistros= 20;
-	// 20 bytes corespondientes a caracteres de control
-	// 4  para espacio libre en bloque
-	// 16 corresponden a los prefijos de long(int) (registro,string,identificadores,referencias)
+	unsigned int tamanioRegistros= 4;
+	// 4  bytes para espacio libre en bloque
 
 	list<Registro>* registrosDelBloque = unBloque->obtenerRegistros();
 	list<Registro>::iterator itRegistros = registrosDelBloque->begin();
@@ -136,12 +172,12 @@ unsigned int ArchivoBloques::getBytesOcupados(Bloque* unBloque){
 
 	while (itRegistros != registrosDelBloque->end() ){
 		Registro* unRegistro = &(*itRegistros);
-		tamanioRegistros += this->getLongBytes( unRegistro);
+		//16 bytes corresponden a los prefijos de long(int) (registro,string,identificadores,referencias)
+		tamanioRegistros += 16+this->getLongBytes( unRegistro);
 		itRegistros++;
 	}
 
 	return tamanioRegistros;
-
 }
 
 
@@ -153,6 +189,5 @@ unsigned int ArchivoBloques::getLongBytes(Registro* unRegistro){
 
 unsigned int ArchivoBloques::getBytesLibres(Bloque* unBloque){
 	return tamanioBloque - this->getBytesOcupados(unBloque);
-
 }
 

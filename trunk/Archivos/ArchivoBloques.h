@@ -27,7 +27,6 @@ public:
 	void grabarBloque(Bloque* unBloque, unsigned int nroBloque);
 	Bloque* recuperarBloque(unsigned int nroBloque);
 	float getOcupacionBloque(Bloque* unBloque);// devuelve el grado de ocupacion de dicho bloque
-	unsigned int getBytesOcupados(Bloque* unBloque);
 
 private:
 	string miPath;
@@ -35,7 +34,7 @@ private:
 
 	unsigned int getLongBytes(Registro* unRegistro); //devuelve longitud en bytes de un registro
 	unsigned int getBytesLibres(Bloque* unBloque);
-
+	unsigned int getBytesOcupados(Bloque* unBloque);
 };
 
 
