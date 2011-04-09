@@ -11,6 +11,9 @@
 #include "Libro.h"
 #include <fstream>
 #include <list>
+#include <string.h>
+#include <iostream>
+using namespace std;
 
 class ArchivoLibros {
 public:
@@ -19,12 +22,18 @@ public:
 
 	void agregarLibro(Libro* unLibro);
 	void suprimirLibro(unsigned int id);
+	void serializar(Libro* unLibro,char** tiraBytes);
+	void deserializar(char* tiraBytes, Libro** unLibro);
 	Libro* recuperarLibro(unsigned int id); // ¿se recupera por id o por offset?
+
 	list<Libro>* recuperacionComprensiva();
 
-	void reestructurar();
+	void reestructurar(); //como lo hago?? Si no tengo los espacios vacios.//
 
-
+private:
+	string path;
+	unsigned int obtenerOffset(unsigned int id);
+	char* levantarRegistro(unsigned int id);
 
 };
 
