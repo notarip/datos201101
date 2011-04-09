@@ -166,27 +166,30 @@ void Parser::procesarPalabra(string palabra, set<string>* palabras)
 			if (palabra.at(j) == '\n' || palabra.at(j) == '\r' || palabra.at(j) == '\0')
 					palabra[j] = ' ';
 
+	//cambia tilde
+	palabra = Util().sinTilde(palabra);
+
 	//a minuscula
 	palabra = Util().toLower(palabra);
 
-	//cambia tilde
-	//palabra = Util().sinTilde(palabra);
 
 	//saco espacios al pricipio y al final
 	palabra = Util().trim(palabra);
 
 	if (palabra.size() != 0)
 	{
-		//analiza si quedaron dos palabras (ejemplo: potter dragon)
-		//quedo un espacio en el medio ?
+		//analiza si quedaron dos o mas palabras (ejemplo: www fi uba ar)
+		//quedo un espacio en el medio
+		//esto funciona por que antes hice el trim
 		unsigned int posFin = palabra.find(' ',0);
 		string palabraLimpia;
 
-		if (posFin != string::npos)
+		while (posFin != string::npos)
 		{
-			palabraLimpia = palabra.substr(0,posFin-1);
+			palabraLimpia = palabra.substr(0,posFin+1);
 			this->guardarPalabra(palabraLimpia, palabras);
-			palabra.erase(0,posFin-1);
+			palabra.erase(0,posFin+1);
+			posFin = palabra.find(' ',0);
 		}
 
 		this->guardarPalabra(palabra, palabras);
@@ -196,8 +199,9 @@ void Parser::procesarPalabra(string palabra, set<string>* palabras)
 
 void Parser::guardarPalabra(string palabra, set<string> *palabras)
 {
-	if(!this->buscarStopWord(palabra))
-		palabras->insert(palabra);
+	if (palabra[0] != '0' && atoi(palabra.c_str()) == 0)
+		if(!this->buscarStopWord(palabra))
+			palabras->insert(palabra);
 }
 
 bool Parser::buscarStopWord(string palabra)

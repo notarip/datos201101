@@ -147,13 +147,13 @@ int main (int argc, char** argv)
 		 * PRUEBA DEL PARSEO DEL LIBRO
 		 */
 
-		if (false)
+		if (true)
 		{
 			Parser *parser3 = new Parser();
 			fstream salida;
 
 			salida.open("./archivos/pruebas/salida_libro1.txt",ios::out);
-			parser3->parsear("./archivos/pruebas/libro1.txt");
+			parser3->parsear("./archivos/pruebas/prueba1.txt");
 
 			set<string> *lista = parser3->obtenerPalabras();
 
@@ -200,7 +200,7 @@ int main (int argc, char** argv)
 				parser4->listarLibro(false);
 				cout << "--------------------------" << endl;
 
-				if (cont == 99)
+				if (cont == 0)
 				{
 					set<string> *listap = parser4->obtenerPalabras();
 					for (set<string>::iterator it2 = listap->begin(); it2 != listap->end(); it2++)
