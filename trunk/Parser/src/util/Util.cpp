@@ -52,18 +52,19 @@ string Util::sinTilde(string cadena)
 {
 
 
-	string invalidos("\341\351\355\363\372");
-	string parejas("áaéeíióoúu");
+	string invalidos("\341\351\355\363\372\361\301\311\315\323\332\344\353\357\366\374");
 	string reemp;
 
 
 	unsigned int pos = cadena.find_first_of(invalidos);
-	if (pos != string::npos)
+	while (pos != string::npos)
 	{
+		reemp.clear();
 		reemp.append(cadena.substr(0,pos));
 		reemp.append(convertir(cadena[pos]));
 		reemp.append(cadena.substr(pos+1,cadena.size() - pos - 1));
 		cadena  = reemp;
+		pos = cadena.find_first_of(invalidos);
 	}
 
 
@@ -74,21 +75,42 @@ string Util::sinTilde(string cadena)
 string Util::convertir(char letra)
 {
 	if (letra == '\341') //a
-		return "á";
-
+		return "a";
 	if (letra == '\351') //e
-		return "é";
-
+		return "e";
 	if (letra == '\355') //i
-		return "í";
-
+		return "i";
 	if (letra == '\363') //o
-		return "ó";
-
+		return "o";
 	if (letra == '\372') //u
-		return "ú";
+		return "u";
 
 
+
+	if (letra == '\361') //ñ
+		return "ñ";
+
+	if (letra == '\301') //A
+			return "A";
+	if (letra == '\311') //E
+			return "E";
+	if (letra == '\315') //I
+			return "I";
+	if (letra == '\323') //O
+			return "O";
+	if (letra == '\332') //U
+			return "U";
+
+	if (letra == '\344') //ä
+			return "a";
+	if (letra == '\353') //ë
+			return "e";
+	if (letra == '\357') //ï
+			return "i";
+	if (letra == '\366') //ö
+			return "o";
+	if (letra == '\374') //ü
+			return "u";
 
 }
 
