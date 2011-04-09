@@ -11,8 +11,7 @@
 #include <fstream>
 #include "Bloque.h"
 #include <list>
-
-
+#include "ExceptionBloque.h"
 
 
 /*ArchivoBloques
