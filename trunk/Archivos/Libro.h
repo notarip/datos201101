@@ -14,8 +14,9 @@ using namespace std;
 
 class Libro {
 public:
-	Libro(string titulo, string editorial, string autor, string texto);
+	Libro(unsigned int id,string titulo, string editorial, string autor, string texto);
 	virtual ~Libro();
+	unsigned int getId();
 	string getTitulo();
 	string getEditorial();
 	string getAutor();
@@ -23,6 +24,7 @@ public:
 
 
 private:
+	unsigned int id;
 	string titulo,editorial,autor,texto;
 
 
