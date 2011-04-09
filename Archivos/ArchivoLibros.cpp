@@ -20,12 +20,11 @@ void ArchivoLibros::agregarLibro(Libro* unLibro){
 	this->serializar(unLibro,&tiraBytes);
 	unsigned int longreg= (unsigned int)tiraBytes[0]; //<-- longitud de registro variable.//
 	char path_bajas[]="bajas_rvariables.dat"; //<-- debe ser parametrizable por el usuario//
-	fstream archivo (this->path.c_str(), ios::out|  ios::binary);
-
-	archivo.seekg(0,ios::end);
+	fstream archivo;
 	fstream bajas (path_bajas ,ios::in | ios::out );
 	unsigned int offset=0;
 	if (bajas){
+		archivo.open(this->path.c_str(), ios::out| ios::in | ios::binary | ios::ate);
 		char* libres=new char[8];
 		bool listo=false;
 		while(!bajas.eof() || !listo){
@@ -41,13 +40,15 @@ void ArchivoLibros::agregarLibro(Libro* unLibro){
 			bajas.seekg(posicion*(2*sizeof(unsigned int)),ios::beg);
 			bajas.write(libres,sizeof(unsigned int));
 			offset= (unsigned int)libres[1];
-			archivo.seekg(offset,ios::beg);
+			archivo.seekp(offset,ios::beg);
 			archivo.write(tiraBytes,longreg);
 		}
 
 	}
 	else{
-		archivo.seekg(0,ios::end);
+		archivo.open(this->path.c_str(), ios::out| ios::in | ios::binary | ios::app);
+		cout<<"no reescribo."<<endl;
+		archivo.seekp(0,ios::end);
 		archivo.write(tiraBytes,longreg);
 	}
 
@@ -68,7 +69,6 @@ void ArchivoLibros::suprimirLibro(unsigned int id){
 	char path_bajas[]="bajas_rvariables.dat";
 	fstream archivo_bajas (path_bajas,ios::in | ios::out | ios::app);
 	archivo_bajas.seekg(0,ios::end);
-	cout<<(unsigned int)regBajas[0]<<"   "<<(unsigned int)(regBajas+sizeof(unsigned int))[0]<<endl;
 	archivo_bajas.write(regBajas,2*sizeof(unsigned int));
 	archivo_bajas.close();
 }
