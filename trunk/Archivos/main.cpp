@@ -4,7 +4,7 @@
 using namespace std;
 
 
-int main(int argc, char** argv){
+int main3(int argc, char** argv){
 	//prueba libro//
 
 	Libro libro(43,"dsadsadsaad","fdsfdsfds","texto de prueba" , "prueba,prueba,prueba,prueba,prueba,prueba");
