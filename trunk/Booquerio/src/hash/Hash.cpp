@@ -10,9 +10,20 @@
 
 #include "Hash.h"
 
-Hash::Hash()
+Hash::Hash(string nombre)
 {
-	// TODO Auto-generated constructor stub
+	this->pathTabla = Parametros().getParametro(CARPETA_DATOS);
+	this->pathDatos = pathTabla;
+	this->pathTabla += nombre + EXTENCION_TABLA;
+	this->pathDatos += nombre + EXTENCION_DATOS;
+
+	if (Util().existeArchivo(this->pathTabla))
+	{
+		this->abrir();
+	}else{
+		this->crear();
+		this->abrir();
+	}
 }
 
 Hash::~Hash()
@@ -20,17 +31,11 @@ Hash::~Hash()
 	delete [] tabla;
 }
 
-int Hash::crear(string nombre)
+int Hash::crear()
 {
-	//crear el archivo de la tabla de dispersion
-	string pathTabla = Parametros().getParametro(CARPETA_DATOS);
-	pathTabla += nombre + EXTENCION_TABLA;
-
-	if (Util().existeArchivo(pathTabla))
-		return 1; //error de creacion
 
 	fstream archivo;
-	archivo.open(pathTabla.c_str(), ios::out | ios::binary);
+	archivo.open(this->pathTabla.c_str(), ios::out | ios::binary);
 
 	if (archivo.is_open())
 	{
@@ -40,25 +45,32 @@ int Hash::crear(string nombre)
 		archivo.write(buff,sizeof(elemLista));
 		archivo.close();
 		delete []buff;
-		return 0; //creacion correcta
 	}
-		return 1; //error al crear
+
 
 	//llamada a la creacion de un nuevo archivo de bloques
+	ArchivoBloques *archivoBloque = new ArchivoBloques(this->pathDatos,TAMANIO_BLOQUE);
+	Bloque *bloque0 = new Bloque();
+
+	try{
+		archivoBloque->grabarBloque(bloque0,0);
+		//bloques = true;
+	}catch (ExceptionBloque &e)
+	{
+		cout << e.what() << endl;
+	}
+
+
+	archivoBloque->~ArchivoBloques();
+	bloque0->~Bloque();
+
 }
 
 
-int Hash::abrir(string nombre)
+int Hash::abrir()
 {
-	//cargar el achivo de la tabla de dispersion en memoria
-	string carpeta  = Parametros().getParametro(CARPETA_DATOS);
-	string arcTabla = carpeta + nombre + EXTENCION_TABLA;
-
-	if (!Util().existeArchivo(arcTabla.c_str()))
-		return 2; //error al quere abrir el hash
-
 	fstream archivo;
-	archivo.open(arcTabla.c_str(), ios::in | ios::binary);
+	archivo.open(this->pathTabla.c_str(), ios::in | ios::binary);
 	if (archivo.is_open())
 	{
 		char *buff = new char[sizeof(elemLista)];
@@ -90,11 +102,30 @@ int Hash::abrir(string nombre)
 		return 2; //error al quere abrir el hash
 }
 
-void Hash::insertar(void *registro)
+void Hash::insertar(Registro *registro)
 {
-	//buscar en el hash
-	//this->buscar(registro->que);
-	//analizar si esta o no
+
+	Registro *registroOld = this->buscar(registro->getString());
+
+	if (!registro)
+	{
+		elemLista nroElem = this->hasheo(registro->getString());
+		ArchivoBloques *archivo = new ArchivoBloques(this->pathDatos, TAMANIO_BLOQUE);
+		Bloque *bloque = archivo->recuperarBloque(this->tabla[nroElem]);
+		try{
+			bloque->agregarRegistro(*registro);
+			//ok
+		}catch (ExceptionBloque &e)
+		{
+			//Bloque *bloqueNuevo = new Bloque();
+			//archivo->grabarBloque(bloqueNuevo,1);
+			//ver aca por que el archivo de bloques deveria manejar bloques vacios
+			//osea que tendria que darme el bloque nuevo con el nro de bloque asignado
+
+		}
+	}else{
+
+	}
 
 
 	//si no esta
@@ -151,37 +182,37 @@ void Hash::borrar(string que)
 				//no se hace nada
 }
 
-int Hash::buscar(string que)
+Registro *Hash::buscar(string que)
 {
 
 	//logica de busqueda
 	int nroElemento = this->hasheo(que);
 	if (nroElemento < 0)
-		return -1;
+		return NULL;
 
 	elemLista nroBloque = this->tabla[nroElemento];
 
-	//llamda al archivo de bloques con nroBloque
+	ArchivoBloques *archivoBloq = new ArchivoBloques(this->pathDatos, TAMANIO_BLOQUE);
 
-	//busqueda del registro dentro del bloque
-	//si lo encuentra
-		//asignar a this->offsetUltimaBusqueda en que byte empieza dentro del bloque
-	//si no lo encuentra asignar a this->offsetUltimaBusqueda -1
+	Bloque *bloque = archivoBloq->recuperarBloque(nroBloque);
 
-	return 0;
+
+	Registro *registro = bloque->recuperarRegistro(que);
+	bloque->~Bloque();
+	archivoBloq->~ArchivoBloques();
+
+	return registro;
 
 }
 
 int Hash::hasheo(string key)
 {
 
-	elemLista keyNumerica;
-	elemLista nroElemento;
-	elemLista nroBloque;
+	elemLista keyNumerica=0;
 
 	if (key.length() > 0)
 	{
-		keyNumerica += (elemLista)(elemLista)key[0];
+		keyNumerica += (elemLista)key[0];
 		if (key.length() > 1)
 			keyNumerica += (elemLista)(elemLista)key[1];
 			if (key.length() > 2)
@@ -191,7 +222,3 @@ int Hash::hasheo(string key)
 
 	return (keyNumerica % (this->tamanioLista));
 }
-
-
-
-

@@ -11,35 +11,33 @@
 typedef unsigned int elemLista;
 
 #define EXTENCION_TABLA ".table"
+#define EXTENCION_DATOS ".hash"
 #define TAMANIO_TABLA 8
 #define BYTES_TABLA TAMANIO_TABLA*sizeof(elemLista)
+#define TAMANIO_BLOQUE 512
 
 #include <string.h>
 #include <fstream>
 #include "../util/Parametros.h"
 #include "../util/Util.h"
+#include "../archivos/Registro.h"
+#include "../archivos/ArchivoBloques.h"
+#include "../archivos/Bloque.h"
+#include "../archivos/ExceptionBloque.h"
 using namespace std;
 
 
 
 class Hash {
 public:
-	Hash();
+	Hash(string nombre);
 	virtual ~Hash();
-	/*
-	 * Crea un hash con el @nombre
-	 */
-	int crear(string nombre);
-	/*
-	 * Abre un hash con el @nombre
-	 */
-	int abrir(string nombre);
 	/*
 	 * Inserta un registro es pre que este
 	 * abierto el hash, retorna el resutado de la
 	 * operacion
 	 */
-	void insertar(void *registro);
+	void insertar(Registro *registro);
 
 	/*
 	 * Borra del hash el @que
@@ -54,13 +52,24 @@ public:
 	 * y devuelve el registro, si no encuentra la
 	 * clave devuelve null
 	 */
-	int buscar(string que);
+	Registro* buscar(string que);
 private:
 	fstream archivoTabla;
 	string nombre;
+	string pathTabla;
+	string pathDatos;
 	elemLista tamanioLista;
 	elemLista *tabla;
 	unsigned int offsetUltimaBusqueda;
+	/*
+	 * Crea un hash
+	 */
+	int crear();
+	/*
+	 * Abre un hash
+	 */
+	int abrir();
+
 	/*
 	 * Retorna el nro de elemento en la lista
 	 */
