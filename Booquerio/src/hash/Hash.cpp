@@ -6,7 +6,7 @@
  */
 
 //TODO revisar como devolver los errores
-//TODO conexion con manejador de archivos
+//TODO implementar borrar
 
 #include "Hash.h"
 
@@ -112,20 +112,20 @@ void Hash::insertar(Registro *registro)
 	{
 		elemLista nroElem = this->hasheo(registro->getString());
 		ArchivoBloques *archivo = new ArchivoBloques(this->pathDatos, TAMANIO_BLOQUE);
-		Bloque *bloque = archivo->recuperarBloque(this->tabla[nroElem].nroBloque);
+		unsigned int nroBloque = this->tabla[nroElem].nroBloque;
+		Bloque *bloque = archivo->recuperarBloque(nroBloque);
 		try{
 			bloque->agregarRegistro(*registro);
 			//ok
 		}catch (ExceptionBloque &e)
 		{
-			elemLista nroNuevoBloque;
-			//pedir nuevo bloque
-			//ver aca por que el archivo de bloques deveria manejar bloques vacios
-			//osea que tendria que darme el bloque nuevo con el nro de bloque asignado
+			elemLista nroNuevoBloque; //TODO asignarle el nro del bloque nuevo
+			//TODO pedir nuevo bloque
+			//TODO ver aca por que el archivo de bloques deberia manejar bloques vacios
+			//TODO osea que tendria que darme el bloque nuevo con el nro de bloque asignado
 
 			if (this->tabla[nroElem].TD < this->tamanioLista)
 			{
-				//pedir al archivo de bloques un bloque nuevo
 				//buscar la mitad de las referencias de bloque viejo y apuntarlas al nuevo
 				//duplicar el tamaño de TD del bloque viejo
 				//agarrar todos los registros del bloque viejo y dispersarlos de nuevo
@@ -136,7 +136,7 @@ void Hash::insertar(Registro *registro)
 				unsigned int i = this->tamanioLista-1;
 				while (i >= 0)
 				{
-					if (this->tabla[i].nroBloque == this->tabla[nroElem].nroBloque )
+					if (this->tabla[i].nroBloque == nroBloque )
 					{
 						this->tabla[i].TD = this->tabla[nroElem].TD*2;
 						if (aBuscar > 0)
@@ -147,17 +147,39 @@ void Hash::insertar(Registro *registro)
 					}
 				}
 
-				//agarrar todos los registros del bloque viejo y dispersarlos de nuevo
-				//reintentar la insersion de registro
-
 			}else{
+				//duplica el TD del bloque viejo
+				//hago esto aca para que el elemento nuevo ya quede con el TD duplicado
+				//todavia no apunto al bloque nuevo para que el elemento espejado apunte al bloque viejo
+				this->tabla[nroElem].TD *= 2;
 
-				//duplicar el tamaño de la tabla espejando los elementos
-				//apuntar el elemento original al bloque nuevo
-				//duplicar el TD del bloque viejo
-				//agarrar todos los registros del bloque viejo y dispersarlos de nuevo
-				//reintentar la insersion de registro
+				//duplica el tamaño de la tabla
+				elemLista2 *nuevaTabla = new elemLista2[this->tamanioLista*2];
+
+				// espejo los elementos
+				for (unsigned int j = 0; j < this->tamanioLista;j++)
+				{
+					nuevaTabla[j] = this->tabla[j];
+					nuevaTabla[this->tamanioLista + j] = this->tabla[j];
+				}
+
+				//apunta el elemento viejo al bloque nuevo
+				this->tabla[nroElem].nroBloque = nroNuevoBloque;
+
+				delete [] this->tabla;
+				this->tabla = nuevaTabla;
+
 			}
+
+			//agarra todos los registros del bloque viejo y los dispersa de nuevo
+			//reintenta la insersion de registro
+			list<Registro> *lista =  bloque->obtenerRegistros();
+			archivo->grabarBloque(new Bloque(),nroBloque); //grabo vacio el viejo
+			for (list<Registro>::iterator it = lista->begin(); it != lista->end(); it++)
+			{
+				this->insertar(&(*it));
+			}
+			bloque->~Bloque();
 		}
 
 	}
