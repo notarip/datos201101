@@ -10,9 +10,8 @@ using namespace std;
 int main(int argc, char** argv)
 {
 	string name = "palabras";
-	Hash *prueba = new Hash();
-	if (prueba->crear(name) != 0)
-		prueba->abrir(name);
+	Hash *prueba = new Hash(name);
+
 
 	prueba->~Hash();
 
