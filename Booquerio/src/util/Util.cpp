@@ -72,6 +72,20 @@ string Util::sinTilde(string cadena)
 	return cadena;
 }
 
+bool Util::existeArchivo(string archivo)
+{
+	fstream arc;
+
+	arc.open(archivo.c_str(), ios::in);
+	if (arc.is_open())
+	{
+		arc.close();
+		return true;
+	}else
+		return false;
+
+}
+
 string Util::convertir(char letra)
 {
 	if (letra == '\341') //a
