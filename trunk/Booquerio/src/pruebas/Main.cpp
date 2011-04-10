@@ -74,7 +74,7 @@ void pruebaTilde()
 	delete [] buff;
 }
 
-int main (int argc, char** argv)
+int main_3 (int argc, char** argv)
 {
 
 

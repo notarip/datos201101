@@ -8,6 +8,7 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <list>
 #include <sys/types.h>
@@ -53,6 +54,11 @@ public:
 	 * @carpeta
 	 */
 	static list<string>* getCarpetas(string carpeta);
+
+	/*
+	 * Retorna true si el @archivo existe
+	 */
+	static bool existeArchivo(string archivo);
 
 private:
 	static string convertir(char letra);
