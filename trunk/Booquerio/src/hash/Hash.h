@@ -9,6 +9,10 @@
 #define HASH_H_
 
 typedef unsigned int elemLista;
+struct elemLista2{
+	elemLista nroBloque;
+	elemLista TD;
+};
 
 #define EXTENCION_TABLA ".table"
 #define EXTENCION_DATOS ".hash"
@@ -59,14 +63,14 @@ private:
 	string pathTabla;
 	string pathDatos;
 	elemLista tamanioLista;
-	elemLista *tabla;
+	elemLista2 *tabla;
 	unsigned int offsetUltimaBusqueda;
 	/*
 	 * Crea un hash
 	 */
 	int crear();
 	/*
-	 * Abre un hash
+	 * Abre u	n hash
 	 */
 	int abrir();
 

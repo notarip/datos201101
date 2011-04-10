@@ -64,6 +64,7 @@ int Hash::crear()
 	archivoBloque->~ArchivoBloques();
 	bloque0->~Bloque();
 
+	return 0;
 }
 
 
@@ -81,20 +82,20 @@ int Hash::abrir()
 		//si tiene elementos
 		if (tamanioLista > 0)
 		{
-			unsigned int bytes = tamanioLista*sizeof(elemLista);
+			unsigned int bytes = tamanioLista*sizeof(elemLista2);
 			buff = new char[bytes];
-			this->tabla = new elemLista[tamanioLista];
+			this->tabla = new elemLista2[tamanioLista];
 			archivo.read(buff,bytes);
-			delete [] buff;
 			archivo.close();
 
 			int count = 0;
 			while (bytes > 0)
 			{
-				memcpy(&tabla[count],buff, sizeof(elemLista));
-				bytes -= sizeof(elemLista);
+				memcpy(&tabla[count],buff, sizeof(elemLista2));
+				bytes -= sizeof(elemLista2);
 				count ++;
 			}
+			delete [] buff;
 		}
 		return 0;
 
@@ -111,53 +112,56 @@ void Hash::insertar(Registro *registro)
 	{
 		elemLista nroElem = this->hasheo(registro->getString());
 		ArchivoBloques *archivo = new ArchivoBloques(this->pathDatos, TAMANIO_BLOQUE);
-		Bloque *bloque = archivo->recuperarBloque(this->tabla[nroElem]);
+		Bloque *bloque = archivo->recuperarBloque(this->tabla[nroElem].nroBloque);
 		try{
 			bloque->agregarRegistro(*registro);
 			//ok
 		}catch (ExceptionBloque &e)
 		{
-			//Bloque *bloqueNuevo = new Bloque();
-			//archivo->grabarBloque(bloqueNuevo,1);
+			elemLista nroNuevoBloque;
+			//pedir nuevo bloque
 			//ver aca por que el archivo de bloques deveria manejar bloques vacios
 			//osea que tendria que darme el bloque nuevo con el nro de bloque asignado
 
-		}
-	}else{
-
-	}
-
-
-	//si no esta
-		//elemLista nroBloque = this->hasheo(registro->que);
-		//obtener bloque del archivo de bloques
-		//agregar el registro al final
-		//grabar bloque en el archivo de bloques
-		//si se grabo
-			//devolver ok
-		//sino se grabo por exceso del tamaño del bloque
-			//si TD < tamanio de la tabla
+			if (this->tabla[nroElem].TD < this->tamanioLista)
+			{
 				//pedir al archivo de bloques un bloque nuevo
 				//buscar la mitad de las referencias de bloque viejo y apuntarlas al nuevo
 				//duplicar el tamaño de TD del bloque viejo
 				//agarrar todos los registros del bloque viejo y dispersarlos de nuevo
 				//reintentar la insersion de registro
-			//si TD > tamanio de la tabla
-				//pedir al archivo de bloques un bloque nuevo
+
+
+				unsigned int aBuscar = (this->tamanioLista/this->tabla[nroElem].TD)/2;
+				unsigned int i = this->tamanioLista-1;
+				while (i >= 0)
+				{
+					if (this->tabla[i].nroBloque == this->tabla[nroElem].nroBloque )
+					{
+						this->tabla[i].TD = this->tabla[nroElem].TD*2;
+						if (aBuscar > 0)
+						{
+							this->tabla[i].nroBloque = nroNuevoBloque;
+							aBuscar--;
+						}
+					}
+				}
+
+				//agarrar todos los registros del bloque viejo y dispersarlos de nuevo
+				//reintentar la insersion de registro
+
+			}else{
+
 				//duplicar el tamaño de la tabla espejando los elementos
 				//apuntar el elemento original al bloque nuevo
 				//duplicar el TD del bloque viejo
 				//agarrar todos los registros del bloque viejo y dispersarlos de nuevo
 				//reintentar la insersion de registro
-		//fin si no se grabo
-	//si esta
-	//devolver error
+			}
+		}
 
+	}
 
-
-	//logica de insersion
-
-	//llamada al archivo de bloques
 
 }
 
@@ -190,7 +194,7 @@ Registro *Hash::buscar(string que)
 	if (nroElemento < 0)
 		return NULL;
 
-	elemLista nroBloque = this->tabla[nroElemento];
+	elemLista nroBloque = this->tabla[nroElemento].nroBloque;
 
 	ArchivoBloques *archivoBloq = new ArchivoBloques(this->pathDatos, TAMANIO_BLOQUE);
 
