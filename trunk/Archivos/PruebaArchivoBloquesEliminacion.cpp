@@ -6,9 +6,9 @@
 
 using namespace std;
 
-int main() {
+int main1() {
 
-	ArchivoBloques arch("testArchivoBloques", 128);
+	ArchivoBloques arch("testArchivoBloques2Eliminacion", 128);
 
 	/* CREO UN PAR DE REGISTROS*/
 
@@ -50,61 +50,45 @@ int main() {
 	bloq3.agregarRegistro(reg5);
 	// tamanio = 4 + 16*5 + 34 + 24 + 20 + 6 + 38 = 206 bytes  ===> no entra
 
-	/*PRUEBA DE TAMANIOS*/
 
-	cout << "PRUEBA DE TAMANIOS" << endl << endl;
-
-	cout <<"ocupacion bloque1 : " <<arch.getOcupacionBloque(&bloq1) << " bytes" << endl;
-	cout <<"ocupacion bloque2 : " <<arch.getOcupacionBloque(&bloq2) << " bytes" << endl;
-	cout <<"ocupacion bloque3 : " <<arch.getOcupacionBloque(&bloq3) << " bytes" << endl;
-
-
-	if (arch.getOcupacionBloque(&bloq1) == (float)94 / 128) {
-		cout << "bloque1 							[OK]" << endl;
-	} else {
-		cout << "bloque1 							[WRONG]" << endl;
-	}
-	if (arch.getOcupacionBloque(&bloq2) == (float)116 / 128) {
-		cout << "bloque2								[OK]" << endl;
-	} else {
-		cout << "bloque2 								[WRONG]" << endl;
-	}
-	if (arch.getOcupacionBloque(&bloq3) == (float)206 / 128) {
-		cout << "bloque3 							[OK]" << endl;
-	} else {
-		cout << "bloque3 							[WRONG]" << endl;
-	}
-
-	arch.grabarBloque(&bloq1, 0);
+	arch.grabarBloque(&bloq2, 0);
 	arch.grabarBloque(&bloq2, 1);
+	arch.grabarBloque(&bloq2, 2);
+	arch.grabarBloque(&bloq2, 3);
 	arch.grabarBloque(&bloq2, 4);
 
-	try {
-		arch.grabarBloque(&bloq3,3);
+	/* ELIMINO UN PAR DE BLOQUES */
+	cin.get();
+	arch.eliminarBloque(2);
+	cin.get();
+	arch.eliminarBloque(3);
 
-	} catch (ExceptionBloque& e) {
-		cout << e.what() << endl;
-		cout << "TRANKI ESTA OK QUISISTE GUARDAR UN BLOQUE MUY GRANDE" << endl << endl;
+	cin.get();
+	unsigned int lugarLibre  = arch.getBloqueLibre();
+	arch.grabarBloque(&bloq1,lugarLibre);
 
-	}
+	cout <<"LUGAR LIBRE: "<< lugarLibre << endl;
+
+	cin.get();
+	lugarLibre = arch.getBloqueLibre();
+	arch.grabarBloque(&bloq1,lugarLibre);
+
+	cout <<"LUGAR LIBRE: "<< lugarLibre << endl;
 
 
 	/* LEVANTO LOS BLOQUES PARA VER QUE ONDA*/
 
-
-	Bloque* bloq1Restored = arch.recuperarBloque(0);
-	Bloque* bloq2Restored = arch.recuperarBloque(1);
-	Bloque* bloq2Restoredtwo = arch.recuperarBloque(4);
-
+	Bloque* bloq2Restored = arch.recuperarBloque(2);
+	Bloque* bloq3Restored = arch.recuperarBloque(3);
 
 	/*VERIFICACION DE LOS DATOS*/
 
 	cout << "VERIFICACION DE LOS DATOS" << endl << endl;
 
 	/************************************************************************************************/
-	cout << "BLOQUE-1 " << endl;
+	cout << "BLOQUE-2 " << endl;
 
-	list<Registro>* listreg = bloq1Restored->obtenerRegistros();
+	list<Registro>* listreg = bloq2Restored->obtenerRegistros();
 	list<Registro>::iterator it = listreg->begin();
 
 	list<unsigned int>::iterator itIds;
@@ -191,26 +175,26 @@ int main() {
 
 	/************************************************************************************************/
 
+	cout << "BLOQUE-3 " << endl;
 
-	cout << "BLOQUE-2 " << endl;
 
-	listreg = bloq2Restored->obtenerRegistros();
+	listreg = bloq3Restored->obtenerRegistros();
 	it = listreg->begin();
 
 	cout << "registro1" << endl;
 	reg1Restored = *it;
 	it++;
 
-	if (reg1Restored.getString() == reg3.getString()) {
+	if (reg1Restored.getString() == reg.getString()) {
 		cout << "string1 							[OK]" << endl;
 	} else {
 		cout << "string1 							[WRONG]" << endl;
 	}
 
-	itIds = reg3.getIdentificadores()->begin();
+	itIds = reg.getIdentificadores()->begin();
 	itIdsRestored = reg1Restored.getIdentificadores()->begin();
 
-	while (itIds != reg3.getIdentificadores()->end()) {
+	while (itIds != reg.getIdentificadores()->end()) {
 		if ((*itIds) == (*itIdsRestored)) {
 			cout << "id 								[OK]" << endl;
 		} else {
@@ -218,6 +202,19 @@ int main() {
 		}
 		itIds++;
 		itIdsRestored++;
+	}
+
+	itRefs = reg.getReferencias()->begin();
+	itRefsRestored = reg1Restored.getReferencias()->begin();
+
+	while (itRefs != reg.getReferencias()->end()) {
+		if ((*itRefs) == (*itRefsRestored)) {
+			cout << "ref 								[OK]" << endl;
+		} else {
+			cout << "ref 								[WRONG]" << endl;
+		}
+		itRefs++;
+		itRefsRestored++;
 	}
 
 	cout << endl;
@@ -226,16 +223,16 @@ int main() {
 	reg2Restored = *it;
 	it++;
 
-	if (reg2Restored.getString() == reg4.getString()) {
+	if (reg2Restored.getString() == reg2.getString()) {
 		cout << "string2 							[OK]" << endl;
 	} else {
 		cout << "string2 							[WRONG]" << endl;
 	}
 
-	itIds = reg4.getIdentificadores()->begin();
+	itIds = reg2.getIdentificadores()->begin();
 	itIdsRestored = reg2Restored.getIdentificadores()->begin();
 
-	while (itIds != reg4.getIdentificadores()->end()) {
+	while (itIds != reg2.getIdentificadores()->end()) {
 		if ((*itIds) == (*itIdsRestored)) {
 			cout << "id 								[OK]" << endl;
 		} else {
@@ -245,10 +242,10 @@ int main() {
 		itIdsRestored++;
 	}
 
-	itRefs = reg4.getReferencias()->begin();
+	itRefs = reg2.getReferencias()->begin();
 	itRefsRestored = reg2Restored.getReferencias()->begin();
 
-	while (itRefs != reg4.getReferencias()->end()) {
+	while (itRefs != reg2.getReferencias()->end()) {
 		if ((*itRefs) == (*itRefsRestored)) {
 			cout << "ref 								[OK]" << endl;
 		} else {
@@ -261,49 +258,10 @@ int main() {
 	cout << endl;
 
 
-	/************************************************************************************************/
-	cout << "registro3" << endl;
-	Registro reg3Restored = *it;
-
-
-	if (reg3Restored.getString() == reg5.getString()) {
-		cout << "string2 							[OK]" << endl;
-	} else {
-		cout << "string2 							[WRONG]" << endl;
-	}
-
-	itIds = reg5.getIdentificadores()->begin();
-	itIdsRestored = reg3Restored.getIdentificadores()->begin();
-
-	while (itIds != reg5.getIdentificadores()->end()) {
-		if ((*itIds) == (*itIdsRestored)) {
-			cout << "id 								[OK]" << endl;
-		} else {
-			cout << "id 								[WRONG]" << endl;
-		}
-		itIds++;
-		itIdsRestored++;
-	}
-
-	itRefs = reg5.getReferencias()->begin();
-	itRefsRestored = reg3Restored.getReferencias()->begin();
-
-	while (itRefs != reg5.getReferencias()->end()) {
-		if ((*itRefs) == (*itRefsRestored) ) {
-			cout << "ref 								[OK]" << endl;
-		} else {
-			cout << "ref 								[WRONG]" << endl;
-		}
-		itRefs++;
-		itRefsRestored++;
-	}
-
-	cout << endl << endl;
 
 
 
-	delete bloq1Restored;
 	delete bloq2Restored;
-	delete bloq2Restoredtwo;
+	delete bloq3Restored;
 	return 0;
 }
