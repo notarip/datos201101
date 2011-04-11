@@ -211,3 +211,63 @@ unsigned int ArchivoBloques::getBytesLibres(Bloque* unBloque) {
 	return tamanioBloque - this->getBytesOcupados(unBloque);
 }
 
+void ArchivoBloques::eliminarBloque(unsigned int nroBloque){
+	string pathLibres = miPath;
+	pathLibres += "-libres";
+	fstream archivoLibres;
+
+	cout << pathLibres << endl;
+
+	archivoLibres.open(pathLibres.c_str(),ios::binary | ios::in | ios::out | ios::ate);
+
+	cout << boolalpha << archivoLibres.good() << endl;
+
+	if (!archivoLibres.good()){
+		archivoLibres.open(pathLibres.c_str(), ios::binary | ios::out | ios::ate );}
+
+	archivoLibres.write((char*)&nroBloque , 4);
+}
+
+unsigned int ArchivoBloques::getBloqueLibre(){
+	string pathLibres = miPath;
+	pathLibres += "-libres";
+	fstream archivoLibres, archivoBloques;
+	unsigned int unBloqueLibre;
+
+	archivoLibres.open(pathLibres.c_str(),ios::binary | ios::in | ios::out );
+
+	if (!archivoLibres.eof() && archivoLibres.good() ){
+		//leo primer numero
+		archivoLibres.read((char*)&unBloqueLibre,4);
+
+		unsigned int posInicial, posFinal, longitud;
+		posInicial = archivoLibres.tellg();
+		archivoLibres.seekg(0, ios::end);
+		posFinal = archivoLibres.tellg();
+		longitud = posFinal - posInicial;
+
+		archivoLibres.seekg(posInicial,ios::beg);
+
+		char libresRestantes[longitud];
+		archivoLibres.read(libresRestantes, longitud);
+		archivoLibres.close();
+
+		archivoLibres.open(pathLibres.c_str(), ios::binary | ios::out);
+		archivoLibres.write(libresRestantes,longitud);
+	}
+
+	else { //el archivo no existe o esta vacio
+		archivoBloques.open(miPath.c_str(), ios::binary | ios::in | ios::ate);
+
+		if (archivoBloques.good()){
+			unBloqueLibre = archivoBloques.tellp() / this->tamanioBloque;
+		}
+
+		archivoBloques.close();
+	}
+
+	archivoLibres.close();
+
+	return unBloqueLibre;
+
+}

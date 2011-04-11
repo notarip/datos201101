@@ -6,7 +6,7 @@
 
 using namespace std;
 
-int main() {
+int main2() {
 
 	ArchivoBloques arch("testArchivoBloques", 128);
 

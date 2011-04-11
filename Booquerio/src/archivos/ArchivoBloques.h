@@ -26,10 +26,14 @@ public:
 	void grabarBloque(Bloque* unBloque, unsigned int nroBloque);
 	Bloque* recuperarBloque(unsigned int nroBloque);
 	float getOcupacionBloque(Bloque* unBloque);// devuelve el grado de ocupacion de dicho bloque
+	void eliminarBloque(unsigned int nroBloque);
+	unsigned int getBloqueLibre();
+
 
 private:
 	string miPath;
 	unsigned int tamanioBloque;
+
 
 	unsigned int getLongBytes(Registro* unRegistro); //devuelve longitud en bytes de un registro
 	unsigned int getBytesLibres(Bloque* unBloque);

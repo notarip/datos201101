@@ -205,8 +205,6 @@ void ArchivoLibros::deserializar(char* tiraBytes,Libro** obtenido){
 }
 
 
-
-
 unsigned int ArchivoLibros::obtenerOffset(unsigned int id){
 	return id;
 }
