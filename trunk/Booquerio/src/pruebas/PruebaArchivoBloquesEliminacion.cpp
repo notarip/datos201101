@@ -1,7 +1,7 @@
 #include <iostream>
-#include "ArchivoBloques.h"
-#include "Bloque.h"
-#include "Registro.h"
+#include "../archivos/ArchivoBloques.h"
+#include "../archivos/Bloque.h"
+#include "../archivos/Registro.h"
 #include "string.h"
 
 using namespace std;
