@@ -8,7 +8,7 @@ using namespace std;
 
 int main2() {
 
-	ArchivoBloques arch("testArchivoBloques", 128);
+	ArchivoBloques arch("archivos/pruebas/testArchivoBloques", 128);
 
 	/* CREO UN PAR DE REGISTROS*/
 

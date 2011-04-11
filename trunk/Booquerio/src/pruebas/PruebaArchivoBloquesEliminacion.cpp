@@ -6,9 +6,9 @@
 
 using namespace std;
 
-int main1() {
+int main() {
 
-	ArchivoBloques arch("testArchivoBloques2Eliminacion", 128);
+	ArchivoBloques arch("archivos/pruebas/testArchivoBloques2Eliminacion", 128);
 
 	/* CREO UN PAR DE REGISTROS*/
 
