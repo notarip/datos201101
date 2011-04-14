@@ -12,15 +12,13 @@
 
 Hash::Hash(string nombre)
 {
-	this->pathTabla = Parametros().getParametro(CARPETA_DATOS);
-	this->pathDatos = pathTabla;
-	this->pathTabla += nombre + EXTENCION_TABLA;
-	this->pathDatos += nombre + EXTENCION_DATOS;
+	this->pathHash = Parametros().getParametro(CARPETA_DATOS);
 
-	if (Util().existeArchivo(this->pathTabla))
-	{
+	if (Util().existeArchivo(this->pathHash))
 		this->abrir();
-	}else{
+
+	else {
+
 		this->crear();
 		this->abrir();
 	}
@@ -31,75 +29,55 @@ Hash::~Hash()
 	delete [] tabla;
 }
 
-int Hash::crear()
-{
+int Hash::crear(){
 
-	fstream archivo;
-	archivo.open(this->pathTabla.c_str(), ios::out | ios::binary);
+	ArchivoBloques archivo(this->pathHash,TAMANIO_BLOQUE);
 
 	if (archivo.is_open())
 	{
-		elemLista tamanio = 0;
-		char *buff = new char[sizeof(elemLista)];
-		memcpy(buff,&tamanio,sizeof(elemLista));
-		archivo.write(buff,sizeof(elemLista));
-		archivo.close();
-		delete []buff;
+		Registro regTabla(0,0);
+		Bloque bloqueTabla(regTabla);
+
+		try{
+			archivo.grabarBloque(bloqueTabla,0);
+		}catch (ExceptionBloque &e)
+		{
+			cout << e.what() << endl;
+		}
+
 	}
 
 
-	//llamada a la creacion de un nuevo archivo de bloques
-	ArchivoBloques *archivoBloque = new ArchivoBloques(this->pathDatos,TAMANIO_BLOQUE);
-	Bloque *bloque0 = new Bloque();
+
+	Bloque *bloque1 = new Bloque();
+	unsigned int libre1= archivo.getBloqueLibre();
 
 	try{
-		archivoBloque->grabarBloque(bloque0,0);
-		//bloques = true;
+		archivo.grabarBloque(bloque1,libre1);
 	}catch (ExceptionBloque &e)
 	{
 		cout << e.what() << endl;
 	}
 
 
-	archivoBloque->~ArchivoBloques();
-	bloque0->~Bloque();
-
 	return 0;
 }
 
 
-int Hash::abrir()
-{
-	fstream archivo;
-	archivo.open(this->pathTabla.c_str(), ios::in | ios::binary);
-	if (archivo.is_open())
-	{
-		char *buff = new char[sizeof(elemLista)];
-		archivo.read(buff,sizeof(elemLista));
-		memcpy(&tamanioLista, buff, sizeof(elemLista));
-		delete [] buff;
+int Hash::abrir(){  //TODO nose exactamente q es lo que haces, le saque el is_open ese
+					// porque el archivo se abre si no existe cuando creas el objeto.
+					//
+		ArchivoBloques archivoHash(this->pathHash,TAMANIO_BLOQUE);
+		Bloque* bloqueTabla = archivoHash.recuperarBloque(0);
+		Registro* regTabla = (bloqueTabla)->recuperarRegistro(0);
+		unsigned int tamanioLista = regTabla->getIdentificadores().size();
 
-		//si tiene elementos
 		if (tamanioLista > 0)
 		{
-			unsigned int bytes = tamanioLista*sizeof(elemLista2);
-			buff = new char[bytes];
-			this->tabla = new elemLista2[tamanioLista];
-			archivo.read(buff,bytes);
-			archivo.close();
-
-			int count = 0;
-			while (bytes > 0)
-			{
-				memcpy(&tabla[count],buff, sizeof(elemLista2));
-				bytes -= sizeof(elemLista2);
-				count ++;
-			}
-			delete [] buff;
-		}
+		List<unsigned int>* tabla= regTabla->getIdentificadores();
 		return 0;
-
-	}else
+	}
+	else
 		return 2; //error al quere abrir el hash
 }
 
@@ -222,10 +200,10 @@ Registro *Hash::buscar(string que)
 
 	Bloque *bloque = archivoBloq->recuperarBloque(nroBloque);
 
-
 	Registro *registro = bloque->recuperarRegistro(que);
-	bloque->~Bloque();
-	archivoBloq->~ArchivoBloques();
+
+	delete bloque;
+	delete archivoBloq;
 
 	return registro;
 
@@ -235,16 +213,13 @@ int Hash::hasheo(string key)
 {
 
 	elemLista keyNumerica=0;
-
+	unsigned int i=0;
+	while(i<key.length() && i< 3){
+		keyNumerica += (elemLista)key[i];
+		i++;
+		if (i<3) keyNumerica= keyNumerica<<8;
+	}
 	if (key.length() > 0)
-	{
-		keyNumerica += (elemLista)key[0];
-		if (key.length() > 1)
-			keyNumerica += (elemLista)(elemLista)key[1];
-			if (key.length() > 2)
-				keyNumerica += (elemLista)(elemLista)key[2];
-	}else
-		return -1;
-
-	return (keyNumerica % (this->tamanioLista));
+		return (keyNumerica % (this->tamanioLista));
+	return -1;
 }
