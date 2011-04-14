@@ -22,9 +22,15 @@ public:
 	Registro* recuperarRegistro(unsigned int id);
 	Registro* recuperarRegistro(string palabra);
 	list<Registro>* obtenerRegistros();
+	void setSiguiente(unsigned int siguiente);
+	unsigned int getSiguiente();
+	void setAtributoBloque(unsigned int atributoBloque);
+	unsigned int getAtributoBloque();
 
 private:
 	list<Registro> listaRegistros;
+	unsigned int siguiente;
+	unsigned int atributoBloque;
 };
 
 #endif /* BLOQUE_H_ */

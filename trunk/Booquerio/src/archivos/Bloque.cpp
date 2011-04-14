@@ -8,10 +8,13 @@
 #include "Bloque.h"
 
 Bloque::Bloque() {
-
+	this->siguiente= 0;
+	this->atributoBloque= 0;
 }
 
 Bloque::Bloque(Registro unRegistro) {
+	this->siguiente= 0;
+	this->atributoBloque= 0;
 	this->listaRegistros.push_back(unRegistro);
 }
 
@@ -49,6 +52,22 @@ Registro* Bloque::recuperarRegistro(string palabra) {
 
 list<Registro>* Bloque::obtenerRegistros(){
 	return &this->listaRegistros;
+}
+
+void Bloque::setSiguiente(unsigned int siguiente){
+	this->siguiente= siguiente;
+}
+
+unsigned int Bloque::getSiguiente(){
+	return this->siguiente;
+}
+
+void Bloque::setAtributoBloque(unsigned int atributoBloque){
+	this->atributoBloque=atributoBloque;
+}
+
+unsigned int Bloque::getAtributoBloque(){
+	return this->atributoBloque;
 }
 
 Bloque::~Bloque() {

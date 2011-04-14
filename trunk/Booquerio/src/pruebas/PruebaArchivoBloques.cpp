@@ -6,7 +6,7 @@
 
 using namespace std;
 
-int main2() {
+int main() {
 
 	ArchivoBloques arch("archivos/pruebas/testArchivoBloques", 128);
 
@@ -15,40 +15,42 @@ int main2() {
 	Registro reg("El planeta de los simios", 2);
 	reg.agregarId(8);
 	reg.agregarReferencia(5);
-	// tamanio = 24 + 2*4 + 2*1 = 34 bytes
+	// tamanio = 24 + 2*4 + 4*1 = 36 bytes
 	Registro reg2("La vida es bella", 1);
 	reg2.agregarReferencia(20);
 	reg2.agregarReferencia(25);
-	// tamanio = 16 + 1*4 + 2*2 = 24 bytes
+	// tamanio = 16 + 1*4 + 2*4 = 28 bytes
 
 
 	Registro reg3("Harry Potter y la Piedra Filosofal", 3);
 	// tamanio = 34 + 1*4 = 38 bytes
 
 	Registro reg4(4, 300);
-	// tamanio = 4 + 2 = 6 bytes
+	// tamanio = 4 + 4 = 8 bytes
 
 	Registro reg5("El Codigo Da Vinci");
 	reg5.agregarReferencia(410);
-	// tamanio = 18 + 2*1 = 20 bytes
+	// tamanio = 18 + 4*1 = 22 bytes
 
 	/*ARMO UN PAR DE BLOQUES*/
 
 	Bloque bloq1(reg);
+	bloq1.setAtributoBloque(20);
 	bloq1.agregarRegistro(reg2);
-	// tamanio = 4 + 16*2 + 34 + 24 = 94 bytes
+	// tamanio = 12 + 16*2 + 36 + 28 = 108 bytes
 
 	Bloque bloq2(reg3);
+	bloq2.setSiguiente(1000);
 	bloq2.agregarRegistro(reg4);
 	bloq2.agregarRegistro(reg5);
-	// tamanio = 4 + 16*3 + 20 + 6 + 38= 116 bytes
+	// tamanio = 12 + 16*3 + 22 + 8 + 38= 128 bytes
 
 	Bloque bloq3(reg);
 	bloq3.agregarRegistro(reg2);
 	bloq3.agregarRegistro(reg3);
 	bloq3.agregarRegistro(reg4);
 	bloq3.agregarRegistro(reg5);
-	// tamanio = 4 + 16*5 + 34 + 24 + 20 + 6 + 38 = 206 bytes  ===> no entra
+	// tamanio = 12 + 16*5 + 36 + 28 + 22 + 8 + 38 = 224 bytes  ===> no entra
 
 	/*PRUEBA DE TAMANIOS*/
 
@@ -59,17 +61,17 @@ int main2() {
 	cout <<"ocupacion bloque3 : " <<arch.getOcupacionBloque(&bloq3) << " bytes" << endl;
 
 
-	if (arch.getOcupacionBloque(&bloq1) == (float)94 / 128) {
+	if (arch.getOcupacionBloque(&bloq1) == (float)108 / 128) {
 		cout << "bloque1 							[OK]" << endl;
 	} else {
 		cout << "bloque1 							[WRONG]" << endl;
 	}
-	if (arch.getOcupacionBloque(&bloq2) == (float)116 / 128) {
+	if (arch.getOcupacionBloque(&bloq2) == (float)128 / 128) {
 		cout << "bloque2								[OK]" << endl;
 	} else {
 		cout << "bloque2 								[WRONG]" << endl;
 	}
-	if (arch.getOcupacionBloque(&bloq3) == (float)206 / 128) {
+	if (arch.getOcupacionBloque(&bloq3) == (float)224 / 128) {
 		cout << "bloque3 							[OK]" << endl;
 	} else {
 		cout << "bloque3 							[WRONG]" << endl;
@@ -104,14 +106,20 @@ int main2() {
 	/************************************************************************************************/
 	cout << "BLOQUE-1 " << endl;
 
+	if (bloq1Restored->getAtributoBloque() == 20) {
+		cout << "Atributo Bloque 							[OK]" << endl;
+	} else {
+		cout << "Atributo Bloque 							[WRONG]" << endl;
+	}
+
 	list<Registro>* listreg = bloq1Restored->obtenerRegistros();
 	list<Registro>::iterator it = listreg->begin();
 
 	list<unsigned int>::iterator itIds;
 	list<unsigned int>::iterator itIdsRestored;
 
-	list<unsigned short int>::iterator itRefs;
-	list<unsigned short int>::iterator itRefsRestored;
+	list<unsigned int>::iterator itRefs;
+	list<unsigned int>::iterator itRefsRestored;
 
 	cout << "registro1" << endl;
 	Registro reg1Restored = *it;
@@ -193,6 +201,12 @@ int main2() {
 
 
 	cout << "BLOQUE-2 " << endl;
+
+	if (bloq2Restored->getSiguiente() == 1000) {
+		cout << "Puntero Siguiente 							[OK]" << endl;
+	} else {
+		cout << "Puntero Siguiente 							[WRONG]" << endl;
+	}
 
 	listreg = bloq2Restored->obtenerRegistros();
 	it = listreg->begin();
