@@ -15,25 +15,25 @@ using namespace std;
 class Registro {
 
 public:
-  Registro(string unString);
-	Registro(unsigned int id, unsigned int unaReferencia);
-	Registro (string unString, unsigned int id);
+	Registro(string unString);
+	Registro(unsigned int atribEntero, unsigned int unaReferencia);
+	Registro (string unString, unsigned int atribEntero);
 	virtual ~Registro();
 
 	string getString();
-	bool buscarID(unsigned int idBuscado);
-	list<unsigned int>* getIdentificadores();
+	bool buscarAtribEntero(unsigned int atribBuscado);
+	list<unsigned int>* getAtributosEnteros();
 	list<unsigned int>* getReferencias();
-	void agregarId (unsigned int id);
+	void agregarAtribEntero (unsigned int atribEntero);
 	void agregarReferencia(unsigned int);
 
 
 
 private:
-	// trate de hacerlo lo mas generico posible, un string, n ids y n referencias.
+	// trate de hacerlo lo mas generico posible, un string, n atribEnteros y n referencias.
 	// Por mas que la referencia sea 1 sola.
 	string miString;
-	list<unsigned int> identificadores;
+	list<unsigned int> atribEnteros;
 	list<unsigned int> referencias;
 
 };

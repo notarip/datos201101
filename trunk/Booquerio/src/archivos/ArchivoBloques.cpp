@@ -74,19 +74,19 @@ void ArchivoBloques::grabarBloque(Bloque* unBloque, unsigned int nroBloque) {
 		i = i + tamanioString;
 
 		//despues los identificadores
-		list<unsigned int>* Ids = unRegistro->getIdentificadores();
-		unsigned int tamanioIds = Ids->size() * sizeof(int);
+		list<unsigned int>* atribEnteros = unRegistro->getAtributosEnteros();
+		unsigned int tamanioatribEnteros = atribEnteros->size() * sizeof(int);
 
-		memcpy(tiraBytes + i, &tamanioIds, sizeof(int));
+		memcpy(tiraBytes + i, &tamanioatribEnteros, sizeof(int));
 		i = i + sizeof(int);
 
-		list<unsigned int>::iterator itIds = Ids->begin();
-		while (itIds != Ids->end()) {
+		list<unsigned int>::iterator itatribEnteros = atribEnteros->begin();
+		while (itatribEnteros != atribEnteros->end()) {
 
-			unsigned int id = *itIds;
-			memcpy(tiraBytes + i, &id, sizeof(int));
+			unsigned int atribEntero = *itatribEnteros;
+			memcpy(tiraBytes + i, &atribEntero, sizeof(int));
 			i = i + sizeof(int);
-			itIds++;
+			itatribEnteros++;
 		}
 
 		//por ultimo las referencias
@@ -174,14 +174,14 @@ Bloque* ArchivoBloques::recuperarBloque(unsigned int nroBloque) {
 		Registro unRegistro(unString);
 
 		//levanto identificadores
-		unsigned int tamanioIds;
-		memcpy(&tamanioIds, tiraBytes + i, sizeof(int));
+		unsigned int tamanioatribEnteros;
+		memcpy(&tamanioatribEnteros, tiraBytes + i, sizeof(int));
 		i = i + sizeof(int);
-		for (unsigned int j = 0; j < tamanioIds / sizeof(int); j++) {
-			unsigned int unId;
-			memcpy(&unId, tiraBytes + i, sizeof(int));
+		for (unsigned int j = 0; j < tamanioatribEnteros / sizeof(int); j++) {
+			unsigned int unatribEntero;
+			memcpy(&unatribEntero, tiraBytes + i, sizeof(int));
 			i = i + sizeof(int);
-			unRegistro.agregarId(unId);
+			unRegistro.agregarAtribEntero(unatribEntero);
 		}
 
 		//levanto referencias
@@ -230,7 +230,7 @@ unsigned int ArchivoBloques::getBytesOcupados(Bloque* unBloque) {
 
 unsigned int ArchivoBloques::getLongBytes(Registro* unRegistro) {
 
-	return (((unRegistro->getIdentificadores()->size()) * sizeof(int))
+	return (((unRegistro->getAtributosEnteros()->size()) * sizeof(int))
 			+ ((unRegistro->getReferencias()->size()) * sizeof(int))
 			+ unRegistro->getString().size());
 }
