@@ -11,40 +11,40 @@ Registro::Registro(string unString) {
   this->miString= unString;
 }
 
-Registro::Registro(unsigned int id, unsigned int unaReferencia) {
-	this->identificadores.push_back(id);
+Registro::Registro(unsigned int atribEntero, unsigned int unaReferencia) {
+	this->atribEnteros.push_back(atribEntero);
 	this->referencias.push_back(unaReferencia);
 }
 
-Registro::Registro(string unString, unsigned int id) {
+Registro::Registro(string unString, unsigned int atribEntero) {
 	this->miString= unString;
-	this->identificadores.push_back(id);
+	this->atribEnteros.push_back(atribEntero);
 }
 
 string Registro::getString(){
 	return this->miString;
 }
 
-bool Registro::buscarID(unsigned int idBuscado){
-	list<unsigned int>::iterator it= this->identificadores.begin();
+bool Registro::buscarAtribEntero(unsigned int atribEnteroBuscado){
+	list<unsigned int>::iterator it= this->atribEnteros.begin();
 	bool encontrado= false;
-	while (it!=this->identificadores.end()&&!encontrado) {
-		if (*it==idBuscado) encontrado= true;
+	while (it!=this->atribEnteros.end()&&!encontrado) {
+		if (*it==atribEnteroBuscado) encontrado= true;
 		it++;
 	}
 	return encontrado;
 }
 
-list<unsigned int>* Registro::getIdentificadores(){
-	return &this->identificadores;
+list<unsigned int>* Registro::getAtributosEnteros(){
+	return &this->atribEnteros;
 }
 
 list<unsigned int>* Registro::getReferencias(){
 	return &this->referencias;
 }
 
-void Registro::agregarId (unsigned int id){
-  this->identificadores.push_back(id);
+void Registro::agregarAtribEntero (unsigned int atribEntero){
+  this->atribEnteros.push_back(atribEntero);
 }
 
 void Registro::agregarReferencia(unsigned int ref) {

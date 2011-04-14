@@ -22,14 +22,14 @@ void Bloque::agregarRegistro(Registro unRegistro) {
 	this->listaRegistros.push_back(unRegistro);
 }
 
-Registro* Bloque::recuperarRegistro(unsigned int id) {
-	//este metodo esta pensado para el indice de ids, o sea los registros en realidad
-	//contendrian solo un id, se hizo asi para que sea mas gral
+Registro* Bloque::recuperarRegistro(unsigned int atribEntero) {
+	//este metodo esta pensado para el indice de atribEnteros, o sea los registros en realidad
+	//contendrian solo un atribEntero, se hizo asi para que sea mas gral
 	Registro* resultado = NULL;
 	bool encontrado = false;
 	list<Registro>::iterator it = this->listaRegistros.begin();
 	while (it != this->listaRegistros.end() && !encontrado) {
-		if ((*it).buscarID(id))
+		if ((*it).buscarAtribEntero(atribEntero))
 			resultado = &(*it);
 		it++;
 	}

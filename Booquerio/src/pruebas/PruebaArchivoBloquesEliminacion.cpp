@@ -13,7 +13,7 @@ int main2() {
 	/* CREO UN PAR DE REGISTROS*/
 
 	Registro reg("El planeta de los simios", 2);
-	reg.agregarId(8);
+	reg.agregarAtribEntero(8);
 	reg.agregarReferencia(5);
 	// tamanio = 24 + 2*4 + 2*1 = 34 bytes
 	Registro reg2("La vida es bella", 1);
@@ -107,10 +107,10 @@ int main2() {
 		cout << "string1 							[WRONG]" << endl;
 	}
 
-	itIds = reg.getIdentificadores()->begin();
-	itIdsRestored = reg1Restored.getIdentificadores()->begin();
+	itIds = reg.getAtributosEnteros()->begin();
+	itIdsRestored = reg1Restored.getAtributosEnteros()->begin();
 
-	while (itIds != reg.getIdentificadores()->end()) {
+	while (itIds != reg.getAtributosEnteros()->end()) {
 		if ((*itIds) == (*itIdsRestored)) {
 			cout << "id 								[OK]" << endl;
 		} else {
@@ -145,10 +145,10 @@ int main2() {
 		cout << "string2 							[WRONG]" << endl;
 	}
 
-	itIds = reg2.getIdentificadores()->begin();
-	itIdsRestored = reg2Restored.getIdentificadores()->begin();
+	itIds = reg2.getAtributosEnteros()->begin();
+	itIdsRestored = reg2Restored.getAtributosEnteros()->begin();
 
-	while (itIds != reg2.getIdentificadores()->end()) {
+	while (itIds != reg2.getAtributosEnteros()->end()) {
 		if ((*itIds) == (*itIdsRestored)) {
 			cout << "id 								[OK]" << endl;
 		} else {
@@ -191,10 +191,10 @@ int main2() {
 		cout << "string1 							[WRONG]" << endl;
 	}
 
-	itIds = reg.getIdentificadores()->begin();
-	itIdsRestored = reg1Restored.getIdentificadores()->begin();
+	itIds = reg.getAtributosEnteros()->begin();
+	itIdsRestored = reg1Restored.getAtributosEnteros()->begin();
 
-	while (itIds != reg.getIdentificadores()->end()) {
+	while (itIds != reg.getAtributosEnteros()->end()) {
 		if ((*itIds) == (*itIdsRestored)) {
 			cout << "id 								[OK]" << endl;
 		} else {
@@ -229,10 +229,10 @@ int main2() {
 		cout << "string2 							[WRONG]" << endl;
 	}
 
-	itIds = reg2.getIdentificadores()->begin();
-	itIdsRestored = reg2Restored.getIdentificadores()->begin();
+	itIds = reg2.getAtributosEnteros()->begin();
+	itIdsRestored = reg2Restored.getAtributosEnteros()->begin();
 
-	while (itIds != reg2.getIdentificadores()->end()) {
+	while (itIds != reg2.getAtributosEnteros()->end()) {
 		if ((*itIds) == (*itIdsRestored)) {
 			cout << "id 								[OK]" << endl;
 		} else {
