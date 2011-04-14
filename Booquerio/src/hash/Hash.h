@@ -9,16 +9,16 @@
 #define HASH_H_
 
 typedef unsigned int elemLista;
-struct elemLista2{
-	elemLista nroBloque;
-	elemLista TD;
-};
+//struct elemLista2{       //TODO el tamaño de dispersion ahora esta en el bloque.
+//	elemLista nroBloque;
+//	elemLista TD;
+//};
 
 #define EXTENCION_TABLA ".table"
 #define EXTENCION_DATOS ".hash"
 #define TAMANIO_TABLA 8
 #define BYTES_TABLA TAMANIO_TABLA*sizeof(elemLista)
-#define TAMANIO_BLOQUE 512
+#define TAMANIO_BLOQUE 4096
 
 #include <string.h>
 #include <fstream>
@@ -60,8 +60,7 @@ public:
 private:
 	fstream archivoTabla;
 	string nombre;
-	string pathTabla;
-	string pathDatos;
+	string pathHash;
 	elemLista tamanioLista;
 	elemLista2 *tabla;
 	unsigned int offsetUltimaBusqueda;
