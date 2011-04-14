@@ -11,7 +11,7 @@ Registro::Registro(string unString) {
   this->miString= unString;
 }
 
-Registro::Registro(unsigned int id, unsigned short int unaReferencia) {
+Registro::Registro(unsigned int id, unsigned int unaReferencia) {
 	this->identificadores.push_back(id);
 	this->referencias.push_back(unaReferencia);
 }
@@ -39,7 +39,7 @@ list<unsigned int>* Registro::getIdentificadores(){
 	return &this->identificadores;
 }
 
-list<unsigned short int>* Registro::getReferencias(){
+list<unsigned int>* Registro::getReferencias(){
 	return &this->referencias;
 }
 
@@ -47,7 +47,7 @@ void Registro::agregarId (unsigned int id){
   this->identificadores.push_back(id);
 }
 
-void Registro::agregarReferencia(unsigned short int ref) {
+void Registro::agregarReferencia(unsigned int ref) {
   this->referencias.push_back(ref);
 }
 

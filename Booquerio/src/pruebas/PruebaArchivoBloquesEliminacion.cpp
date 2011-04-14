@@ -6,7 +6,7 @@
 
 using namespace std;
 
-int main() {
+int main2() {
 
 	ArchivoBloques arch("archivos/pruebas/testArchivoBloques2Eliminacion", 128);
 
@@ -94,8 +94,8 @@ int main() {
 	list<unsigned int>::iterator itIds;
 	list<unsigned int>::iterator itIdsRestored;
 
-	list<unsigned short int>::iterator itRefs;
-	list<unsigned short int>::iterator itRefsRestored;
+	list<unsigned int>::iterator itRefs;
+	list<unsigned int>::iterator itRefsRestored;
 
 	cout << "registro1" << endl;
 	Registro reg1Restored = *it;
