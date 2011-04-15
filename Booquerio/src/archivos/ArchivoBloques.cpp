@@ -110,6 +110,7 @@ void ArchivoBloques::grabarBloque(Bloque* unBloque, unsigned int nroBloque) {
 
 	fstream archivo;
 	archivo.open(miPath.c_str(),ios::binary| ios::out | ios::in | ios::ate);
+	//si no existe lo creo
 	if( !archivo.good()) {archivo.open(miPath.c_str(),ios::binary| ios::out | ios::ate);}
 
 	//posiciono el puntero del archivo al principio del bloque que necesito (primer bloque = bloque0)

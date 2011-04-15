@@ -27,6 +27,8 @@ public:
 	list<unsigned int>* getReferencias();
 	void agregarAtribEntero (unsigned int atribEntero);
 	void agregarReferencia(unsigned int);
+	unsigned int getReferenciai(unsigned int i);
+
 
 
 
@@ -40,3 +42,4 @@ private:
 };
 
 #endif /* REGISTRO_H_ */
+

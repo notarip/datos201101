@@ -19,20 +19,35 @@ using namespace std;
 
 class ArbolBMas {
 public:
-	ArbolBMas(string path, int tipoClave);
+	ArbolBMas(string path, float ocupacion, unsigned int tamanioBloque);
 	virtual ~ArbolBMas();
 	resultadoOperacion* insertar(string clave, unsigned int valor);
-	resultadoOperacion* buscar(string clave, Registro* regEncontrado);
+
+	//busca un bloque en donde se puede encontrar una clave, sino esta en ese bloque => no esta
+	resultadoOperacion* buscarBloque(string clave, Bloque* bloqueEncontrado);
+
 	resultadoOperacion* eliminar(string clave, unsigned int valor);
+
 	resultadoOperacion* siguiente(Registro* regSiguiente);
+
 	void exportar();
 
 private:
-	int ultimaHojaVisitada, ultimoValorBuscado;
+	unsigned int ultimaHojaVisitada, ultimoValorBuscado;
 	Bloque* raiz;
-	string pathArchivoBloques;
+	ArchivoBloques* archivoNodos;
 	float ocupacionNodo;
-	int tamanioNodo;
+	unsigned int tamanioNodo;
+
+	/*PARA DEFINIR UN ARBOL B+ HAY QUE INDICAR 2 ESTRATEGIAS:
+	 * 1- En cual de todos los atritutos de un registro vas a guardar la clave(identificador)
+	 * 2- Como comparo las claves (alfabeticas vs numericas)
+	 * */
+	virtual char compareRegistros(string clave, Registro* unRegistro ) = 0;
+	virtual Registro* crearRegistroClave(string clave)= 0;
+
+	resultadoOperacion* buscarBloqueRecursivo(string clave ,unsigned int refBloque, Bloque* bloqueEncontrado );
+
 };
 
 #endif /* ARBOLBMAS_H_ */
