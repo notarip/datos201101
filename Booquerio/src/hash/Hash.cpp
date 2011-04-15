@@ -44,24 +44,28 @@ int Hash::crear(){
 	ArchivoBloques manejadorTabla(this->pathHash,TAMANIO_BLOQUE_TABLA);
 	ArchivoBloques manejadorDatos(this->pathHash,TAMANIO_BLOQUE);
 
-	Registro regTabla();
+	Registro *regTabla = new Registro();
 
 	for (int i = 0; i < TAMANIO_TABLA; i++)
-		regTabla.agregarId(0);
+		regTabla->agregarAtribEntero(0);
 
 
-	Bloque bloqueTabla();
-	bloqueTabla.agregarRegistro(regTabla);
+
+	Bloque *bloqueTabla = new Bloque();
+	bloqueTabla->agregarRegistro(*regTabla);
 
 
 
 
 	try{
-		manejadorTabla.grabarBloque(&bloqueTabla(),0);
+		manejadorTabla.grabarBloque(bloqueTabla,0);
 	}catch (ExceptionBloque &e)
 	{
 		cout << e.what() << endl;
 	}
+
+	regTabla->~Registro();
+	bloqueTabla->~Bloque();
 
 
 	/*
@@ -78,6 +82,7 @@ int Hash::crear(){
 		cout << e.what() << endl;
 	}
 
+	bloque1->~Bloque();
 
 	return 0;
 }
@@ -91,7 +96,7 @@ int Hash::abrir(){
 		Bloque* bloqueTabla = archivoLista.recuperarBloque(0);
 		Registro* regTabla = bloqueTabla->recuperarRegistro(0);
 
-		list<unsigned int> *listaDeBloques = regTabla->getIdentificadores();
+		list<unsigned int> *listaDeBloques = regTabla->getAtributosEnteros();
 
 		while (hayMasElementos)
 		{
@@ -100,7 +105,7 @@ int Hash::abrir(){
 				unsigned int bloque = regTabla->getReferencias()->front();
 				bloqueTabla = archivoLista.recuperarBloque(bloque);
 				regTabla = bloqueTabla->recuperarRegistro(0);
-				listaDeBloques->assign(regTabla->getIdentificadores()->begin(), regTabla->getIdentificadores()->end());
+				listaDeBloques->assign(regTabla->getAtributosEnteros()->begin(), regTabla->getAtributosEnteros()->end());
 			}else
 				hayMasElementos = false;
 		}
