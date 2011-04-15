@@ -7,6 +7,11 @@
 
 #include "Registro.h"
 
+Registro::Registro()
+{
+}
+
+
 Registro::Registro(string unString) {
   this->miString= unString;
 }
@@ -46,6 +51,7 @@ list<unsigned int>* Registro::getReferencias(){
 void Registro::agregarAtribEntero (unsigned int atribEntero){
   this->atribEnteros.push_back(atribEntero);
 }
+
 
 void Registro::agregarReferencia(unsigned int ref) {
   this->referencias.push_back(ref);
