@@ -58,6 +58,16 @@ void Registro::agregarReferencia(unsigned int ref) {
   this->referencias.push_back(ref);
 }
 
+unsigned int Registro::getReferenciai(unsigned int i){
+	list<unsigned int>::iterator itReferencias = this->referencias.begin();
+	for (unsigned int j = 1 ; j < i ; j++){
+		itReferencias++;
+	}
+	return *itReferencias;
+
+}
+
+
 
 Registro::~Registro() {
 
