@@ -7,9 +7,8 @@
 
 #include "resultadoOperacion.h"
 
-resultadoOperacion::resultadoOperacion() {
-	// TODO Auto-generated constructor stub
-
+resultadoOperacion::resultadoOperacion(int codigo) {
+	this->codigo=codigo;
 }
 
 resultadoOperacion::~resultadoOperacion() {

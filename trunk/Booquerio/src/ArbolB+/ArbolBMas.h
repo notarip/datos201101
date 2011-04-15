@@ -21,14 +21,15 @@ class ArbolBMas {
 public:
 	ArbolBMas(string path, int tipoClave);
 	virtual ~ArbolBMas();
-	resultadoOperacion* insertar(Registro registroAInsertar);
-	resultadoOperacion* buscar(Registro registroABuscar);
-	resultadoOperacion* eliminar(Registro registroAEliminar);
-	resultadoOperacion* siguiente(Registro registroAInsertar);
+	resultadoOperacion* insertar(string clave, unsigned int valor);
+	resultadoOperacion* buscar(string clave, Registro* regEncontrado);
+	resultadoOperacion* eliminar(string clave, unsigned int valor);
+	resultadoOperacion* siguiente(Registro* regSiguiente);
 	void exportar();
 
 private:
-	int ultimaHojaVisitada, raiz;
+	int ultimaHojaVisitada, ultimoValorBuscado;
+	Bloque* raiz;
 	string pathArchivoBloques;
 	float ocupacionNodo;
 	int tamanioNodo;
