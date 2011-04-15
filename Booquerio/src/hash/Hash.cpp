@@ -7,12 +7,17 @@
 
 //TODO revisar como devolver los errores
 //TODO implementar borrar
+//TODO agregar metodo para persistir la tabla teniendo en cuenta si viene
+//de varios registros
+//TODO en crear pasar la creacion del 1er bloque de datos a la 1er insercion
+//TODO Hernan dejame el insertar que termino de tocarlo yo
 
 #include "Hash.h"
 
 Hash::Hash(string nombre)
 {
 	this->pathHash = Parametros().getParametro(CARPETA_DATOS);
+	this->pathHash += nombre + EXTENCION_DATOS;
 
 	if (Util().existeArchivo(this->pathHash))
 		this->abrir();
@@ -31,29 +36,43 @@ Hash::~Hash()
 
 int Hash::crear(){
 
-	ArchivoBloques archivo(this->pathHash,TAMANIO_BLOQUE);
+	/*
+	 * Se crea el registro para la lista de bloques
+	 * y se crea el bloque que va a contener la lista
+	 */
 
-	if (archivo.is_open())
+	ArchivoBloques manejadorTabla(this->pathHash,TAMANIO_BLOQUE_TABLA);
+	ArchivoBloques manejadorDatos(this->pathHash,TAMANIO_BLOQUE);
+
+	Registro regTabla();
+
+	for (int i = 0; i < TAMANIO_TABLA; i++)
+		regTabla.agregarId(0);
+
+
+	Bloque bloqueTabla();
+	bloqueTabla.agregarRegistro(regTabla);
+
+
+
+
+	try{
+		manejadorTabla.grabarBloque(&bloqueTabla(),0);
+	}catch (ExceptionBloque &e)
 	{
-		Registro regTabla(0,0);
-		Bloque bloqueTabla(regTabla);
-
-		try{
-			archivo.grabarBloque(bloqueTabla,0);
-		}catch (ExceptionBloque &e)
-		{
-			cout << e.what() << endl;
-		}
-
+		cout << e.what() << endl;
 	}
 
 
-
+	/*
+	 * Se crea el primer bloque de datos vacio
+	 * TODO: este se deberia crear al primer insert
+	 */
 	Bloque *bloque1 = new Bloque();
-	unsigned int libre1= archivo.getBloqueLibre();
+	unsigned int libre1= manejadorDatos.getBloqueLibre();
 
 	try{
-		archivo.grabarBloque(bloque1,libre1);
+		manejadorDatos.grabarBloque(bloque1,libre1);
 	}catch (ExceptionBloque &e)
 	{
 		cout << e.what() << endl;
@@ -64,21 +83,42 @@ int Hash::crear(){
 }
 
 
-int Hash::abrir(){  //TODO nose exactamente q es lo que haces, le saque el is_open ese
-					// porque el archivo se abre si no existe cuando creas el objeto.
-					//
-		ArchivoBloques archivoHash(this->pathHash,TAMANIO_BLOQUE);
-		Bloque* bloqueTabla = archivoHash.recuperarBloque(0);
-		Registro* regTabla = (bloqueTabla)->recuperarRegistro(0);
-		unsigned int tamanioLista = regTabla->getIdentificadores().size();
+int Hash::abrir(){
 
-		if (tamanioLista > 0)
+		bool hayMasElementos = true;
+		ArchivoBloques archivoLista(this->pathHash,TAMANIO_BLOQUE_TABLA);
+
+		Bloque* bloqueTabla = archivoLista.recuperarBloque(0);
+		Registro* regTabla = bloqueTabla->recuperarRegistro(0);
+
+		list<unsigned int> *listaDeBloques = regTabla->getIdentificadores();
+
+		while (hayMasElementos)
 		{
-		List<unsigned int>* tabla= regTabla->getIdentificadores();
+			if (regTabla->getReferencias()->size() > 0)
+			{
+				unsigned int bloque = regTabla->getReferencias()->front();
+				bloqueTabla = archivoLista.recuperarBloque(bloque);
+				regTabla = bloqueTabla->recuperarRegistro(0);
+				listaDeBloques->assign(regTabla->getIdentificadores()->begin(), regTabla->getIdentificadores()->end());
+			}else
+				hayMasElementos = false;
+		}
+		this->tamanioLista = listaDeBloques->size();
+		this->tabla = new unsigned int[this->tamanioLista];
+
+		unsigned int i = 0;
+		for (list<unsigned int>::iterator it = listaDeBloques->begin(); it != listaDeBloques->end(); it++ )
+		{
+			this->tabla[i] = (*it);
+			i++;
+		}
+
+
+		bloqueTabla->~Bloque();
+		regTabla->~Registro();
+
 		return 0;
-	}
-	else
-		return 2; //error al quere abrir el hash
 }
 
 void Hash::insertar(Registro *registro)
@@ -86,53 +126,51 @@ void Hash::insertar(Registro *registro)
 
 	Registro *registroOld = this->buscar(registro->getString());
 
-	if (!registro)
+	if (!registroOld)
 	{
 		elemLista nroElem = this->hasheo(registro->getString());
-		ArchivoBloques *archivo = new ArchivoBloques(this->pathDatos, TAMANIO_BLOQUE);
-		unsigned int nroBloque = this->tabla[nroElem].nroBloque;
-		Bloque *bloque = archivo->recuperarBloque(nroBloque);
+		ArchivoBloques archivo(this->pathHash, TAMANIO_BLOQUE);
+		unsigned int nroBloque = this->tabla[nroElem];
+		Bloque *bloque = archivo.recuperarBloque(nroBloque);
 		try{
 			bloque->agregarRegistro(*registro);
 			//ok
 		}catch (ExceptionBloque &e)
 		{
-			elemLista nroNuevoBloque; //TODO asignarle el nro del bloque nuevo
-			//TODO pedir nuevo bloque
-			//TODO ver aca por que el archivo de bloques deberia manejar bloques vacios
-			//TODO osea que tendria que darme el bloque nuevo con el nro de bloque asignado
+			elemLista nroNuevoBloque = archivo.getBloqueLibre();
+			Bloque *nuevoBloque = archivo.recuperarBloque(nroNuevoBloque);
 
-			if (this->tabla[nroElem].TD < this->tamanioLista)
+			if (bloque->getAtributoBloque() < this->tamanioLista)
 			{
-				//buscar la mitad de las referencias de bloque viejo y apuntarlas al nuevo
-				//duplicar el tamaño de TD del bloque viejo
-				//agarrar todos los registros del bloque viejo y dispersarlos de nuevo
-				//reintentar la insersion de registro
+				//buscar la mitad de las referencias de bloque viejo y apuntarlas al nuevo -ok
+				//duplicar el tamaño de TD del bloque viejo -ok
+				//agarrar todos los registros del bloque viejo y dispersarlos de nuevo -ok
+				//reintentar la insersion de registro -ok
 
+				bloque->setAtributoBloque(bloque->getAtributoBloque()*2);
+				nuevoBloque->setAtributoBloque(bloque->getAtributoBloque());
 
-				unsigned int aBuscar = (this->tamanioLista/this->tabla[nroElem].TD)/2;
+				unsigned int aBuscar = (this->tamanioLista/bloque->getAtributoBloque())/2;
 				unsigned int i = this->tamanioLista-1;
 				while (i >= 0)
 				{
-					if (this->tabla[i].nroBloque == nroBloque )
+					if (this->tabla[i] == nroBloque )
 					{
-						this->tabla[i].TD = this->tabla[nroElem].TD*2;
 						if (aBuscar > 0)
 						{
-							this->tabla[i].nroBloque = nroNuevoBloque;
+							this->tabla[i] = nroNuevoBloque;
 							aBuscar--;
 						}
 					}
 				}
 
 			}else{
-				//duplica el TD del bloque viejo
-				//hago esto aca para que el elemento nuevo ya quede con el TD duplicado
-				//todavia no apunto al bloque nuevo para que el elemento espejado apunte al bloque viejo
-				this->tabla[nroElem].TD *= 2;
+
+				bloque->setAtributoBloque(bloque->getAtributoBloque()*2); //duplica el TD del bloque viejo
+				nuevoBloque->setAtributoBloque(bloque->getAtributoBloque());
 
 				//duplica el tamaño de la tabla
-				elemLista2 *nuevaTabla = new elemLista2[this->tamanioLista*2];
+				elemLista *nuevaTabla = new elemLista[this->tamanioLista*2];
 
 				// espejo los elementos
 				for (unsigned int j = 0; j < this->tamanioLista;j++)
@@ -142,22 +180,23 @@ void Hash::insertar(Registro *registro)
 				}
 
 				//apunta el elemento viejo al bloque nuevo
-				this->tabla[nroElem].nroBloque = nroNuevoBloque;
+				this->tabla[nroElem] = nroNuevoBloque;
 
 				delete [] this->tabla;
 				this->tabla = nuevaTabla;
-
 			}
 
-			//agarra todos los registros del bloque viejo y los dispersa de nuevo
-			//reintenta la insersion de registro
+			//TODO metodo que persista la tabla
+
+			//agarra todos los registros del bloque viejo incluso el registro nuevo y los dispersa de nuevo
 			list<Registro> *lista =  bloque->obtenerRegistros();
-			archivo->grabarBloque(new Bloque(),nroBloque); //grabo vacio el viejo
+			archivo.grabarBloque(new Bloque(),nroBloque); //graba un bloque vacio en lugar el viejo
 			for (list<Registro>::iterator it = lista->begin(); it != lista->end(); it++)
 			{
 				this->insertar(&(*it));
 			}
 			bloque->~Bloque();
+			nuevoBloque->~Bloque();
 		}
 
 	}
@@ -194,16 +233,16 @@ Registro *Hash::buscar(string que)
 	if (nroElemento < 0)
 		return NULL;
 
-	elemLista nroBloque = this->tabla[nroElemento].nroBloque;
+	elemLista nroBloque = this->tabla[nroElemento];
 
-	ArchivoBloques *archivoBloq = new ArchivoBloques(this->pathDatos, TAMANIO_BLOQUE);
+	ArchivoBloques *archivoBloq = new ArchivoBloques(this->pathHash, TAMANIO_BLOQUE);
 
 	Bloque *bloque = archivoBloq->recuperarBloque(nroBloque);
 
 	Registro *registro = bloque->recuperarRegistro(que);
 
-	delete bloque;
-	delete archivoBloq;
+	bloque->~Bloque();
+	archivoBloq->~ArchivoBloques();
 
 	return registro;
 
