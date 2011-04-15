@@ -7,8 +7,8 @@
 
 #include "Registro.h"
 
-Registro::Registro()
-{
+Registro::Registro(){
+	this->miString="";
 }
 
 
@@ -17,6 +17,7 @@ Registro::Registro(string unString) {
 }
 
 Registro::Registro(unsigned int atribEntero, unsigned int unaReferencia) {
+	this->miString="";
 	this->atribEnteros.push_back(atribEntero);
 	this->referencias.push_back(unaReferencia);
 }

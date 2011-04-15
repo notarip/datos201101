@@ -13,7 +13,7 @@ using namespace std;
 
 class resultadoOperacion {
 public:
-	resultadoOperacion();
+	resultadoOperacion(int codigo);
 	virtual ~resultadoOperacion();
 	int getCodigo();
 	string getDescripcion();
