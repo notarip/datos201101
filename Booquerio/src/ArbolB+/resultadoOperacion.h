@@ -9,6 +9,11 @@
 #define RESULTADOOPERACION_H_
 #include <string>
 
+#define OK 0
+#define HUBO_MODIFICACION 1
+#define ENCONTRADO 2
+
+
 using namespace std;
 
 class resultadoOperacion {

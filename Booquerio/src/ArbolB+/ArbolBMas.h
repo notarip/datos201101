@@ -46,6 +46,7 @@ private:
 	virtual char compareRegistros(string clave, Registro* unRegistro ) = 0;
 	virtual Registro* crearRegistroClave(string clave)= 0;
 
+	resultadoOperacion* insertarRecursivo( Bloque* bloqueActual, string clave,unsigned int valor);
 	resultadoOperacion* buscarBloqueRecursivo(string clave ,unsigned int refBloque, Bloque* bloqueEncontrado );
 
 };

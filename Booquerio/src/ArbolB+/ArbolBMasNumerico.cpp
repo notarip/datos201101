@@ -39,7 +39,7 @@ Registro* ArbolBMasNumerico::crearRegistroClave(string clave) {
 	return unRegistro;
 }
 
-resultadoOperacion* ArbolBMasNumerico::insertarNum(unsigned int clave,
+resultadoOperacion* ArbolBMasNumerico::insertarNumerico(unsigned int clave,
 		unsigned int valor) {
 	stringstream buffer(stringstream::in | stringstream::out);
 	buffer << clave;
@@ -49,7 +49,7 @@ resultadoOperacion* ArbolBMasNumerico::insertarNum(unsigned int clave,
 
 }
 
-resultadoOperacion* ArbolBMasNumerico::buscarBloqueNum(unsigned int clave,
+resultadoOperacion* ArbolBMasNumerico::buscarBloqueNumerico(unsigned int clave,
 		Bloque* bloqueEncontrado) {
 	stringstream buffer(stringstream::in | stringstream::out);
 	buffer << clave;
@@ -58,7 +58,7 @@ resultadoOperacion* ArbolBMasNumerico::buscarBloqueNum(unsigned int clave,
 	buscarBloque(claveAlfabetica, bloqueEncontrado);
 }
 
-resultadoOperacion* ArbolBMasNumerico::eliminarNum(unsigned int clave,
+resultadoOperacion* ArbolBMasNumerico::eliminarNumerico(unsigned int clave,
 		unsigned int valor) {
 	stringstream buffer(stringstream::in | stringstream::out);
 	buffer << clave;
@@ -68,7 +68,7 @@ resultadoOperacion* ArbolBMasNumerico::eliminarNum(unsigned int clave,
 
 }
 
-resultadoOperacion* ArbolBMasNumerico::siguienteNum(Registro* regSiguiente) {
+resultadoOperacion* ArbolBMasNumerico::siguienteNumerico(Registro* regSiguiente) {
 
 	siguiente(regSiguiente);
 
