@@ -22,6 +22,12 @@ void Bloque::agregarRegistro(Registro unRegistro) {
 	this->listaRegistros.push_back(unRegistro);
 }
 
+void Bloque::agregarRegistroAlInicio(Registro unRegistro){
+	this->listaRegistros.push_front(unRegistro);
+
+
+}
+
 Registro* Bloque::recuperarRegistro(unsigned int atribEntero) {
 	//este metodo esta pensado para el indice de atribEnteros, o sea los registros en realidad
 	//contendrian solo un atribEntero, se hizo asi para que sea mas gral

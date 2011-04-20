@@ -19,13 +19,13 @@ public:
 	virtual char compareRegistros(string clave, Registro* unRegistro );
 	virtual Registro* crearRegistroClave(string clave);
 
-	resultadoOperacion* insertarNum(unsigned int clave, unsigned int valor);
+	resultadoOperacion* insertarNumerico(unsigned int clave, unsigned int valor);
 
-	resultadoOperacion* buscarBloqueNum(unsigned int clave, Bloque* bloqueEncontrado);
+	resultadoOperacion* buscarBloqueNumerico(unsigned int clave, Bloque* bloqueEncontrado);
 
-	resultadoOperacion* eliminarNum(unsigned int clave, unsigned int valor);
+	resultadoOperacion* eliminarNumerico(unsigned int clave, unsigned int valor);
 
-	resultadoOperacion* siguienteNum(Registro* regSiguiente);
+	resultadoOperacion* siguienteNumerico(Registro* regSiguiente);
 };
 
 #endif /* ARBOLBMASNUMERICO_H_ */
