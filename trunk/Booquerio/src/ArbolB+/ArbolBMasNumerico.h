@@ -12,9 +12,9 @@
 #include <sstream>
 
 
-class ArbolBMasNumerico : protected ArbolBMas {
+class ArbolBMasNumerico : public ArbolBMas {
 public:
-	ArbolBMasNumerico(string path, float ocupacion, unsigned int tamanioBloque);
+	ArbolBMasNumerico(string path, unsigned int tamanioBloque);
 	virtual ~ArbolBMasNumerico();
 	virtual char compareRegistros(string clave, Registro* unRegistro );
 	virtual Registro* crearRegistroClave(string clave);

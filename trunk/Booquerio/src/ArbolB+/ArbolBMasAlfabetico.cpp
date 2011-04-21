@@ -7,9 +7,9 @@
 
 #include "ArbolBMasAlfabetico.h"
 
-ArbolBMasAlfabetico::ArbolBMasAlfabetico(string path, float ocupacion,
+ArbolBMasAlfabetico::ArbolBMasAlfabetico(string path,
 		unsigned int tamanioBloque) :
-	ArbolBMas(path, ocupacion, tamanioBloque) {
+	ArbolBMas(path, tamanioBloque) {
 
 }
 
