@@ -17,6 +17,7 @@ public:
 	virtual ~ArbolBMasAlfabetico();
 	virtual char compareRegistros(string clave, Registro* unRegistro );
 	virtual Registro* crearRegistroClave(string clave);
+	virtual string consultarClave(Registro* unRegistro);
 };
 
 #endif /* ARBOLBMASALFABETICO_H_ */

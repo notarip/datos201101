@@ -74,6 +74,18 @@ resultadoOperacion* ArbolBMasNumerico::siguienteNumerico(Registro* regSiguiente)
 
 }
 
+string ArbolBMasNumerico::consultarClave(Registro* unRegistro){
+	stringstream buffer(stringstream::in | stringstream::out);
+	buffer << unRegistro->getAtributosEnteros()->front();
+	string claveAlfabetica;
+	buffer >> claveAlfabetica;
+
+	return claveAlfabetica;
+
+
+
+}
+
 ArbolBMasNumerico::~ArbolBMasNumerico() {
 
 }
