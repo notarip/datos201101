@@ -18,6 +18,7 @@ public:
 	virtual ~ArbolBMasNumerico();
 	virtual char compareRegistros(string clave, Registro* unRegistro );
 	virtual Registro* crearRegistroClave(string clave);
+	virtual string consultarClave(Registro* unRegistro);
 
 	resultadoOperacion* insertarNumerico(unsigned int clave, unsigned int valor);
 

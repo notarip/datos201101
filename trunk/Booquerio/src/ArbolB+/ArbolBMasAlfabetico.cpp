@@ -25,6 +25,10 @@ Registro* ArbolBMasAlfabetico::crearRegistroClave(string clave){
 	return new Registro(clave);
 }
 
+string ArbolBMasAlfabetico::consultarClave(Registro* unRegistro){
+	return unRegistro->getString();
+}
+
 ArbolBMasAlfabetico::~ArbolBMasAlfabetico() {
 
 }

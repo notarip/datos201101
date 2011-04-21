@@ -22,8 +22,7 @@ ArbolBMas::ArbolBMas(string path, float ocupacion, unsigned int tamanioBloque) {
 }
 
 resultadoOperacion* ArbolBMas::insertar(string clave, unsigned int valor) {
-
-	this->insertarRecursivo(this->raiz,clave,valor);
+	return this->insertarRecursivo(this->raiz, clave, valor);
 
 }
 
@@ -35,12 +34,12 @@ resultadoOperacion* ArbolBMas::insertarRecursivo(Bloque* bloqueActual,
 		//debo escribir el registro, mi papa se encaragara de
 		//ver si entre en overflow o no cuando intente grabarme
 
+		/* CHEKEAR SI AGREGAR IMPLICA HACER UN REGISTRO NUEVO O SOLO AGREGAR UN ID*/
+
 		Registro* registroAAgregar = this->crearRegistroClave(clave);
 
-		/************************************************************/
-		bloqueActual->agregarRegistro(*registroAAgregar);
-		//MUCHO OJO!!! NO SE INSERTAN EN ORDEN => TO DO
-		/************************************************************/
+		this->AgregarRegistroEnOrden(bloqueActual,*registroAAgregar);
+
 		return new resultadoOperacion(HUBO_MODIFICACION);
 
 	}
@@ -65,70 +64,118 @@ resultadoOperacion* ArbolBMas::insertarRecursivo(Bloque* bloqueActual,
 		if (itRegistros == listaRegistros->end()) {
 			nroBloqueABajar = itRegistros->getReferenciai(2);
 			bloqueABajar = this->archivoNodos->recuperarBloque(nroBloqueABajar);
-		}
-		else{
-		//sino bajo por la IZQUIERDA del mayor
-			nroBloqueABajar =itRegistros->getReferenciai(1);
+		} else {
+			//sino bajo por la IZQUIERDA del mayor
+			nroBloqueABajar = itRegistros->getReferenciai(1);
 			bloqueABajar = this->archivoNodos->recuperarBloque(nroBloqueABajar);
 		}
 
 		//llamo a la siguiente recursion
-		resultadoHijo = insertarRecursivo(bloqueABajar,clave,valor);
+		resultadoHijo = insertarRecursivo(bloqueABajar, clave, valor);
 
 		//volviendo de la recursion debo encargarme de resolver los
 		//problemas de mi hijo
 
 		//si fue modificado lo intento grabar
 		//-> ojo puede venir exception por overflow
-		if(resultadoHijo->getCodigo() == HUBO_MODIFICACION){
-			try{
-				this->archivoNodos->grabarBloque(bloqueABajar,nroBloqueABajar);
-			}
-			catch(ExceptionBloque& e){
-				Bloque* bloqueSplit = new Bloque();
-				list<Registro>* listaRegistros = bloqueABajar->obtenerRegistros();
-				Registro registroASplit;
 
-				//realizo el split
-				while (archivoNodos->getOcupacionBloque(bloqueSplit) <= 0.50){
-					registroASplit = listaRegistros->back();
-					listaRegistros->pop_back();
-					bloqueSplit->agregarRegistro(registroASplit);
-				}
-				//grabo el bloque q antes me dio overflow
-				archivoNodos->grabarBloque(bloqueABajar,nroBloqueABajar);
-				//grabo el nuevo bloque producto de split donde me diga archivoNodos
-				unsigned int posLibre = archivoNodos->getBloqueLibre();
-				archivoNodos->grabarBloque(bloqueSplit,posLibre);
-
-				//me agrego a mi bloque un orientador con la referencia a este nuevo nodo
-				//el lugar donde va ese registro orientador quedo guardado en itregistros
-				//antes de ver por donde bajaba
-				// => Ahora debo agregar el registro ahi:
-				//con doble referencia si baje por el ultimo
-				//con referencia simple y modificando la referencia del que me sigue
-				//si baje por alguno del medio.
-
-				/*Registro* registroOrientador = this->crearRegistroClave();
-				registroOrientador->agregarReferencia()
-				bloqueActual->agregarRegistro(*registroOrientador);*/
-
-				delete resultadoHijo;
+		if (resultadoHijo->getCodigo() == HUBO_MODIFICACION) {
+			try {
+				this->archivoNodos->grabarBloque(bloqueABajar, nroBloqueABajar);
+			} catch (ExceptionBloque& e) {
+				// => estamos en presencia de un overflow
+				this-> resolverOverflow(bloqueABajar, nroBloqueABajar,
+						bloqueActual);
 				return new resultadoOperacion(HUBO_MODIFICACION);
-
-				/*FALTO VER LOS OVERFLOW DE NODOS INTERNOS*/
+				delete resultadoHijo;
 			}
-
+		} else {
 			//sino hubo overflow
 			delete resultadoHijo;
-			return new resultadoOperacion(OK);
-
 		}
 
+		return new resultadoOperacion(OK);
+	}
+}
 
+void ArbolBMas::resolverOverflow(Bloque* bloqueOverflow,
+		unsigned int nroBloqueOverflow, Bloque* bloqueActual) {
+
+	Bloque* bloqueSplit = new Bloque();
+	list<Registro>* listaRegistros = bloqueOverflow->obtenerRegistros();
+	Registro registroASplit;
+
+	//realizo el split
+	while (archivoNodos->getOcupacionBloque(bloqueSplit) <= 0.50) {
+		registroASplit = listaRegistros->back();
+		listaRegistros->pop_back();
+		bloqueSplit->agregarRegistro(registroASplit);
 	}
 
+	Registro registroASubir = bloqueSplit->obtenerRegistros()->front();
+	string claveASubir = this->consultarClave(&registroASubir);
+
+	//si es un interno lo que sube al bloque hay que sacarlo del bloque split
+	if (bloqueOverflow->getAtributoBloque() == 0) {
+		bloqueSplit->obtenerRegistros()->pop_front();
+	}
+
+	//el siguiente de bloque split es el que era siguiente del bloque overflow
+	bloqueSplit->setSiguiente(bloqueOverflow->getSiguiente());
+
+	//GRABO el nuevo bloque producto de split donde me diga archivoNodos
+	unsigned int posLibre = archivoNodos->getBloqueLibre();
+	archivoNodos->grabarBloque(bloqueSplit, posLibre);
+
+	//el siguiente a overflow ahora es el bloquesplit
+	bloqueOverflow->setSiguiente(posLibre);
+
+	//GRABO el bloque q antes me dio overflow
+	archivoNodos->grabarBloque(bloqueOverflow, nroBloqueOverflow);
+
+	//me agrego a mi bloque un orientador con la referencia a este nuevo nodo
+	//el lugar donde va ese registro orientador quedo guardado en itregistros
+	//antes de ver por donde bajaba
+	// => Ahora debo agregar el registro ahi:
+	//con doble referencia si baje por el ultimo
+	//con referencia simple y modificando la referencia del que me sigue
+	//si baje por alguno del medio.
+
+	Registro* registroOrientador = this->crearRegistroClave(claveASubir);
+	registroOrientador->agregarReferencia(nroBloqueOverflow);
+
+	//agrego el orientador en el bloque actual
+	list<Registro>::iterator posAgregado = this->AgregarRegistroEnOrden(bloqueActual, *registroOrientador);
+
+	//si es el ultimo
+	if (posAgregado == (bloqueActual->obtenerRegistros()->end())){
+		posAgregado->agregarReferencia(posLibre);
+		//al anterior debo borrarle la doble referencia
+		posAgregado--;
+		posAgregado->getReferencias()->pop_back();
+	}
+	else{
+		posAgregado++;
+		posAgregado->getReferencias()->pop_front();
+		posAgregado->getReferencias()->push_front(posLibre);
+	}
+
+
+
 }
+
+list<Registro>::iterator ArbolBMas::AgregarRegistroEnOrden(Bloque* unBloque,Registro unRegistro){
+	list<Registro>* listaRegistros = unBloque->obtenerRegistros();
+	list<Registro>::iterator itRegistros = listaRegistros->begin();
+	string claveRegistroAAgregar = this->consultarClave(&unRegistro);
+
+	while (this->compareRegistros(claveRegistroAAgregar,&(*itRegistros)) <=0 && itRegistros!= listaRegistros->end()){
+		itRegistros++;
+	}
+	listaRegistros->insert(itRegistros,unRegistro);
+	return itRegistros--;
+}
+
 
 resultadoOperacion* ArbolBMas::eliminar(string clave, unsigned int valor) {
 	return 0;
@@ -194,12 +241,11 @@ resultadoOperacion* ArbolBMas::buscarBloqueRecursivo(string clave,
 		if (itRegistros == listaRegistros->end()) {
 			return this->buscarBloqueRecursivo(clave,
 					(*itRegistros).getReferenciai(2), bloqueEncontrado);
-		}
-		else{
+		} else {
 
-		//sino bajo por la IZQUIERDA del mayor
-		return this->buscarBloqueRecursivo(clave,
-				(*itRegistros).getReferenciai(1), bloqueEncontrado);
+			//sino bajo por la IZQUIERDA del mayor
+			return this->buscarBloqueRecursivo(clave,
+					(*itRegistros).getReferenciai(1), bloqueEncontrado);
 		}
 	}
 }
