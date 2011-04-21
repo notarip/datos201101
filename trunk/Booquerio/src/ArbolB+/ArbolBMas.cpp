@@ -250,6 +250,63 @@ resultadoOperacion* ArbolBMas::buscarBloqueRecursivo(string clave,
 	}
 }
 
+void ArbolBMas::imprimirBloque(fstream* archivo, Bloque* unBloque, unsigned int nroBloque){
+	(*archivo)<<"Bloque "<<nroBloque<<": ";
+	(*archivo)<<unBloque->getAtributoBloque()<<", ";
+	list<Registro>* registros= unBloque->obtenerRegistros();
+	(*archivo)<<registros->size()<<"; ";
+	list<Registro>::iterator itRegistros= registros->begin();
+	while (itRegistros!=registros->end()){
+		if (itRegistros->getReferencias()->size()!=0)
+			(*archivo)<<itRegistros->getReferenciai(1);
+		(*archivo)<<"("<<this->consultarClave(&*itRegistros)<<")";
+		itRegistros++;
+	}
+	if (itRegistros->getReferencias()->size()!=0)
+		(*archivo)<<itRegistros->getReferenciai(2);
+	(*archivo)<<" ";
+	if (unBloque->getAtributoBloque()!=0)
+		(*archivo)<<unBloque->getAtributoBloque();
+	(*archivo)<<endl;
+}
+
+void ArbolBMas::exportarRecursivo(fstream* archivo, unsigned int nroBloque, unsigned int nivelRecursion){
+	nivelRecursion++;
+	Bloque* bloqueLeido= this->archivoNodos->recuperarBloque(nroBloque);
+	for(unsigned int i=0;i<nivelRecursion;i++)
+		(*archivo)<<'\t';
+	imprimirBloque(archivo, bloqueLeido, nroBloque);
+	if (bloqueLeido->getAtributoBloque()== 0) {
+		nivelRecursion--;
+		return;
+	}
+	list<Registro>* listaReg= bloqueLeido->obtenerRegistros();
+		list<Registro>::iterator itRegistros= listaReg->begin();
+		while (itRegistros!=listaReg->end()) {
+			exportarRecursivo(archivo, itRegistros->getReferenciai(1), nivelRecursion);
+			itRegistros++;
+		}
+		exportarRecursivo(archivo, itRegistros->getReferenciai(2), nivelRecursion);
+
+	nivelRecursion--;
+	return;
+}
+
+void ArbolBMas::exportar(string path){
+	fstream archivo;
+	archivo.open(path.c_str(),ios::in | ios::app);
+	this->imprimirBloque(&archivo,this->raiz,0);
+	list<Registro>* listaReg= raiz->obtenerRegistros();
+	list<Registro>::iterator itRegistros= listaReg->begin();
+	while (itRegistros!=listaReg->end()) {
+		exportarRecursivo(&archivo, itRegistros->getReferenciai(1), 1);
+		itRegistros++;
+	}
+	exportarRecursivo(&archivo, itRegistros->getReferenciai(2), 1);
+
+	archivo.close();
+}
+
 ArbolBMas::~ArbolBMas() {
 	delete this->archivoNodos;
 	delete raiz;

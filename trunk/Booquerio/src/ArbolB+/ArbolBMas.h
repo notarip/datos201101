@@ -14,6 +14,7 @@
 #include "../archivos/ExceptionBloque.h"
 #include "../util/Parametros.h"
 #include "resultadoOperacion.h"
+#include <sstream>
 
 using namespace std;
 
@@ -30,7 +31,10 @@ public:
 
 	resultadoOperacion* siguiente(Registro* regSiguiente);
 
-	void exportar();
+	void exportar(string path);
+
+	void exportarRecursivo(fstream* archivo, unsigned int nroBloque, unsigned int nivelRecursion);
+
 
 private:
 	unsigned int ultimaHojaVisitada, ultimoValorBuscado;
@@ -53,6 +57,7 @@ private:
 	resultadoOperacion* buscarBloqueRecursivo(string clave ,unsigned int refBloque, Bloque* bloqueEncontrado );
 	list<Registro>::iterator AgregarRegistroEnOrden(Bloque* unBloque,Registro unRegistro);
 
+	void imprimirBloque(fstream* archivo, Bloque* unBloque, unsigned int nroBloque);
 };
 
 #endif /* ARBOLBMAS_H_ */
