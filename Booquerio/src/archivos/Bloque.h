@@ -20,6 +20,8 @@ public:
 	virtual ~Bloque();
 	void agregarRegistro(Registro unRegistro);
 	void agregarRegistroAlInicio(Registro unRegistro);
+	list<Registro>::iterator agregarRegAlfa (Registro unRegistro);
+	list<Registro>::iterator agregarRegNum (Registro unRegistro);
 	Registro* recuperarRegistro(unsigned int atribEntero);
 	Registro* recuperarRegistro(string palabra);
 	list<Registro>* obtenerRegistros();

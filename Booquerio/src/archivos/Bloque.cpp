@@ -76,6 +76,21 @@ unsigned int Bloque::getAtributoBloque(){
 	return this->atributoBloque;
 }
 
+list<Registro>::iterator Bloque::agregarRegAlfa (Registro unRegistro){
+	list<Registro>::iterator itRegistros= this->listaRegistros.begin();
+	while (itRegistros->getString()<=unRegistro.getString() && itRegistros!=this->listaRegistros.end()){
+		itRegistros++;
+	}
+	this->listaRegistros.insert(itRegistros,unRegistro);
+}
+list<Registro>::iterator Bloque::agregarRegNum (Registro unRegistro){
+	list<Registro>::iterator itRegistros= this->listaRegistros.begin();
+		while (itRegistros->getAtributosEnteros()->front()<=unRegistro.getAtributosEnteros()->front() && itRegistros!=this->listaRegistros.end()){
+			itRegistros++;
+		}
+		this->listaRegistros.insert(itRegistros,unRegistro);
+}
+
 Bloque::~Bloque() {
 
 }
