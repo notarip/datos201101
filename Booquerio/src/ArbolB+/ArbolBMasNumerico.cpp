@@ -7,9 +7,9 @@
 
 #include "ArbolBMasNumerico.h"
 
-ArbolBMasNumerico::ArbolBMasNumerico(string path, float ocupacion,
+ArbolBMasNumerico::ArbolBMasNumerico(string path,
 		unsigned int tamanioBloque) :
-	ArbolBMas(path, ocupacion, tamanioBloque) {
+	ArbolBMas(path, tamanioBloque) {
 
 }
 
@@ -45,7 +45,8 @@ resultadoOperacion* ArbolBMasNumerico::insertarNumerico(unsigned int clave,
 	buffer << clave;
 	string claveAlfabetica;
 	buffer >> claveAlfabetica;
-	insertar(claveAlfabetica, valor);
+	return insertar(claveAlfabetica, valor);
+
 
 }
 

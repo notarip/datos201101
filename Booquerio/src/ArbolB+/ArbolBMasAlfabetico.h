@@ -13,7 +13,7 @@
 
 class ArbolBMasAlfabetico : public ArbolBMas{
 public:
-	ArbolBMasAlfabetico(string path, float ocupacion, unsigned int tamanioBloque);
+	ArbolBMasAlfabetico(string path, unsigned int tamanioBloque);
 	virtual ~ArbolBMasAlfabetico();
 	virtual char compareRegistros(string clave, Registro* unRegistro );
 	virtual Registro* crearRegistroClave(string clave);

@@ -20,7 +20,7 @@ using namespace std;
 
 class ArbolBMas {
 public:
-	ArbolBMas(string path, float ocupacion, unsigned int tamanioBloque);
+	ArbolBMas(string path, unsigned int tamanioBloque);
 	virtual ~ArbolBMas();
 	resultadoOperacion* insertar(string clave, unsigned int valor);
 
@@ -40,7 +40,6 @@ private:
 	unsigned int ultimaHojaVisitada, ultimoValorBuscado;
 	Bloque* raiz;
 	ArchivoBloques* archivoNodos;
-	float ocupacionNodo;
 	unsigned int tamanioNodo;
 
 	/*PARA DEFINIR UN ARBOL B+ HAY QUE INDICAR 2 ESTRATEGIAS:
@@ -55,7 +54,7 @@ private:
 	resultadoOperacion* insertarRecursivo( Bloque* bloqueActual, string clave,unsigned int valor);
 	void resolverOverflow(Bloque* bloqueOverflow, unsigned int nroBloqueOverflow, Bloque* bloqueActual);
 	resultadoOperacion* buscarBloqueRecursivo(string clave ,unsigned int refBloque, Bloque* bloqueEncontrado );
-	list<Registro>::iterator AgregarRegistroEnOrden(Bloque* unBloque,Registro unRegistro);
+	list<Registro>::iterator agregarRegistroEnOrden(Bloque* unBloque,Registro unRegistro);
 
 	void imprimirBloque(fstream* archivo, Bloque* unBloque, unsigned int nroBloque);
 };
