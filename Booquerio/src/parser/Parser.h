@@ -42,6 +42,8 @@ public:
 	 * el path del archivo de stop words y lo carga en la lista
 	 */
 	Parser();
+
+
 	virtual ~Parser();
 	/*
 	 * Metodo encargado del parseo del @archivo
@@ -54,8 +56,22 @@ public:
 	 */
 	int parsear(string archivo);
 
-
+	/*
+	 *Retorna una instacia del libro
+	 *
+	 */
 	Libro* getLibro();
+	/*
+	 * Retorna la lista de palabras que
+	 * contiene el libro con las siguentes
+	 * restricciones:
+	 * -todas la palabras estan en minusculas
+	 * -no estan las stop words
+	 * -sin duplicados
+	 */
+	set<string>* obtenerPalabras(Libro unLibro);
+
+
 	/*
 	 * Retorna la lista de palabras que
 	 * contiene el libro con las siguentes

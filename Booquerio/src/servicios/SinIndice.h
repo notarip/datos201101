@@ -53,7 +53,11 @@ public:
 	 * por editorial
 	 */
 	 void agregarLibroPendienteEditoriales(unsigned int unId);
-	/*
+	 /*
+	  * Agrega un libro a todas las listas
+	  */
+	 void agregarLibroPendienteATodasLasListas(unsigned int unId);
+	 /*
 	 * retorna la lista de libros pendientes de procesar por
 	 * autor
 	 */

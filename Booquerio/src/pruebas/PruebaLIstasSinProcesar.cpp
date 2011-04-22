@@ -75,6 +75,17 @@ int main_90(int argc, char** argv)
 	listar(listas);
 
 
+	listas->agregarLibroPendienteATodasLasListas(22);
+	listas->agregarLibroPendienteATodasLasListas(33);
+	listas->agregarLibroPendienteATodasLasListas(55);
+	listas->agregarLibroPendienteATodasLasListas(900);
+
+
+	cout << "agrego a las listas 22,33,55,900" << endl;
+
+	listar(listas);
+
+
 
 
 	return 0;

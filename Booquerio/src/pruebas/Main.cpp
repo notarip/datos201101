@@ -6,6 +6,7 @@
 #include <iostream>
 #include "../util/Parametros.h"
 #include "../parser/Parser.h"
+#include "../archivos/Libro.h"
 
 void ascii()
 {
@@ -74,7 +75,7 @@ void pruebaTilde()
 	delete [] buff;
 }
 
-int main_3 (int argc, char** argv)
+int main0 (int argc, char** argv)
 {
 
 
@@ -147,7 +148,7 @@ int main_3 (int argc, char** argv)
 		 * PRUEBA DEL PARSEO DEL LIBRO
 		 */
 
-		if (true)
+		if (false)
 		{
 			Parser *parser3 = new Parser();
 			fstream salida;
@@ -184,14 +185,14 @@ int main_3 (int argc, char** argv)
 
 
 
-		if (true)
+		if (false)
 		{
 			string rutaLibros = Parametros().getParametro(CARPETA_LIBROS);
 			list<string> *archivos2 = Util().getArchivos(rutaLibros);
 			archivos2->sort();
 			string libro;
 			Parser *parser4 = new Parser();
-			int cont = 10;
+			int cont = 1;
 
 			for (list<string>::iterator it= archivos2->begin(); it != archivos2->end();it++)
 			{
@@ -221,6 +222,42 @@ int main_3 (int argc, char** argv)
 			cout << "Fin de listar libro" << endl;
 			pausa();
 		}
+	}
+
+	if (true)
+	{
+		string rutaLibros2 = "";
+
+		rutaLibros2 += Parametros().getParametro(CARPETA_LIBROS);
+
+		list<string> *archivos3 = Util().getArchivos(rutaLibros2);
+
+		Parser *parser10 = new Parser();
+
+		//parser10->parsear(rutaLibros2 + archivos3->front());
+
+		parser10->parsear("./archivos/pruebas/Alejando Pérez - La saga - El Tenebroso.txt");
+
+
+		Libro *unLibro;
+
+		unLibro = parser10->getLibro();
+
+		parser10->~Parser();
+
+		parser10 = new Parser();
+
+		set<string> *listap2 = parser10->obtenerPalabras(*unLibro);
+
+		for (set<string>::iterator itp2 = listap2->begin(); itp2 != listap2->end(); itp2++)
+			cout << (*itp2).c_str() << endl;
+
+		listap2->clear();
+
+		parser10->~Parser();
+
+		unLibro->~Libro();
+
 	}
 
 	return 0;

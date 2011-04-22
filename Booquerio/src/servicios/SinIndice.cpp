@@ -12,6 +12,7 @@ SinIndice::SinIndice(void)
 {
 	rutaListas = Parametros().getParametro(RUTA_LISTAS);
 	if (!Util().existeArchivo(rutaListas))
+
 	{
 		ArchivoBloques *manejador = new ArchivoBloques(rutaListas, TAMANIO_B_LISTAS);
 		unsigned int nroBloque = 0;
@@ -75,13 +76,10 @@ void SinIndice::agregarLibroPendientePalabras(unsigned int unId)
 }
 
 
-
 list<unsigned int>* SinIndice::getPendientesTitulos()
 {
 	return this->getLista(LISTA_TITULOS);
-
 }
-
 
 list<unsigned int>* SinIndice::getPendientesAutores()
 {
@@ -163,6 +161,38 @@ void SinIndice::agregarLibro(unsigned int unId, int lista)
 	unBloque->~Bloque();
 
 	nuevoBloque->~Bloque();
+
+	manejador->~ArchivoBloques();
+
+}
+
+void SinIndice::agregarLibroPendienteATodasLasListas(unsigned int unId)
+{
+
+	ArchivoBloques *manejador = new ArchivoBloques(this->rutaListas, TAMANIO_B_LISTAS);
+	Bloque *unBloque = manejador->recuperarBloque(0);
+	Registro *unRegistroA = unBloque->recuperarRegistro(LISTA_AUTORES);
+	Registro *unRegistroE = unBloque->recuperarRegistro(LISTA_EDITORIALES);
+	Registro *unRegistroT = unBloque->recuperarRegistro(LISTA_TITULOS);
+	Registro *unRegistroP = unBloque->recuperarRegistro(LISTA_PALABRAS);
+
+	unRegistroA->agregarReferencia(unId);
+	unRegistroE->agregarReferencia(unId);
+	unRegistroT->agregarReferencia(unId);
+	unRegistroP->agregarReferencia(unId);
+
+	Bloque *nuevoBloque = new Bloque();
+
+	nuevoBloque->agregarRegistro(*unRegistroA);
+	nuevoBloque->agregarRegistro(*unRegistroE);
+	nuevoBloque->agregarRegistro(*unRegistroT);
+	nuevoBloque->agregarRegistro(*unRegistroP);
+
+	manejador->grabarBloque(nuevoBloque,0);
+
+	unBloque->~Bloque();
+	nuevoBloque->~Bloque();
+	manejador->~ArchivoBloques();
 
 }
 
