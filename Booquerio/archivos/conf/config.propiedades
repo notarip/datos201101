@@ -6,3 +6,5 @@ path_datos=./archivos/datos/;
 path_libros=./archivos/libros/;
 path_stopWords=./archivos/conf/stopWords.csv;
 path_editoriales=./archivos/conf/editoriales.csv;
+path_id=./archivos/datos/id.dat;
+path_listas=./archivos/datos/listas;
