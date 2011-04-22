@@ -24,6 +24,9 @@ string Libro::getTitulo(){return this->titulo;}
 string Libro::getEditorial(){return this->editorial;}
 string Libro::getAutor(){return this->autor;}
 string Libro::getTexto(){return this->texto;}
+string Libro::getPalabras(){return this->palabras;}
+unsigned int Libro::getCantPalabras(){return this->cantPalabras;}
+
 
 void Libro::setPalabras(string palabras, unsigned int cantidad)
 {

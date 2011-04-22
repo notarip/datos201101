@@ -21,6 +21,8 @@ public:
 	string getEditorial();
 	string getAutor();
 	string getTexto();
+	string getPalabras();
+	unsigned int getCantPalabras();
 	string toString();
 	void setPalabras(string palabras, unsigned int cantidad);
 
