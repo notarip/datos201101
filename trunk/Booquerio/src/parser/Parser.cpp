@@ -12,7 +12,9 @@ Parser::Parser() {
 
 }
 
-Parser::~Parser() {
+
+Parser::~Parser()
+{
 
 	stopWords.clear();
 
@@ -35,6 +37,13 @@ int Parser::parsear(string archivo)
 	return ARCHIVO_INVALIDO;
 }
 
+set<string> *Parser::obtenerPalabras(Libro unLibro)
+{
+	this->texto = unLibro.getTexto();
+
+	return this->obtenerPalabras();
+
+}
 
 set<string> *Parser::obtenerPalabras()
 {

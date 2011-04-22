@@ -48,6 +48,8 @@
 
 
 #include <iostream>
+#include "../servicios/Servicios.h"
+
 using namespace std;
 
 
@@ -69,12 +71,17 @@ void error_de_llamada()
 
 }
 
-int determinar_operacion(int cant_parm, char** parm)
+int determinar_operacion(int cant_parm, char** parm, string *parametro)
 {
 
 	if (cant_parm > 4 || cant_parm < 2)
 		return ERROR_DE_LLAMADA;
 
+	if (parm[1][1] == 'i')
+	{
+		parametro->append(parm[2]);
+		return TOMAR_TEXTO;
+	}
 	if (parm[1][1] == 'e')
 		return PROCESAR_EDITORIAL;
 
@@ -90,8 +97,18 @@ int determinar_operacion(int cant_parm, char** parm)
 	if (parm[1][1] == 'l')
 		return LISTAR_ARCHIVOS_TOMADOS;
 
+	if (parm[1][1] == 'o')
+	{
+		parametro->append(parm[2]);
+		return OBTENER_ARCHIVO;
+	}
+
 	if (parm[1][1] == 'q')
+	{
+		parametro->append(parm[2]);
 		return QUITAR_ARCHIVO;
+	}
+
 
 	if (parm[1][1] == 'v')
 	{
@@ -109,27 +126,28 @@ int determinar_operacion(int cant_parm, char** parm)
 }
 
 
-int main_2 (int argc, char** argv)
+int main (int argc, char** argv)
 {
 
-	int operacion =	determinar_operacion(argc, argv);
+	string parametro;
+	int operacion =	determinar_operacion(argc, argv, &parametro);
 
 	switch(operacion)
 	{
-	case TOMAR_TEXTO:/*llamada al servicio que toma los libros*/;break;
-	case PROCESAR_AUTOR:/*llamada al servicio que procesa autores*/;break;
-	case PROCESAR_EDITORIAL:/*llamada al servicio que procesa editoriales*/;break;
-	case PROCESAR_PALABRAS:/*llamada al servicio que procesa palabras*/;break;
-	case PROCESAR_TITULO:/*llamada al servicio que procesa titulos*/;break;
-	case LISTAR_ARCHIVOS_TOMADOS:/*llamada al servicio que lista los libros tomados*/;break;
-	case OBTENER_ARCHIVO:/*llamada al servicio que devuelve un libro*/;break;
-	case QUITAR_ARCHIVO:/*llamada al servicio que saca un libro*/;break;
-	case VER_ESTRUCTURA_AUTOR:/*llamada al servicio que muestra estructuras autor*/;break;
-	case VER_ESTRUCTURA_EDITORIAL:/*llamada al servicio que muestra estructuras autor*/;break;
-	case VER_ESTRUCTURA_PALABRA:/*llamada al servicio que muestra estructuras autor*/;break;
-	case VER_ESTRUCTURA_TITULO:/*llamada al servicio que muestra estructuras autor*/;break;
-	case ERROR_DE_LLAMADA:error_de_llamada();break;
-	default:error_de_llamada();break;
+		case TOMAR_TEXTO:Servicios().tomarTexto(parametro);break;
+		case PROCESAR_AUTOR:Servicios().procesarAutores();break;
+		case PROCESAR_EDITORIAL:Servicios().procesarEditoriales();break;
+		case PROCESAR_TITULO:Servicios().procesarTitulos();break;
+		case PROCESAR_PALABRAS:Servicios().procesarPalabras();break;
+		case LISTAR_ARCHIVOS_TOMADOS:/*llamada al servicio que lista los libros tomados*/;break;
+		case OBTENER_ARCHIVO:/*llamada al servicio que devuelve un libro*/;break;
+		case QUITAR_ARCHIVO:/*llamada al servicio que saca un libro*/;break;
+		case VER_ESTRUCTURA_AUTOR:/*llamada al servicio que muestra estructuras autor*/;break;
+		case VER_ESTRUCTURA_EDITORIAL:/*llamada al servicio que muestra estructuras autor*/;break;
+		case VER_ESTRUCTURA_PALABRA:/*llamada al servicio que muestra estructuras autor*/;break;
+		case VER_ESTRUCTURA_TITULO:/*llamada al servicio que muestra estructuras autor*/;break;
+		case ERROR_DE_LLAMADA:error_de_llamada();break;
+		default:error_de_llamada();break;
 	}
 
 	return 0;
