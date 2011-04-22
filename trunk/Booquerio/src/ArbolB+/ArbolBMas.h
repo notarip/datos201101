@@ -33,8 +33,6 @@ public:
 
 	void exportar(string path);
 
-	void exportarRecursivo(fstream* archivo, unsigned int nroBloque, unsigned int nivelRecursion);
-
 
 private:
 	unsigned int ultimaHojaVisitada, ultimoValorBuscado;
@@ -56,7 +54,8 @@ private:
 	resultadoOperacion* buscarBloqueRecursivo(string clave ,unsigned int refBloque, Bloque* bloqueEncontrado );
 	list<Registro>::iterator agregarRegistroEnOrden(Bloque* unBloque,Registro unRegistro);
 
-	void imprimirBloque(fstream* archivo, Bloque* unBloque, unsigned int nroBloque);
+	string exportarRecursivo(unsigned int nroBloque, unsigned int nivelRecursion);
+	string imprimirBloque(Bloque* unBloque, unsigned int nroBloque);
 };
 
 #endif /* ARBOLBMAS_H_ */
