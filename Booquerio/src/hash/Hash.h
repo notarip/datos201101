@@ -9,13 +9,9 @@
 #define HASH_H_
 
 typedef unsigned int elemLista;
-//struct elemLista2{       //TODO el tamaño de dispersion ahora esta en el bloque.
-//	elemLista nroBloque;
-//	elemLista TD;
-//};
 
-#define EXTENCION_TABLA ".table"
-#define EXTENCION_DATOS ".hash"
+// #define EXTENCION_TABLA ".table" ya no sirve (creo).
+#define EXTENSION_DATOS ".hash"
 #define TAMANIO_TABLA 8
 #define BYTES_TABLA TAMANIO_TABLA*sizeof(elemLista)
 #define TAMANIO_BLOQUE 4096
@@ -36,7 +32,7 @@ using namespace std;
 class Hash {
 public:
 	Hash(string nombre);
-	virtual ~Hash();
+
 	/*
 	 * Inserta un registro es pre que este
 	 * abierto el hash, retorna el resutado de la
@@ -45,39 +41,63 @@ public:
 	void insertar(Registro *registro);
 
 	/*
-	 * Borra del hash el @que
+	 * Borra del hash el registro @que
 	 * si lo borra retorna ok
 	 * si no lo encontro retorna
 	 * error
 	 *
 	 */
 	void borrar(string que);
+
+
 	/*
 	 * busca en el hash la clave @que
 	 * y devuelve el registro, si no encuentra la
 	 * clave devuelve null
 	 */
 	Registro* buscar(string que);
+
+	virtual ~Hash();
+
 private:
-	fstream archivoTabla;
-	string nombre;
 	string pathHash;
-	elemLista tamanioLista;
-	elemLista *tabla;
-	unsigned int offsetUltimaBusqueda;
+	unsigned int tamanioTabla;
+	unsigned int *tabla;
 	/*
 	 * Crea un hash
 	 */
 	int crear();
 	/*
-	 * Abre u	n hash
+	 * Abre un hash
 	 */
 	int abrir();
 
 	/*
 	 * Retorna el nro de elemento en la lista
 	 */
-	int hasheo(string key);
+	unsigned int hasheo(string key);
+
+	/*
+	 * Determina el tamaño de dispersion para un elemento
+	 */
+	unsigned int tamDispersion(unsigned int numbloque);
+
+
+	/*
+	 * Actualiza la tabla cuando se realiza una insercion.
+	 */
+	void actualizarTabla_insercion(unsigned int tamDispersion,unsigned int pos_desbordado,unsigned int bl_nuevo);
+
+	/*
+	 * Actualiza la tabla cuando se realiza una eliminacion.
+	 */
+	void actualizarTabla_eliminacion(unsigned int tamDispersion,unsigned int pos_eliminado);
+
+	/*
+	 * Reestructura el archivo en los casos de overflow.
+	 */
+	void reestructurar_archivo(ArchivoBloques archivo,unsigned int nro_desbordado,unsigned int nro_libre,Registro* registro_a_ins); //TODO VER BIEN!!!!!!!*/
+
 
 };
 
