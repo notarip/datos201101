@@ -128,6 +128,7 @@ void ArbolBMas::resolverOverflow(Bloque* bloqueOverflow,
 		unsigned int nroBloqueOverflow, Bloque* bloqueActual) {
 
 	Bloque* bloqueSplit = new Bloque();
+	bloqueSplit->setAtributoBloque(bloqueOverflow->getAtributoBloque());
 	list<Registro>* listaRegistros = bloqueOverflow->obtenerRegistros();
 	Registro registroASplit;
 
@@ -144,6 +145,8 @@ void ArbolBMas::resolverOverflow(Bloque* bloqueOverflow,
 
 	//si es un interno lo que sube al bloque hay que sacarlo del bloque split
 	if (bloqueOverflow->getAtributoBloque() != 0) {
+		unsigned int refAPasar=bloqueSplit->obtenerRegistros()->front().getReferenciai(1);
+		listaRegistros->back().agregarReferencia(refAPasar);
 		bloqueSplit->obtenerRegistros()->pop_front();
 	}
 
@@ -180,14 +183,15 @@ void ArbolBMas::resolverOverflow(Bloque* bloqueOverflow,
 	//agrego el orientador en el bloque actual
 	list<Registro>::iterator posAgregado = this->agregarRegistroEnOrden(
 			bloqueActual, *registroOrientador);
-
 	//si es el ultimo
-	if (posAgregado++ == (bloqueActual->obtenerRegistros()->end())) {
-		//posAgregado--;
-		cout<< boolalpha<<  (posAgregado == bloqueActual->obtenerRegistros()->begin())<<endl;
+
+	if (consultarClave(registroOrientador)==consultarClave(&(bloqueActual->obtenerRegistros()->back()))) {
 		posAgregado->agregarReferencia(posLibre);
 		//si hay donde meti la doble ref no es el primero => debo borrarle la 2da ref al anterior a mi
-		if (posAgregado != bloqueActual->obtenerRegistros()->begin()) {
+
+		if (bloqueActual->obtenerRegistros()->size()>1) {
+			posAgregado= (bloqueActual->obtenerRegistros()->end());
+			posAgregado--;
 			posAgregado--;
 			posAgregado->getReferencias()->pop_back();
 		}
@@ -216,7 +220,8 @@ list<Registro>::iterator ArbolBMas::agregarRegistroEnOrden(Bloque* unBloque,
 	}
 	//itRegistros++;
 	listaRegistros->insert(itRegistros, unRegistro);
-	return itRegistros--;
+	--itRegistros;
+	return itRegistros;
 }
 
 resultadoOperacion* ArbolBMas::eliminar(string clave, unsigned int valor) {
@@ -292,66 +297,93 @@ resultadoOperacion* ArbolBMas::buscarBloqueRecursivo(string clave,
 	}
 }
 
-void ArbolBMas::imprimirBloque(fstream* archivo, Bloque* unBloque,
-		unsigned int nroBloque) {
-	cout << "Bloque " << nroBloque << ": ";
-	cout << unBloque->getAtributoBloque() << ", ";
+string ArbolBMas::imprimirBloque(Bloque* unBloque, unsigned int nroBloque) {
+	stringstream conversor;
+	string bloqueImpreso="";
+	bloqueImpreso+="Bloque ";
+	conversor<<nroBloque;
+	bloqueImpreso+=conversor.str();
+	conversor.str("");
+	bloqueImpreso+=": ";
+	conversor<<unBloque->getAtributoBloque();
+	bloqueImpreso+=conversor.str();
+	conversor.str("");
+	bloqueImpreso+=", ";
 	list<Registro>* registros = unBloque->obtenerRegistros();
-	cout << registros->size() << "; ";
+	conversor<<registros->size();
+	bloqueImpreso+=conversor.str();
+	conversor.str("");
+	bloqueImpreso+= "; ";
 	list<Registro>::iterator itRegistros = registros->begin();
 	while (itRegistros != registros->end()) {
-		if (itRegistros->getReferencias()->size() != 0)
-			cout << itRegistros->getReferenciai(1);
-		cout << "(" << this->consultarClave(&*itRegistros) << ")";
+		if (itRegistros->getReferencias()->size() != 0){
+			conversor << itRegistros->getReferenciai(1);
+			bloqueImpreso+=conversor.str();
+			conversor.str("");
+		}
+		bloqueImpreso+= "(";
+		bloqueImpreso+= this->consultarClave(&*itRegistros);
+		bloqueImpreso+= ")";
 		itRegistros++;
 	}
 	itRegistros--;
-	if (itRegistros->getReferencias()->size() != 0)
-		cout << itRegistros->getReferenciai(2);
-	cout << " ";
-	if (unBloque->getAtributoBloque() == 0)
-		cout << unBloque->getSiguiente();
-	cout << endl;
+	if (itRegistros->getReferencias()->size() != 0) {
+		conversor << itRegistros->getReferenciai(2);
+		bloqueImpreso+=conversor.str();
+		conversor.str("");
+	}
+	bloqueImpreso+=" ";
+	if (unBloque->getAtributoBloque() == 0){
+		conversor<< unBloque->getSiguiente();
+		bloqueImpreso+=conversor.str();
+		conversor.str("");
+	}
+	bloqueImpreso+= '\n';
+	return bloqueImpreso;
 }
 
-void ArbolBMas::exportarRecursivo(fstream* archivo, unsigned int nroBloque,
+string ArbolBMas::exportarRecursivo(unsigned int nroBloque,
 		unsigned int nivelRecursion) {
 	nivelRecursion++;
+	string textoAExportar="";
 	Bloque* bloqueLeido = this->archivoNodos->recuperarBloque(nroBloque);
 	for (unsigned int i = 0; i < nivelRecursion; i++)
-		cout << '\t';
-	imprimirBloque(archivo, bloqueLeido, nroBloque);
+		textoAExportar+= '\t';
+	textoAExportar+=imprimirBloque(bloqueLeido, nroBloque);
 	if (bloqueLeido->getAtributoBloque() == 0) {
-		return;
+		return textoAExportar;
 	}
 	list<Registro>* listaReg = bloqueLeido->obtenerRegistros();
 	list<Registro>::iterator itRegistros = listaReg->begin();
 	while (itRegistros != listaReg->end()) {
-		exportarRecursivo(archivo, itRegistros->getReferenciai(1),
+		textoAExportar+=exportarRecursivo(itRegistros->getReferenciai(1),
 				nivelRecursion);
 		itRegistros++;
 	}
 	itRegistros--;
-	exportarRecursivo(archivo, itRegistros->getReferenciai(2), nivelRecursion);
-	return;
+	textoAExportar+=exportarRecursivo(itRegistros->getReferenciai(2), nivelRecursion);
+	return textoAExportar;
 }
 
 void ArbolBMas::exportar(string path) {
-	fstream archivo;
-	archivo.open(path.c_str(), ios::in | ios::app);
-	this->imprimirBloque(&archivo, this->raiz, 0);
-	if (raiz->getAtributoBloque() == 0)
-		return;
+	string textoAExportar= "";
 
-	list<Registro>* listaReg = raiz->obtenerRegistros();
-	list<Registro>::iterator itRegistros = listaReg->begin();
-	while (itRegistros != listaReg->end()) {
-		exportarRecursivo(&archivo, itRegistros->getReferenciai(1), 0);
-		itRegistros++;
+	textoAExportar+=this->imprimirBloque(this->raiz, 0);
+	if (raiz->getAtributoBloque() != 0){
+
+		list<Registro>* listaReg = raiz->obtenerRegistros();
+		list<Registro>::iterator itRegistros = listaReg->begin();
+		while (itRegistros != listaReg->end()) {
+			textoAExportar+=exportarRecursivo(itRegistros->getReferenciai(1), 0);
+			itRegistros++;
+		}
+		itRegistros--;
+		textoAExportar+=exportarRecursivo(itRegistros->getReferenciai(2), 0);
 	}
-	itRegistros--;
-	exportarRecursivo(&archivo, itRegistros->getReferenciai(2), 0);
-
+	fstream archivo;
+	archivo.open(path.c_str(), ios::out | ios::app);
+	archivo<<textoAExportar;
+	archivo<<"-------------------------------------------------------------"<<endl;
 	archivo.close();
 }
 
