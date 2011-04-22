@@ -28,6 +28,8 @@ int Parser::parsear(string archivo)
 	{
 		procesarLibro(&archLibro,archivo);
 		archLibro.close();
+		unsigned int id = Util().generarIdNuevo();
+		this->libro = new Libro(id,this->titulo,this->editorial,this->autor,this->texto);
 		return EXITOSO;
 	}
 	return ARCHIVO_INVALIDO;
@@ -94,6 +96,11 @@ void Parser::obtenerAutorTitulo(string nombre)
 }
 
 
+
+Libro *Parser::getLibro()
+{
+	return this->libro;
+}
 
 void Parser::obtenerEditorial()
 {

@@ -25,6 +25,8 @@
 #include <fstream>
 #include "../util/Parametros.h"
 #include "../util/Util.h"
+#include "../archivos/Libro.h"
+
 using namespace std;
 
 
@@ -52,6 +54,8 @@ public:
 	 */
 	int parsear(string archivo);
 
+
+	Libro* getLibro();
 	/*
 	 * Retorna la lista de palabras que
 	 * contiene el libro con las siguentes
@@ -82,6 +86,7 @@ private:
 	string titulo;
 	string texto;
 	set<string> stopWords;
+	Libro* libro;
 
 	/*
 	 * Metodo privado que levanta las palabras

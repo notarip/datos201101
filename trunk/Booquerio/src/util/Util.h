@@ -9,11 +9,12 @@
 #define UTIL_H_
 #include <iostream>
 #include <fstream>
-#include <string>
+#include <string.h>
 #include <list>
 #include <sys/types.h>
 #include <dirent.h>
-
+#include "Parametros.h"
+#define RUTA_ID "path_id"
 
 
 using namespace std;
@@ -59,6 +60,17 @@ public:
 	 * Retorna true si el @archivo existe
 	 */
 	static bool existeArchivo(string archivo);
+
+	/*
+	 *Retorna un id nuevo para un libro
+	 */
+	static unsigned int generarIdNuevo();
+
+	/*
+	 *Reinicia el contador de ids
+	 *ojo por que rompe todo
+	 */
+	static void reiniciarId(unsigned int unId);
 
 private:
 	static string convertir(char letra);

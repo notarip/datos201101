@@ -86,6 +86,7 @@ bool Util::existeArchivo(string archivo)
 
 }
 
+
 string Util::convertir(char letra)
 {
 	if (letra == '\341') //a
@@ -165,3 +166,45 @@ list<string>* Util::getCarpetas(string carpeta)
 
 }
 
+unsigned int Util::generarIdNuevo()
+{
+	 fstream archivo;
+	 string ruta = Parametros().getParametro(RUTA_ID);
+	 unsigned int id;
+	 archivo.open(ruta.c_str(), ios::in | ios::out | ios::binary);
+	 if (archivo.is_open())
+	 {
+
+		char* buff = new char[sizeof(unsigned int)];
+
+		archivo.read(buff, sizeof(unsigned int));
+		memcpy(&id, buff, sizeof(unsigned int));
+		unsigned int nuevo = id + 1;
+		archivo.seekp(0,ios::beg);
+		memcpy(buff, &nuevo, sizeof(unsigned int));
+		archivo.write(buff, sizeof(unsigned int));
+		delete [] buff;
+		archivo.close();
+	 }
+
+	 return id;
+
+}
+
+
+void Util::reiniciarId(unsigned int unId)
+{
+	 fstream archivo;
+	 string ruta = Parametros().getParametro(RUTA_ID);
+	 archivo.open(ruta.c_str(), ios::in | ios::out | ios::binary);
+	 if (archivo.is_open())
+	 {
+		unsigned int id = unId;
+		char* buff = new char[sizeof(unsigned int)];
+		memcpy(buff,&id,sizeof(unsigned int));
+		archivo.write(buff, sizeof(unsigned int));
+		delete [] buff;
+		archivo.close();
+	 }
+
+}
