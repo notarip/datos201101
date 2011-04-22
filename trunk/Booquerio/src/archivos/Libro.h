@@ -21,11 +21,12 @@ public:
 	string getEditorial();
 	string getAutor();
 	string getTexto();
-
+	string toString();
+	void setPalabras(string palabras, unsigned int cantidad);
 
 private:
-	unsigned int id;
-	string titulo,editorial,autor,texto;
+	unsigned int id, cantPalabras;
+	string titulo,editorial,autor,texto,palabras;
 
 
 

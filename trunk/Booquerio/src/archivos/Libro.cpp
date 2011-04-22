@@ -1,4 +1,4 @@
-/*
+	/*
  * Libro.cpp
  *
  *  Created on: 01/04/2011
@@ -24,6 +24,30 @@ string Libro::getTitulo(){return this->titulo;}
 string Libro::getEditorial(){return this->editorial;}
 string Libro::getAutor(){return this->autor;}
 string Libro::getTexto(){return this->texto;}
+
+void Libro::setPalabras(string palabras, unsigned int cantidad)
+{
+	this->palabras = palabras;
+	this->cantPalabras = cantidad;
+}
+
+string Libro::toString()
+{
+	string respuesta;
+
+	respuesta += "Autor: ";
+	respuesta += this->autor;
+	respuesta += "\n";
+	respuesta += "Editorial: ";
+	respuesta += this->editorial;
+	respuesta += "\n";
+	respuesta += "Titulo: ";
+	respuesta += this->titulo;
+	respuesta += "\n";
+	respuesta += "Palabras: ";
+	//respuesta += itoa (this->cantPalabras); //TODO guardar la cantidad de palabras
+	respuesta += "\n";
+}
 
 Libro::~Libro() {
 	// TODO Auto-generated destructor stub
