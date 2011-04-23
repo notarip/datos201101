@@ -14,6 +14,7 @@
 #define INDICE_PALABRAS 3
 
 #include <string>
+#include <stdlib.h>
 #include "../parser/Parser.h"
 #include "../archivos/Libro.h"
 #include "../servicios/SinIndice.h"
@@ -52,6 +53,20 @@ public:
 	 * por palabras
 	 */
 	static void procesarPalabras();
+
+	/*
+	 * Lista por pantalla los libros
+	 * que estan almacenados esten o no
+	 * indexados
+	 */
+	static void listarLibros();
+
+
+	/*
+	 *Recrea en un txt el libro
+	 *solicitado
+	 */
+	static void obtenerLibro(string unId);
 private:
 	static void procesarLibro(int indice);
 	static void agregarIndiceAutores(Libro *unLibro);

@@ -14,7 +14,8 @@
 #define ARCHIVO_STOPWORDS "path_stopWords"
 #define ARCHIVO_EDITORIALES "path_editoriales"
 #define FACTOR_EDITORIALES "factor_editoriales"
-#define RUTA_ARC_LIBROS "path_arc_libros"
+#define CARPETA_ARC_LIBROS "path_arc_libros"
+#define CARPETA_SALIDA "path_salidas"
 
 
 #include <string>

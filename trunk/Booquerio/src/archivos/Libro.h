@@ -8,7 +8,10 @@
 
 #ifndef LIBRO_H_
 #define LIBRO_H_
+
 #include <string>
+#include <set>
+#include "../util/Util.h"
 
 using namespace std;
 
@@ -22,6 +25,7 @@ public:
 	string getAutor();
 	string getTexto();
 	string getPalabras();
+	set<string>* getListaPalabras();
 	unsigned int getCantPalabras();
 	string toString();
 	void setPalabras(string palabras, unsigned int cantidad);
@@ -29,6 +33,7 @@ public:
 private:
 	unsigned int id, cantPalabras;
 	string titulo,editorial,autor,texto,palabras;
+	list<string> *listaPalabras;
 
 
 
