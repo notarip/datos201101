@@ -34,6 +34,27 @@ void Libro::setPalabras(string palabras, unsigned int cantidad)
 	this->cantPalabras = cantidad;
 }
 
+set<string> *Libro::getListaPalabras()
+{
+	set<string> *lista = new set<string>();
+	unsigned int posIni = 0;
+	unsigned int posFin;
+	bool fin = false;
+	string palabra;
+
+	while (!fin)
+	{
+		posFin = this->palabras.find(',',posIni);
+		palabra = this->palabras.substr(posIni, posFin - posIni); //string a almacenar
+		lista->insert(palabra);
+		posIni = posFin + 1;
+		if (posFin >= this->palabras.size()-1)
+			fin = true;
+	}
+
+	return lista;
+}
+
 string Libro::toString()
 {
 	string respuesta;
@@ -48,8 +69,10 @@ string Libro::toString()
 	respuesta += this->titulo;
 	respuesta += "\n";
 	respuesta += "Palabras: ";
-	//respuesta += itoa (this->cantPalabras); //TODO guardar la cantidad de palabras
+	respuesta += Util().UIntToString(this->cantPalabras);
 	respuesta += "\n";
+
+	return respuesta;
 }
 
 Libro::~Libro() {

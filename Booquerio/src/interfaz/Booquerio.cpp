@@ -139,7 +139,7 @@ int main (int argc, char** argv)
 		case PROCESAR_EDITORIAL:Servicios().procesarEditoriales();break;
 		case PROCESAR_TITULO:Servicios().procesarTitulos();break;
 		case PROCESAR_PALABRAS:Servicios().procesarPalabras();break;
-		case LISTAR_ARCHIVOS_TOMADOS:/*llamada al servicio que lista los libros tomados*/;break;
+		case LISTAR_ARCHIVOS_TOMADOS:Servicios().listarLibros();break;
 		case OBTENER_ARCHIVO:/*llamada al servicio que devuelve un libro*/;break;
 		case QUITAR_ARCHIVO:/*llamada al servicio que saca un libro*/;break;
 		case VER_ESTRUCTURA_AUTOR:/*llamada al servicio que muestra estructuras autor*/;break;

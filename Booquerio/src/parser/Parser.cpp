@@ -31,11 +31,26 @@ int Parser::parsear(string archivo)
 		procesarLibro(&archLibro,archivo);
 		archLibro.close();
 		unsigned int id = Util().generarIdNuevo();
-		this->libro = new Libro(id,this->titulo,this->editorial,this->autor,this->texto);
+		this->libro = new Libro(id,this->titulo, this->autor, this->editorial, this->texto);
+		guardarPalabras();
 		return EXITOSO;
 	}
 	return ARCHIVO_INVALIDO;
 }
+
+void Parser::guardarPalabras()
+{
+	set<string> *palabras = this->obtenerPalabras();
+	string palabrasComa;
+	for(set<string>::iterator it = palabras->begin(); it != palabras->end();it++ )
+	{
+		palabrasComa += (*it);
+		palabrasComa += ",";
+	}
+	this->libro->setPalabras(palabrasComa,palabras->size());
+
+}
+
 
 set<string> *Parser::obtenerPalabras(Libro unLibro)
 {
@@ -149,7 +164,7 @@ set<string> *Parser::procesarPalabras()
 	set<string> *palabras = new set<string>();
 
 	unsigned int posIni = 0;
-	unsigned int posFin;
+	unsigned int posFin = 0;
 	unsigned int largo = this->texto.length();
 	string palabra;
 

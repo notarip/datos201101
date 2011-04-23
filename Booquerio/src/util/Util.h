@@ -8,6 +8,7 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <string.h>
 #include <list>
@@ -71,6 +72,21 @@ public:
 	 *ojo por que rompe todo
 	 */
 	static void reiniciarId(unsigned int unId);
+
+	/*
+	 * Retorna el numero en formato
+	 * string
+	 */
+	static string DoubleToString(double numero);
+
+
+	/*
+	 * Retorna el numero en formato
+	 * string
+	 */
+	static string UIntToString(unsigned int numero);
+
+
 
 private:
 	static string convertir(char letra);

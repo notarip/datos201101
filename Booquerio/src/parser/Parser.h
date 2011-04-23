@@ -176,6 +176,13 @@ private:
 	 * debe estar cargado
 	 */
 	void obtenerEditorial();
+
+	/*
+	 * Procesa las palabras del libro
+	 * y las convierte en una lista separada
+	 * por comas para guardalas en el libro
+	 */
+	void guardarPalabras();
 };
 
 #endif /* PARSER_H_ */

@@ -208,3 +208,20 @@ void Util::reiniciarId(unsigned int unId)
 	 }
 
 }
+
+string Util::DoubleToString(double numero)
+{
+        stringstream ss;
+
+        ss << numero;
+        return ss.str();
+}
+
+string Util::UIntToString(unsigned int numero)
+{
+        stringstream ss;
+
+        ss << numero;
+        return ss.str();
+}
+
