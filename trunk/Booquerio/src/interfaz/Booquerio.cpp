@@ -33,6 +33,12 @@
 
 
 #define ERROR_DE_LLAMADA -10
+#define SUCCESS	0
+
+
+
+
+
 #define TOMAR_TEXTO 10
 #define PROCESAR_EDITORIAL 20
 #define PROCESAR_AUTOR 30
@@ -70,6 +76,42 @@ void error_de_llamada()
 	cout << "Título, -p hash de Palabra] \"Nombre Archivo\"" << endl;
 
 }
+
+void error_archivo_listas()
+{
+	cout << "Error en la configuración: no se hallo el archivo de listas." << endl;
+}
+
+void error_ruta_libro_invalida()
+{
+	cout << "Error en ruta: el nombre del archivo es invalido o no hay permisos sobre el directorio." << endl;
+}
+
+void error_ruta_archivo_libros()
+{
+	cout << "Error en la configuración: no se hallo el archivo que contiene los libros." << endl;
+}
+
+void sin_errores()
+{
+	cout << "Satifactorio." << endl;
+}
+
+void procesamiento_de_errores(int error)
+{
+	//TODO armar un case de errores con los mensajes
+
+	switch(error)
+	{
+		case SUCCESS : sin_errores();break;
+		case ERROR_DE_LLAMADA: error_de_llamada();break;
+		case ERROR_ARCHIVO_LISTAS: error_archivo_listas();break;
+		case ERROR_RUTA_INVALIDA:error_ruta_libro_invalida();break;
+		case ERROR_RUTA_ARCHIVO_LIBROS:error_ruta_archivo_libros();break;
+
+	}
+}
+
 
 int determinar_operacion(int cant_parm, char** parm, string *parametro)
 {
@@ -126,29 +168,32 @@ int determinar_operacion(int cant_parm, char** parm, string *parametro)
 }
 
 
+
 int main (int argc, char** argv)
 {
 
 	string parametro;
 	int operacion =	determinar_operacion(argc, argv, &parametro);
+	int error = 0;
 
 	switch(operacion)
 	{
-		case TOMAR_TEXTO:Servicios().tomarTexto(parametro);break;
-		case PROCESAR_AUTOR:Servicios().procesarAutores();break;
-		case PROCESAR_EDITORIAL:Servicios().procesarEditoriales();break;
-		case PROCESAR_TITULO:Servicios().procesarTitulos();break;
-		case PROCESAR_PALABRAS:Servicios().procesarPalabras();break;
-		case LISTAR_ARCHIVOS_TOMADOS:Servicios().listarLibros();break;
-		case OBTENER_ARCHIVO:/*llamada al servicio que devuelve un libro*/;break;
-		case QUITAR_ARCHIVO:/*llamada al servicio que saca un libro*/;break;
-		case VER_ESTRUCTURA_AUTOR:/*llamada al servicio que muestra estructuras autor*/;break;
-		case VER_ESTRUCTURA_EDITORIAL:/*llamada al servicio que muestra estructuras autor*/;break;
-		case VER_ESTRUCTURA_PALABRA:/*llamada al servicio que muestra estructuras autor*/;break;
-		case VER_ESTRUCTURA_TITULO:/*llamada al servicio que muestra estructuras autor*/;break;
-		case ERROR_DE_LLAMADA:error_de_llamada();break;
-		default:error_de_llamada();break;
+		case TOMAR_TEXTO:error = Servicios().tomarTexto(parametro);break;
+		case PROCESAR_AUTOR:error = Servicios().procesarAutores();break;
+		case PROCESAR_EDITORIAL:error = Servicios().procesarEditoriales();break;
+		case PROCESAR_TITULO:error = Servicios().procesarTitulos();break;
+		case PROCESAR_PALABRAS:error = Servicios().procesarPalabras();break;
+		case LISTAR_ARCHIVOS_TOMADOS:error = Servicios().listarLibros();break;
+		case OBTENER_ARCHIVO:error = Servicios().obtenerLibro(parametro);break;
+		case QUITAR_ARCHIVO:error = Servicios().quitarArchivo(parametro);break;
+		case VER_ESTRUCTURA_AUTOR:error = Servicios().verEstructuraAutor();break;
+		case VER_ESTRUCTURA_EDITORIAL:error = Servicios().verEstructuraEditorial();break;
+		case VER_ESTRUCTURA_TITULO:error = Servicios().verEstructuraTitulos();break;
+		case VER_ESTRUCTURA_PALABRA:error = Servicios().verEstructuraPalabras();break;
+		case ERROR_DE_LLAMADA:error = ERROR_DE_LLAMADA;break;
+		default:error = ERROR_DE_LLAMADA;break;
 	}
+	procesamiento_de_errores(error);
 
 	return 0;
 
