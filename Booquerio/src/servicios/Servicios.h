@@ -8,6 +8,9 @@
 #ifndef SERVICIOS_H_
 #define SERVICIOS_H_
 
+#define ERROR_RUTA_INVALIDA -20
+#define ERROR_RUTA_ARCHIVO_LIBROS -40
+
 #define INDICE_AUTORES 0
 #define INDICE_EDITORIALES 1
 #define INDICE_TITULOS 2
@@ -32,43 +35,75 @@ public:
 	 * como relativa segun el archivo "config.propiedades"
 	 * y el path_libros
 	 */
-	static void tomarTexto(string ruta);
+	static int tomarTexto(string ruta);
 	/*
 	 * Resuelve el comando procesamiento del indice
 	 * por autores
 	 */
-	static void procesarAutores();
+	static int procesarAutores();
 	/*
 	 * Resuelve el comando procesamiento del indice
 	 * por editoriales
 	 */
-	static void procesarEditoriales();
+	static int procesarEditoriales();
 	/*
 	 * Resuelve el comando procesamiento del indice
 	 * por titulos
 	 */
-	static void procesarTitulos();
+	static int procesarTitulos();
 	/*
 	 * Resuelve el comando procesamiento del indice
 	 * por palabras
 	 */
-	static void procesarPalabras();
+	static int procesarPalabras();
 
 	/*
 	 * Lista por pantalla los libros
 	 * que estan almacenados esten o no
 	 * indexados
 	 */
-	static void listarLibros();
+	static int listarLibros();
 
 
 	/*
 	 *Recrea en un txt el libro
 	 *solicitado
 	 */
-	static void obtenerLibro(string unId);
+	static int obtenerLibro(string unId);
+
+
+	/*
+	 * Elimina un libro de los libros
+	 * disponibles (reg variables, indices,etc)
+	 */
+	static int quitarArchivo(string unId);
+
+	/*
+	 * Lista las estructuras del indice de
+	 * Autores
+	 */
+	static int verEstructuraAutor();
+
+	/*
+	 * Lista las estructuras del indice de
+	 * Editoriales
+	 */
+	static int verEstructuraEditorial();
+
+	/*
+	 * Lista las estructuras del indice de
+	 * Titulos
+	 */
+	static int verEstructuraTitulos();
+
+	/*
+	 * Lista las estructuras del indice de
+	 * Palabras
+	 */
+	static int verEstructuraPalabras();
+
 private:
-	static void procesarLibro(int indice);
+	static int procesarLibro(int indice);
 	static void agregarIndiceAutores(Libro *unLibro);
 	static void agregarIndiceEditoriales(Libro *unLibro);
 	static void agregarIndiceTitulos(Libro *unLibro);

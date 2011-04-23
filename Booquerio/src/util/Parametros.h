@@ -9,13 +9,17 @@
 #define PARAMETROS_H_
 
 #define RUTA_CONFIG "./archivos/conf/config.propiedades"
+
+#define FACTOR_EDITORIALES "factor_editoriales"
+
 #define CARPETA_DATOS "path_datos"
 #define CARPETA_LIBROS "path_libros"
-#define ARCHIVO_STOPWORDS "path_stopWords"
-#define ARCHIVO_EDITORIALES "path_editoriales"
-#define FACTOR_EDITORIALES "factor_editoriales"
-#define CARPETA_ARC_LIBROS "path_arc_libros"
 #define CARPETA_SALIDA "path_salidas"
+
+#define ARCHIVO_STOPWORDS "path_arc_stopWords"
+#define ARCHIVO_EDITORIALES "path_arc_editoriales"
+#define ARCHIVO_LIBROS "path_arc_libros"
+#define ARCHIVO_LISTAS "path_arc_listas"
 
 
 #include <string>

@@ -10,8 +10,10 @@
 
 SinIndice::SinIndice(void)
 {
-	rutaListas = Parametros().getParametro(RUTA_LISTAS);
-	if (!Util().existeArchivo(rutaListas))
+	rutaListas = "";
+	rutaListas = Parametros().getParametro(ARCHIVO_LISTAS);
+
+	if (rutaListas != "" && !Util().existeArchivo(rutaListas))
 
 	{
 		ArchivoBloques *manejador = new ArchivoBloques(rutaListas, TAMANIO_B_LISTAS);
@@ -55,24 +57,24 @@ SinIndice* SinIndice::getInstancia()
 	return pInstancia;
 }
 
-void SinIndice::agregarLibroPendienteTitulos(unsigned int unId)
+int SinIndice::agregarLibroPendienteTitulos(unsigned int unId)
 {
-	this->agregarLibro(unId, LISTA_TITULOS);
+	return this->agregarLibro(unId, LISTA_TITULOS);
 }
 
-void SinIndice::agregarLibroPendienteEditoriales(unsigned int unId)
+int SinIndice::agregarLibroPendienteEditoriales(unsigned int unId)
 {
-	this->agregarLibro(unId, LISTA_EDITORIALES);
+	return this->agregarLibro(unId, LISTA_EDITORIALES);
 }
 
-void SinIndice::agregarLibroPendienteAutores(unsigned int unId)
+int SinIndice::agregarLibroPendienteAutores(unsigned int unId)
 {
-	this->agregarLibro(unId, LISTA_AUTORES);
+	return this->agregarLibro(unId, LISTA_AUTORES);
 }
 
-void SinIndice::agregarLibroPendientePalabras(unsigned int unId)
+int SinIndice::agregarLibroPendientePalabras(unsigned int unId)
 {
-	this->agregarLibro(unId, LISTA_PALABRAS);
+	return this->agregarLibro(unId, LISTA_PALABRAS);
 }
 
 
@@ -97,53 +99,55 @@ list<unsigned int>* SinIndice::getPendientesPalabras()
 }
 
 
-void SinIndice::sacarLibroListaAutores(unsigned int unId)
+int SinIndice::sacarLibroListaAutores(unsigned int unId)
 {
-	this->borrarLibro(unId, LISTA_AUTORES);
+	return this->borrarLibro(unId, LISTA_AUTORES);
 
 }
 
 
-void SinIndice::sacarLibroListaEditorial(unsigned int unId)
+int SinIndice::sacarLibroListaEditorial(unsigned int unId)
 {
-	this->borrarLibro(unId, LISTA_EDITORIALES);
+	return this->borrarLibro(unId, LISTA_EDITORIALES);
 
 }
 
-void SinIndice::sacarLibroListaTitulos(unsigned int unId)
+int SinIndice::sacarLibroListaTitulos(unsigned int unId)
 {
-	this->borrarLibro(unId, LISTA_TITULOS);
+	return this->borrarLibro(unId, LISTA_TITULOS);
 }
 
-void SinIndice::sacarLibroListaPalabras(unsigned int unId)
+int SinIndice::sacarLibroListaPalabras(unsigned int unId)
 {
-	this->borrarLibro(unId, LISTA_PALABRAS);
+	return this->borrarLibro(unId, LISTA_PALABRAS);
 }
 
-void SinIndice::limpiarListaEditoriales()
+int SinIndice::limpiarListaEditoriales()
 {
-	this->vaciarLista(LISTA_EDITORIALES);
+ 	return this->vaciarLista(LISTA_EDITORIALES);
 }
 
-void SinIndice::limpiarListaTitulos()
+int SinIndice::limpiarListaTitulos()
 {
-	this->vaciarLista(LISTA_TITULOS);
+	return this->vaciarLista(LISTA_TITULOS);
 }
 
-void SinIndice::limpiarListaAutores()
+int SinIndice::limpiarListaAutores()
 {
-	this->vaciarLista(LISTA_AUTORES);
+	return this->vaciarLista(LISTA_AUTORES);
 }
 
-void SinIndice::limpiarListaPalabras()
+int SinIndice::limpiarListaPalabras()
 {
-	this->vaciarLista(LISTA_PALABRAS);
+	return this->vaciarLista(LISTA_PALABRAS);
 }
 
 
 
-void SinIndice::agregarLibro(unsigned int unId, int lista)
+int SinIndice::agregarLibro(unsigned int unId, int lista)
 {
+	if (this->rutaListas == "") return ERROR_ARCHIVO_LISTAS;
+
 	ArchivoBloques *manejador = new ArchivoBloques(this->rutaListas, TAMANIO_B_LISTAS);
 	Bloque *unBloque = manejador->recuperarBloque(0);
 	Registro *unRegistro = unBloque->recuperarRegistro(lista);
@@ -164,10 +168,14 @@ void SinIndice::agregarLibro(unsigned int unId, int lista)
 
 	manejador->~ArchivoBloques();
 
+	return 0;
+
 }
 
-void SinIndice::agregarLibroPendienteATodasLasListas(unsigned int unId)
+int SinIndice::agregarLibroPendienteATodasLasListas(unsigned int unId)
 {
+
+	if (this->rutaListas == "") return ERROR_ARCHIVO_LISTAS;
 
 	ArchivoBloques *manejador = new ArchivoBloques(this->rutaListas, TAMANIO_B_LISTAS);
 	Bloque *unBloque = manejador->recuperarBloque(0);
@@ -194,6 +202,73 @@ void SinIndice::agregarLibroPendienteATodasLasListas(unsigned int unId)
 	nuevoBloque->~Bloque();
 	manejador->~ArchivoBloques();
 
+	return 0;
+
+}
+
+int SinIndice::sacarLibroDeTodasLasListas(unsigned int unId)
+{
+
+	if (this->rutaListas == "") return ERROR_ARCHIVO_LISTAS;
+
+//recuperar el bloque
+	ArchivoBloques *manejador = new ArchivoBloques(this->rutaListas, TAMANIO_B_LISTAS);
+	Bloque *unBloque = manejador->recuperarBloque(0);
+
+//recuperar las litas
+	Registro *unRegistroA = unBloque->recuperarRegistro(LISTA_AUTORES);
+	Registro *unRegistroE = unBloque->recuperarRegistro(LISTA_EDITORIALES);
+	Registro *unRegistroT = unBloque->recuperarRegistro(LISTA_TITULOS);
+	Registro *unRegistroP = unBloque->recuperarRegistro(LISTA_PALABRAS);
+
+//armar un bloque nuevo
+	Bloque *nuevoBloque = new Bloque();
+	Registro *nuevoRegistroA = new Registro();
+	Registro *nuevoRegistroE = new Registro();
+	Registro *nuevoRegistroT = new Registro();
+	Registro *nuevoRegistroP = new Registro();
+
+	nuevoRegistroA->agregarAtribEntero(unRegistroA->getAtributosEnteros()->front());
+	nuevoRegistroE->agregarAtribEntero(unRegistroE->getAtributosEnteros()->front());
+	nuevoRegistroT->agregarAtribEntero(unRegistroT->getAtributosEnteros()->front());
+	nuevoRegistroP->agregarAtribEntero(unRegistroP->getAtributosEnteros()->front());
+
+
+	list<unsigned int> *refs;
+
+	refs = unRegistroA->getReferencias();
+	for (list<unsigned int>::iterator it = refs->begin();it != refs->end(); it++ )
+		if (*it != unId)
+			nuevoRegistroA->agregarReferencia(*it);
+
+	refs = unRegistroE->getReferencias();
+	for (list<unsigned int>::iterator it = refs->begin();it != refs->end(); it++ )
+		if (*it != unId)
+			nuevoRegistroE->agregarReferencia(*it);
+
+	refs = unRegistroT->getReferencias();
+	for (list<unsigned int>::iterator it = refs->begin();it != refs->end(); it++ )
+		if (*it != unId)
+			nuevoRegistroT->agregarReferencia(*it);
+
+	refs = unRegistroP->getReferencias();
+	for (list<unsigned int>::iterator it = refs->begin();it != refs->end(); it++ )
+		if (*it != unId)
+			nuevoRegistroP->agregarReferencia(*it);
+
+
+	nuevoBloque->agregarRegistro(*nuevoRegistroA);
+	nuevoBloque->agregarRegistro(*nuevoRegistroE);
+	nuevoBloque->agregarRegistro(*nuevoRegistroT);
+	nuevoBloque->agregarRegistro(*nuevoRegistroP);
+
+	manejador->grabarBloque(nuevoBloque, 0);
+
+	unBloque->~Bloque();
+	nuevoBloque->~Bloque();
+	manejador->~ArchivoBloques();
+
+	return 0;
 }
 
 
@@ -209,8 +284,10 @@ list<unsigned int> *SinIndice::getLista(int lista)
 
 
 
-void SinIndice::borrarLibro(unsigned int unId, int lista)
+int SinIndice::borrarLibro(unsigned int unId, int lista)
 {
+	if (this->rutaListas == "") return ERROR_ARCHIVO_LISTAS;
+
 	ArchivoBloques *manejador = new ArchivoBloques(this->rutaListas, TAMANIO_B_LISTAS);
 	Bloque *unBloque = manejador->recuperarBloque(0);
 	Bloque *nuevoBloque = new Bloque();
@@ -230,18 +307,21 @@ void SinIndice::borrarLibro(unsigned int unId, int lista)
 
 	manejador->grabarBloque(nuevoBloque, 0);
 
-	//unRegistro->~Registro();
-	//nuevoRegistro->~Registro();
+
 	unBloque->~Bloque();
 	nuevoBloque->~Bloque();
 
 	manejador->~ArchivoBloques();
+
+	return 0;
 }
 
 
 
-void SinIndice::vaciarLista(int lista)
+int SinIndice::vaciarLista(int lista)
 {
+
+	if (this->rutaListas == "") return ERROR_ARCHIVO_LISTAS;
 
 	ArchivoBloques *manejador = new ArchivoBloques(this->rutaListas, TAMANIO_B_LISTAS);
 	Bloque *unBloque = manejador->recuperarBloque(0);
@@ -262,6 +342,8 @@ void SinIndice::vaciarLista(int lista)
 	nuevoBloque->~Bloque();
 
 	manejador->~ArchivoBloques();
+
+	return 0;
 }
 
 void SinIndice::copiarBloque(int lista, Bloque *nuevoBloque, Bloque *viejoBloque)
