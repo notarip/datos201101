@@ -39,6 +39,16 @@ Registro* ArbolBMasNumerico::crearRegistroClave(string clave) {
 	return unRegistro;
 }
 
+void ArbolBMasNumerico::setearClave(Registro* registroAModificar, string clave){
+
+	stringstream buffer(stringstream::in | stringstream::out);
+	buffer << clave;
+	unsigned int claveNumerica;
+	buffer >> claveNumerica;
+	registroAModificar->getAtributosEnteros()->pop_front();
+	registroAModificar->getAtributosEnteros()->push_front(claveNumerica);
+}
+
 resultadoOperacion* ArbolBMasNumerico::insertarNumerico(unsigned int clave,
 		unsigned int valor) {
 	stringstream buffer(stringstream::in | stringstream::out);

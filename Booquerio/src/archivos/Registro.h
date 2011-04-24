@@ -21,6 +21,7 @@ public:
 	Registro (string unString, unsigned int atribEntero);
 	virtual ~Registro();
 
+	void setString (string stringASetear);
 	string getString();
 	bool buscarAtribEntero(unsigned int atribBuscado);
 	list<unsigned int>* getAtributosEnteros();
