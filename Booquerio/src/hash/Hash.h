@@ -49,13 +49,17 @@ public:
 	 */
 	void borrar(string que);
 
-
+	unsigned int hasheo(string key);
 	/*
 	 * busca en el hash la clave @que
 	 * y devuelve el registro, si no encuentra la
 	 * clave devuelve null
 	 */
 	Registro* buscar(string que);
+
+	unsigned int getTamanioTabla();
+
+	void mostrar();
 
 	virtual ~Hash();
 
@@ -75,7 +79,7 @@ private:
 	/*
 	 * Retorna el nro de elemento en la lista
 	 */
-	unsigned int hasheo(string key);
+
 
 	/*
 	 * Determina el tamaño de dispersion para un elemento
@@ -98,6 +102,7 @@ private:
 	 */
 	void reestructurar_archivo(ArchivoBloques archivo,unsigned int nro_desbordado,unsigned int nro_libre,Registro* registro_a_ins); //TODO VER BIEN!!!!!!!*/
 
+	void guardarTabla();
 
 };
 
