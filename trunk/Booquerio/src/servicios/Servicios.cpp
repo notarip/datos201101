@@ -128,37 +128,19 @@ int Servicios::obtenerLibro(string unId)
 	linea = "Autor: ";
 	linea += unLibro->getAutor();
 	linea += "\n";
-	tamanio = linea.size();
-	buff= new char[tamanio];
-	memcpy(buff,linea.c_str(),tamanio);
-	libro.write(buff,tamanio);
-	delete [] buff;
-
 //editorial
-	linea = "Editorial: ";
+	linea += "Editorial: ";
 	linea += unLibro->getEditorial();
 	linea += "\n";
-	tamanio = linea.size();
-	buff= new char[tamanio];
-	memcpy(buff,linea.c_str(),tamanio);
-	libro.write(buff,tamanio);
-	delete [] buff;
-
 //titulo
-	linea = "Titutlo: ";
+	linea += "Titutlo: ";
 	linea += unLibro->getTitulo();
 	linea += "\n";
-	tamanio = linea.size();
-	buff= new char[tamanio];
-	memcpy(buff,linea.c_str(),tamanio);
-	libro.write(buff,tamanio);
-	delete [] buff;
-
-
 //texto
-	linea = "\n\n...\n";
+	linea += "\n\n...\n";
 	linea += unLibro->getTexto();
 	linea += "\n";
+
 	tamanio = linea.size();
 	buff= new char[tamanio];
 	memcpy(buff,linea.c_str(),tamanio);

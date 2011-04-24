@@ -18,7 +18,7 @@ void ArchivoLibros::agregarLibro(Libro* unLibro){
 	char* tiraBytes=NULL;
 	int posicion=-1;
 	this->serializar(unLibro,&tiraBytes);
-	unsigned int longreg= (unsigned int)tiraBytes[0]; //<-- longitud de registro variable.//
+	unsigned int longreg= this->longReg;//(unsigned int)tiraBytes[0]; //<-- longitud de registro variable.//
 	char path_bajas[]="bajas_rvariables.dat"; //<-- debe ser parametrizable por el usuario//
 	fstream archivo;
 	fstream bajas (path_bajas ,ios::in | ios::out );
@@ -129,6 +129,7 @@ list<Libro>* ArchivoLibros::recuperacionComprensiva(){
 void ArchivoLibros::serializar(Libro* unLibro,char** tira){
 	unsigned int tamanioReg=(unLibro->getAutor().size()) + (unLibro->getTitulo().size())+(unLibro->getTexto().size())
 	+(unLibro->getEditorial().size()) + 6*sizeof(unsigned int);
+	this->longReg = tamanioReg;
 	unsigned int offset=0;
 	char* tiraBytes = new char[ tamanioReg ];
 	memcpy(tiraBytes, &(tamanioReg), sizeof(unsigned int));
