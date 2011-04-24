@@ -222,9 +222,19 @@ int Servicios::verEstructuraPalabras()
 
 int Servicios::procesarLibro(int indice)
 {
+	int error = 0;
 	SinIndice *listas = SinIndice().getInstancia();
 
-	list<unsigned int> *lista = listas->getPendientesAutores();
+	list<unsigned int> *lista;
+
+
+	switch(indice)
+	{
+		case INDICE_AUTORES :lista = listas->getPendientesAutores();break;
+		case INDICE_EDITORIALES:lista = listas->getPendientesEditoriales();break;
+		case INDICE_TITULOS:lista = listas->getPendientesTitulos();break;
+		case INDICE_PALABRAS:lista = listas->getPendientesPalabras();break;
+	}
 
 	string rutaArcLibros = Parametros().getParametro(ARCHIVO_LIBROS);
 
@@ -239,41 +249,51 @@ int Servicios::procesarLibro(int indice)
 		libro = archivo->recuperarLibro(*it);
 		switch(indice)
 		{
-			case INDICE_AUTORES :agregarIndiceAutores(libro);break;
-			case INDICE_EDITORIALES:agregarIndiceEditoriales(libro);break;
-			case INDICE_TITULOS:agregarIndiceTitulos(libro);break;
-			case INDICE_PALABRAS:agregarIndicePalabras(libro);break;
+			case INDICE_AUTORES :error = agregarIndiceAutores(libro);break;
+			case INDICE_EDITORIALES:error = agregarIndiceEditoriales(libro);break;
+			case INDICE_TITULOS:error = agregarIndiceTitulos(libro);break;
+			case INDICE_PALABRAS:error = agregarIndicePalabras(libro);break;
 		}
 
 		libro->~Libro();
 	}
 
-	listas->limpiarListaAutores();
+
+	switch(indice)
+	{
+		case INDICE_AUTORES :error = listas->limpiarListaAutores();break;
+		case INDICE_EDITORIALES:error = listas->limpiarListaEditoriales();break;
+		case INDICE_TITULOS:error = listas->limpiarListaTitulos();break;
+		case INDICE_PALABRAS:error = listas->limpiarListaPalabras();break;
+	}
 
 	archivo->~ArchivoLibros();
 
-	return 0;
+	return error;
 }
 
-void Servicios::agregarIndiceAutores(Libro *unLibro)
+int Servicios::agregarIndiceAutores(Libro *unLibro)
 {
 	//TODO agregar al indice de autores
 	//TODO agarrar los errores de esta operacion
+	return 0;
 }
 
-void Servicios::agregarIndiceEditoriales(Libro *unLibro)
+int Servicios::agregarIndiceEditoriales(Libro *unLibro)
 {
 	//TODO agregar al indice de editoriales
 	//TODO agarrar los errores de esta operacion
+	return 0;
 }
 
-void Servicios::agregarIndiceTitulos(Libro *unLibro)
+int Servicios::agregarIndiceTitulos(Libro *unLibro)
 {
 	//TODO agregar al indice de titulos
 	//TODO agarrar los errores de esta operacion
+	return 0;
 }
 
-void Servicios::agregarIndicePalabras(Libro *unLibro)
+int Servicios::agregarIndicePalabras(Libro *unLibro)
 {
 
 	set<string> *palabras = unLibro->getListaPalabras();
@@ -284,5 +304,5 @@ void Servicios::agregarIndicePalabras(Libro *unLibro)
 		//TODO agarrar los errores de esta operacion
 	}
 
-
+	return 0;
 }

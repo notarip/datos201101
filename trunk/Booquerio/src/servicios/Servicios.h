@@ -104,10 +104,10 @@ public:
 
 private:
 	static int procesarLibro(int indice);
-	static void agregarIndiceAutores(Libro *unLibro);
-	static void agregarIndiceEditoriales(Libro *unLibro);
-	static void agregarIndiceTitulos(Libro *unLibro);
-	static void agregarIndicePalabras(Libro *unLibro);
+	static int agregarIndiceAutores(Libro *unLibro);
+	static int agregarIndiceEditoriales(Libro *unLibro);
+	static int agregarIndiceTitulos(Libro *unLibro);
+	static int agregarIndicePalabras(Libro *unLibro);
 
 };
 
