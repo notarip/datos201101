@@ -94,7 +94,7 @@ void error_ruta_archivo_libros()
 
 void sin_errores()
 {
-	cout << "Satifactorio." << endl;
+	cout << "Satisfactorio." << endl;
 }
 
 void procesamiento_de_errores(int error)
@@ -169,7 +169,7 @@ int determinar_operacion(int cant_parm, char** parm, string *parametro)
 
 
 
-int main7 (int argc, char** argv)
+int main (int argc, char** argv)
 {
 
 	string parametro;

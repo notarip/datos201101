@@ -32,6 +32,7 @@ public:
 
 private:
 	string path;
+	unsigned int longReg;
 	unsigned int obtenerOffset(unsigned int id);
 	char* levantarRegistro(unsigned int id);
 
