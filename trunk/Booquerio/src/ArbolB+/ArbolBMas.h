@@ -47,10 +47,13 @@ private:
 	virtual char compareRegistros(string clave, Registro* unRegistro ) = 0;
 	virtual Registro* crearRegistroClave(string clave)= 0;
 	virtual string consultarClave(Registro* unRegistro) = 0;
+	virtual void setearClave(Registro* registroAModificar, string clave)= 0;
 
 
 	resultadoOperacion* insertarRecursivo( Bloque* bloqueActual, string clave,unsigned int valor);
+	resultadoOperacion* eliminarRecursivo( Bloque* bloqueActual, string clave,unsigned int valor);
 	void resolverOverflow(Bloque* bloqueOverflow, unsigned int nroBloqueOverflow, Bloque* bloqueActual);
+	void resolverUnderflow (Bloque* bloqueUnderflow, unsigned int nroBloqueUnderflow, Bloque* bloqueActual, list<Registro>::iterator itRegistros, bool bajePorUltimo);
 	resultadoOperacion* buscarBloqueRecursivo(string clave ,unsigned int refBloque, Bloque* bloqueEncontrado );
 	list<Registro>::iterator agregarRegistroEnOrden(Bloque* unBloque,Registro unRegistro);
 

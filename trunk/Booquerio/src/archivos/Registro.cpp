@@ -31,6 +31,10 @@ string Registro::getString(){
 	return this->miString;
 }
 
+void Registro::setString(string stringASetear) {
+	this->miString= stringASetear;
+}
+
 bool Registro::buscarAtribEntero(unsigned int atribEnteroBuscado){
 	list<unsigned int>::iterator it= this->atribEnteros.begin();
 	bool encontrado= false;

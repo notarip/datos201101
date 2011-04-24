@@ -25,6 +25,9 @@ string resultadoOperacion::getDescripcion() {
 	case 2:
 		return "encontrado";
 		break;
+	case 3:
+		return "no encontrado";
+		break;
 	default:
 		return "ok";
 		break;

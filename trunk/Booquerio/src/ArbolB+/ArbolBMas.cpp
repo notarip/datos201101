@@ -37,10 +37,10 @@ resultadoOperacion* ArbolBMas::insertar(string clave, unsigned int valor) {
 			nuevaRaiz->setAtributoBloque(raiz->getAtributoBloque() + 1);
 			//la raiz vieja se grabara en un nuevo lugar(posicionOverflow), el bloque producto de split
 			//tmb se grabara en alguno libre => se lo asigna el resolverOverflow
-			this-> resolverOverflow(raiz, 0 , nuevaRaiz);
+			this-> resolverOverflow(raiz, 0, nuevaRaiz);
 
 			//grabo la nueva raiz en la pos 0
-			archivoNodos->grabarBloque(nuevaRaiz,0);
+			archivoNodos->grabarBloque(nuevaRaiz, 0);
 			delete raiz;
 			raiz = nuevaRaiz;
 
@@ -82,7 +82,8 @@ resultadoOperacion* ArbolBMas::insertarRecursivo(Bloque* bloqueActual,
 		//itero por los registro del bloque
 		list<Registro>::iterator itRegistros = listaRegistros->begin();
 		//hasta encontrar uno mayor
-		while ( itRegistros	!= listaRegistros->end() && compareRegistros(clave, &(*itRegistros)) >= 0) {
+		while (itRegistros != listaRegistros->end() && compareRegistros(clave,
+				&(*itRegistros)) >= 0) {
 			itRegistros++;
 		}
 		//si llegaste al fin de la lista sin encontra un mayor => bajo por DERECHA
@@ -145,7 +146,8 @@ void ArbolBMas::resolverOverflow(Bloque* bloqueOverflow,
 
 	//si es un interno lo que sube al bloque hay que sacarlo del bloque split
 	if (bloqueOverflow->getAtributoBloque() != 0) {
-		unsigned int refAPasar=bloqueSplit->obtenerRegistros()->front().getReferenciai(1);
+		unsigned int refAPasar =
+				bloqueSplit->obtenerRegistros()->front().getReferenciai(1);
 		listaRegistros->back().agregarReferencia(refAPasar);
 		bloqueSplit->obtenerRegistros()->pop_front();
 	}
@@ -162,7 +164,7 @@ void ArbolBMas::resolverOverflow(Bloque* bloqueOverflow,
 	bloqueOverflow->setSiguiente(posLibre);
 
 	//relocalizacion de la raiz por overflow
-	if(nroBloqueOverflow == 0){
+	if (nroBloqueOverflow == 0) {
 		nroBloqueOverflow = this->archivoNodos->getBloqueLibre();
 	}
 
@@ -185,12 +187,13 @@ void ArbolBMas::resolverOverflow(Bloque* bloqueOverflow,
 			bloqueActual, *registroOrientador);
 	//si es el ultimo
 
-	if (consultarClave(registroOrientador)==consultarClave(&(bloqueActual->obtenerRegistros()->back()))) {
+	if (consultarClave(registroOrientador) == consultarClave(
+			&(bloqueActual->obtenerRegistros()->back()))) {
 		posAgregado->agregarReferencia(posLibre);
 		//si hay donde meti la doble ref no es el primero => debo borrarle la 2da ref al anterior a mi
 
-		if (bloqueActual->obtenerRegistros()->size()>1) {
-			posAgregado= (bloqueActual->obtenerRegistros()->end());
+		if (bloqueActual->obtenerRegistros()->size() > 1) {
+			posAgregado = (bloqueActual->obtenerRegistros()->end());
 			posAgregado--;
 			posAgregado--;
 			posAgregado->getReferencias()->pop_back();
@@ -209,23 +212,292 @@ list<Registro>::iterator ArbolBMas::agregarRegistroEnOrden(Bloque* unBloque,
 	list<Registro>::iterator itRegistros = listaRegistros->begin();
 	string claveRegistroAAgregar = this->consultarClave(&unRegistro);
 
-	/*if (listaRegistros->size() == 0) {
-	 listaRegistros->push_front(unRegistro);
-	 return listaRegistros->end();
-	 }*/
-
 	while (itRegistros != listaRegistros->end() && this->compareRegistros(
 			claveRegistroAAgregar, &(*itRegistros)) > 0) {
 		itRegistros++;
 	}
-	//itRegistros++;
+
 	listaRegistros->insert(itRegistros, unRegistro);
 	--itRegistros;
 	return itRegistros;
 }
 
+resultadoOperacion* ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
+		string clave, unsigned int valor) {
+
+	bool bajePorUltimo = false;
+
+	//Estoy en la hoja y por lo tanto el Reg a eliminar deberia estar aqui(caso salida de la recursion)
+	if (bloqueActual->getAtributoBloque() == 0) {
+		list<Registro>* listaReg = bloqueActual->obtenerRegistros();
+		list<Registro>::iterator itRegistros = listaReg->begin();
+
+		while (itRegistros != listaReg->end() && compareRegistros(clave,
+				&(*itRegistros)) >= 0) {
+			itRegistros++;
+		}
+		// Registro a eliminar encontrado
+		if (compareRegistros(clave, &*itRegistros) == 0) {
+			listaReg->erase(itRegistros);
+			return (new resultadoOperacion(HUBO_MODIFICACION));
+		} else {
+			return (new resultadoOperacion(NO_ENCONTRADO));
+		}
+	}
+
+	else {
+		list<Registro>* listaReg = bloqueActual->obtenerRegistros();
+		Bloque* bloqueABajar = NULL;
+		unsigned int nroBloqueABajar;
+		//itero por los registro del bloque
+		list<Registro>::iterator itRegistros = listaReg->begin();
+		//hasta encontrar uno mayor
+		while (itRegistros != listaReg->end() && compareRegistros(clave,
+				&(*itRegistros)) >= 0) {
+			itRegistros++;
+		}
+
+
+		//si llegaste al fin de la lista sin encontra un mayor => bajo por DERECHA
+		if (itRegistros == listaReg->end()) {
+			itRegistros--;
+			bool bajePorUltimo = true;
+			nroBloqueABajar = itRegistros->getReferenciai(2);
+			bloqueABajar = this->archivoNodos->recuperarBloque(nroBloqueABajar);
+		} else {
+			//sino bajo por la IZQUIERDA del mayor
+			nroBloqueABajar = itRegistros->getReferenciai(1);
+			bloqueABajar = this->archivoNodos->recuperarBloque(nroBloqueABajar);
+		}
+
+
+
+
+		//llamo a la siguiente recursion
+		resultadoOperacion* resultadoHijo = insertarRecursivo(bloqueABajar,
+				clave, valor);
+
+		//chekeo lo sucedido con mi hijo y voy a "resolver sus problemas"
+
+		//si no hubo eliminacion sigo enviando ese mensaje hacia arriba
+		if (resultadoHijo->getCodigo() == NO_ENCONTRADO)
+			return resultadoHijo;
+
+		else {
+			//verifico si mi hijo quedo en underflow
+			if (this->archivoNodos->getOcupacionBloque(bloqueABajar) < 0.5) {
+
+				//this->resolverUnderflow(bloqueABajar,nroBloqueABajar,bloqueActual, bloqueDer, bloqueIzq);
+				delete resultadoHijo;
+				return new resultadoOperacion(HUBO_MODIFICACION);
+
+			}
+			return new resultadoOperacion (OK);
+		}
+	}
+}
+
 resultadoOperacion* ArbolBMas::eliminar(string clave, unsigned int valor) {
 	return 0;
+}
+void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqueUnderflow, Bloque* bloqueActual, list<Registro>::iterator itRegistros, bool bajePorUltimo) {
+	bool bajePorAnteultimo=false;
+
+	if (!bajePorUltimo){
+		itRegistros++;
+		bajePorAnteultimo= (itRegistros == bloqueActual->obtenerRegistros()->end());
+		itRegistros--;
+	}
+
+
+	unsigned int bloqueDer;
+	unsigned int bloqueIzq;
+	if(bajePorUltimo){
+		bloqueDer = 0;
+		bloqueIzq = itRegistros->getReferenciai(1);
+	}
+	//no baje por el ultimo
+	else{
+		itRegistros++;
+		bloqueDer= itRegistros->getReferenciai(1);
+		itRegistros--;
+		if (itRegistros==bloqueActual->obtenerRegistros()->begin())
+			bloqueIzq= 0;
+		else {
+			itRegistros--;
+			bloqueIzq= (itRegistros)->getReferenciai(1);
+			itRegistros++;
+		}
+	}
+
+	Bloque* bloqueAChequear= NULL;
+	bool usoBloqueDer= false;
+	bool underflowEnHojas = false;
+	//Si el derecho existe lo intento usar para balanceo
+	if (bloqueDer!=0) {
+		bloqueAChequear= this->archivoNodos->recuperarBloque(bloqueDer);
+		usoBloqueDer= true;
+	}
+	else bloqueAChequear= this->archivoNodos->recuperarBloque(bloqueIzq);
+
+	underflowEnHojas =bloqueUnderflow->getAtributoBloque()==0;
+
+	//Intento Balancear
+	// Si es una hoja no hace falta incluir el padre en el balanceo
+	if (underflowEnHojas)
+		while(archivoNodos->getOcupacionBloque(bloqueUnderflow)<0.5&&bloqueAChequear->obtenerRegistros()->size()>0) {
+			//caso derecho
+			if (usoBloqueDer) {
+				bloqueUnderflow->obtenerRegistros()->push_back(bloqueAChequear->obtenerRegistros()->front());
+				bloqueAChequear->obtenerRegistros()->pop_front();
+			}
+			//caso izquierdo
+			else {
+				bloqueUnderflow->obtenerRegistros()->push_front(bloqueAChequear->obtenerRegistros()->back());
+				bloqueAChequear->obtenerRegistros()->pop_back();
+			}
+		}
+	else {
+		// Balanceo en nodo interno (debo balancear con el padre)
+		string claveAux=this->consultarClave(&*itRegistros);
+		while(archivoNodos->getOcupacionBloque(bloqueUnderflow)<0.5&&bloqueAChequear->obtenerRegistros()->size()>0) {
+			//caso derecho
+			if (usoBloqueDer) {
+				Registro* registroAPasar = this->crearRegistroClave(claveAux);
+
+				registroAPasar->agregarReferencia(bloqueUnderflow->obtenerRegistros()->back().getReferenciai(2));
+				bloqueUnderflow->obtenerRegistros()->back().getReferencias()->pop_back();
+				registroAPasar->agregarReferencia(bloqueAChequear->obtenerRegistros()->back().getReferenciai(1));
+
+				claveAux = this->consultarClave(&(bloqueAChequear->obtenerRegistros()->front()));
+
+				bloqueUnderflow->obtenerRegistros()->push_back(*registroAPasar);
+				bloqueAChequear->obtenerRegistros()->pop_front();
+
+			}
+			//caso izquierdo
+			else {
+				Registro* registroAPasar = this->crearRegistroClave(claveAux);
+				registroAPasar->agregarReferencia(bloqueAChequear->obtenerRegistros()->back().getReferenciai(2));
+
+				claveAux= this->consultarClave(&(bloqueAChequear->obtenerRegistros()->back()));
+
+				unsigned int unaRef = bloqueAChequear->obtenerRegistros()->back().getReferenciai(1);
+				bloqueAChequear->obtenerRegistros()->pop_back();
+				bloqueAChequear->obtenerRegistros()->back().agregarReferencia(unaRef);
+
+				bloqueUnderflow->obtenerRegistros()->push_front(*registroAPasar);
+			}
+		}
+		this->setearClave(&*itRegistros,claveAux);
+	}
+
+	//Chequeo si el balanceo fue efectivo
+	if (archivoNodos->getOcupacionBloque(bloqueUnderflow)>=0.5 && archivoNodos->getOcupacionBloque(bloqueAChequear)>=0.5){
+		//verifico posibles cambios en  padre por el balanceo
+		//en el caso de las hojas
+		if (underflowEnHojas){
+			if (usoBloqueDer){
+				this->setearClave(&*itRegistros,this->consultarClave(&(bloqueAChequear->obtenerRegistros()->front())));
+			}
+			else{
+				this->setearClave(&*itRegistros,this->consultarClave(&(bloqueUnderflow->obtenerRegistros()->front())));
+			}
+		}
+
+		//grabo los nodos producto de el balanceo
+		this->archivoNodos->grabarBloque(bloqueUnderflow, nroBloqueUnderflow);
+		//caso derecho
+		if (usoBloqueDer){
+		this->archivoNodos->grabarBloque(bloqueAChequear, bloqueDer);
+		}
+		//caso izquierdo
+		else{
+		this->archivoNodos->grabarBloque(bloqueAChequear, bloqueIzq);
+		}
+		return;
+	}//fin balanceo
+
+	//Hubo Fusion de Nodos
+	else {
+		//underflow en hojas => ya tengo pasados todos al bloque underflow
+		if (underflowEnHojas){
+			//caso derecho
+			if (usoBloqueDer){
+				unsigned int refSiguiente = bloqueAChequear->getSiguiente();
+				bloqueUnderflow->setSiguiente(refSiguiente);
+				//la referencia al underflow se la tengo que pasar al siguiente como 1er ref o al anterior como 2da ref
+
+				if (bajePorAnteultimo){
+					itRegistros--;
+					itRegistros->agregarReferencia(nroBloqueUnderflow);
+					itRegistros++;
+				}
+				else{
+					itRegistros++;
+					itRegistros->getReferencias()->pop_front();
+					itRegistros->agregarReferencia(nroBloqueUnderflow);
+					itRegistros--;
+				}
+
+				//elimino el nodo descartado por la fusion
+				this->archivoNodos->eliminarBloque(bloqueDer);
+
+				//elimino el registro en el padre que referenciaba a dicho nodo
+				bloqueActual->obtenerRegistros()->erase(itRegistros);
+
+			}
+			//caso izquierdo
+			else{
+				//actualizo el siguiente de 2 nodos anteriores al de underflow porque sino queda referenciando como siguiente al nodo borrado
+				//para llegar a el debo moverme 1 o 2 posiciones hacia atras con el iterador s/ por donde halla bajado en el underflow
+				if (bajePorUltimo){
+					itRegistros--;
+					unsigned int nrobloqueACambiarSiguiente = itRegistros->getReferenciai(1);
+					Bloque* bloqueACambiarSiguiente = this->archivoNodos->recuperarBloque(nrobloqueACambiarSiguiente);
+					bloqueACambiarSiguiente->setSiguiente(nroBloqueUnderflow);
+					this->archivoNodos->grabarBloque(bloqueACambiarSiguiente,nrobloqueACambiarSiguiente);
+					delete bloqueACambiarSiguiente;
+
+					itRegistros++;
+
+					//ademas en este caso debo agregarle una referencia a derecha en el nodo anterior apuntando al nodo underflow
+					itRegistros--;
+					itRegistros->agregarReferencia(nroBloqueUnderflow);
+					itRegistros++;
+
+
+
+				}
+				else{
+					itRegistros--;itRegistros--;
+					unsigned int nrobloqueACambiarSiguiente = itRegistros->getReferenciai(1);
+					Bloque* bloqueACambiarSiguiente = this->archivoNodos->recuperarBloque(nrobloqueACambiarSiguiente);
+					bloqueACambiarSiguiente->setSiguiente(nroBloqueUnderflow);
+					this->archivoNodos->grabarBloque(bloqueACambiarSiguiente,nrobloqueACambiarSiguiente);
+					delete bloqueACambiarSiguiente;
+
+					itRegistros++;itRegistros++;
+
+				}
+
+				//elimino el nodo descartado por la fusion
+				this->archivoNodos->eliminarBloque(bloqueDer);
+
+				//elimino el registro padre que referenciaba a dicho nodo
+				bloqueActual->obtenerRegistros()->erase(itRegistros);
+
+			}
+		}
+		//fusion en internos
+		else{
+			/* TO DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo*/
+		}
+
+
+	}//fin fusion
+
+
 }
 
 resultadoOperacion* ArbolBMas::siguiente(Registro* regSiguiente) {
@@ -299,91 +571,94 @@ resultadoOperacion* ArbolBMas::buscarBloqueRecursivo(string clave,
 
 string ArbolBMas::imprimirBloque(Bloque* unBloque, unsigned int nroBloque) {
 	stringstream conversor;
-	string bloqueImpreso="";
-	bloqueImpreso+="Bloque ";
-	conversor<<nroBloque;
-	bloqueImpreso+=conversor.str();
+	string bloqueImpreso = "";
+	bloqueImpreso += "Bloque ";
+	conversor << nroBloque;
+	bloqueImpreso += conversor.str();
 	conversor.str("");
-	bloqueImpreso+=": ";
-	conversor<<unBloque->getAtributoBloque();
-	bloqueImpreso+=conversor.str();
+	bloqueImpreso += ": ";
+	conversor << unBloque->getAtributoBloque();
+	bloqueImpreso += conversor.str();
 	conversor.str("");
-	bloqueImpreso+=", ";
+	bloqueImpreso += ", ";
 	list<Registro>* registros = unBloque->obtenerRegistros();
-	conversor<<registros->size();
-	bloqueImpreso+=conversor.str();
+	conversor << registros->size();
+	bloqueImpreso += conversor.str();
 	conversor.str("");
-	bloqueImpreso+= "; ";
+	bloqueImpreso += "; ";
 	list<Registro>::iterator itRegistros = registros->begin();
 	while (itRegistros != registros->end()) {
-		if (itRegistros->getReferencias()->size() != 0){
+		if (itRegistros->getReferencias()->size() != 0) {
 			conversor << itRegistros->getReferenciai(1);
-			bloqueImpreso+=conversor.str();
+			bloqueImpreso += conversor.str();
 			conversor.str("");
 		}
-		bloqueImpreso+= "(";
-		bloqueImpreso+= this->consultarClave(&*itRegistros);
-		bloqueImpreso+= ")";
+		bloqueImpreso += "(";
+		bloqueImpreso += this->consultarClave(&*itRegistros);
+		bloqueImpreso += ")";
 		itRegistros++;
 	}
 	itRegistros--;
 	if (itRegistros->getReferencias()->size() != 0) {
 		conversor << itRegistros->getReferenciai(2);
-		bloqueImpreso+=conversor.str();
+		bloqueImpreso += conversor.str();
 		conversor.str("");
 	}
-	bloqueImpreso+=" ";
-	if (unBloque->getAtributoBloque() == 0){
-		conversor<< unBloque->getSiguiente();
-		bloqueImpreso+=conversor.str();
+	bloqueImpreso += " ";
+	if (unBloque->getAtributoBloque() == 0) {
+		conversor << unBloque->getSiguiente();
+		bloqueImpreso += conversor.str();
 		conversor.str("");
 	}
-	bloqueImpreso+= '\n';
+	bloqueImpreso += '\n';
 	return bloqueImpreso;
 }
 
 string ArbolBMas::exportarRecursivo(unsigned int nroBloque,
 		unsigned int nivelRecursion) {
 	nivelRecursion++;
-	string textoAExportar="";
+	string textoAExportar = "";
 	Bloque* bloqueLeido = this->archivoNodos->recuperarBloque(nroBloque);
 	for (unsigned int i = 0; i < nivelRecursion; i++)
-		textoAExportar+= '\t';
-	textoAExportar+=imprimirBloque(bloqueLeido, nroBloque);
+		textoAExportar += '\t';
+	textoAExportar += imprimirBloque(bloqueLeido, nroBloque);
 	if (bloqueLeido->getAtributoBloque() == 0) {
 		return textoAExportar;
 	}
 	list<Registro>* listaReg = bloqueLeido->obtenerRegistros();
 	list<Registro>::iterator itRegistros = listaReg->begin();
 	while (itRegistros != listaReg->end()) {
-		textoAExportar+=exportarRecursivo(itRegistros->getReferenciai(1),
+		textoAExportar += exportarRecursivo(itRegistros->getReferenciai(1),
 				nivelRecursion);
 		itRegistros++;
 	}
 	itRegistros--;
-	textoAExportar+=exportarRecursivo(itRegistros->getReferenciai(2), nivelRecursion);
+	textoAExportar += exportarRecursivo(itRegistros->getReferenciai(2),
+			nivelRecursion);
 	return textoAExportar;
 }
 
 void ArbolBMas::exportar(string path) {
-	string textoAExportar= "";
+	string textoAExportar = "";
 
-	textoAExportar+=this->imprimirBloque(this->raiz, 0);
-	if (raiz->getAtributoBloque() != 0){
+	textoAExportar += this->imprimirBloque(this->raiz, 0);
+	if (raiz->getAtributoBloque() != 0) {
 
 		list<Registro>* listaReg = raiz->obtenerRegistros();
 		list<Registro>::iterator itRegistros = listaReg->begin();
 		while (itRegistros != listaReg->end()) {
-			textoAExportar+=exportarRecursivo(itRegistros->getReferenciai(1), 0);
+			textoAExportar += exportarRecursivo(itRegistros->getReferenciai(1),
+					0);
 			itRegistros++;
 		}
 		itRegistros--;
-		textoAExportar+=exportarRecursivo(itRegistros->getReferenciai(2), 0);
+		textoAExportar += exportarRecursivo(itRegistros->getReferenciai(2), 0);
 	}
 	fstream archivo;
 	archivo.open(path.c_str(), ios::out | ios::app);
-	archivo<<textoAExportar;
-	archivo<<"-------------------------------------------------------------"<<endl;
+	archivo << textoAExportar;
+	archivo << "-------------------------------------------------------------"
+			<< endl;
 	archivo.close();
 }
 

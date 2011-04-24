@@ -3,7 +3,7 @@
 
 using namespace std;
 
-int main3(){
+int main(){
 	string unPath = "ArbolBMas";
 
 	ArbolBMasNumerico* miArbol = new ArbolBMasNumerico(unPath,96);
@@ -73,6 +73,8 @@ int main3(){
 
 	unResultado = miArbol->insertarNumerico(121,0);
 	miArbol->exportar("prueba");
+
+
 
 	delete miArbol;
 }

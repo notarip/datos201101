@@ -12,6 +12,7 @@
 #define OK 0
 #define HUBO_MODIFICACION 1
 #define ENCONTRADO 2
+#define NO_ENCONTRADO 3
 
 
 using namespace std;
