@@ -249,12 +249,14 @@ void Hash::borrar(string que)
 
 			if (tamTablaVieja > this->tamanioTabla) archivo.eliminarBloque(numBloque);
 
+			else archivo.grabarBloque(bloqueRecuperado,numBloque);
+
 		}
 
 		else archivo.grabarBloque(bloqueRecuperado,numBloque);
 
 	}
-	cout<<"el registro no se encontro."<<endl;
+	else cout<<"el registro a eliminar no se encontro."<<endl;
 }
 
 
@@ -412,6 +414,7 @@ void Hash::actualizarTabla_insercion(unsigned int tamDispersion,unsigned int pos
 
 
 void Hash::actualizarTabla_eliminacion(unsigned int tamDispersion,unsigned int pos_eliminado){
+
 	int tamTabla=tamanioTabla;
 	int salto1= pos_eliminado +tamDispersion/2 ;
 	int salto2= pos_eliminado -tamDispersion/2 ;
@@ -444,6 +447,7 @@ void Hash::actualizarTabla_eliminacion(unsigned int tamDispersion,unsigned int p
 		this->tamanioTabla/=2;
 		delete viejaTabla;
 	}
+
 }
 
 

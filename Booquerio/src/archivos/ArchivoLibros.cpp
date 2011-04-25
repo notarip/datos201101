@@ -8,6 +8,7 @@
 #include "ArchivoLibros.h"
 
 
+
 ArchivoLibros::ArchivoLibros(string path) {
 	this->path= path;
 }
@@ -15,45 +16,81 @@ ArchivoLibros::ArchivoLibros(string path) {
 
 //busca espacio en el archivo e inserta el registro variable //
 void ArchivoLibros::agregarLibro(Libro* unLibro){
+
 	char* tiraBytes=NULL;
+	char* libres;
 	int posicion=-1;
+	unsigned int longreg;
+	bool existiaEspacio=false;
+
 	this->serializar(unLibro,&tiraBytes);
-	unsigned int longreg= this->longReg;//(unsigned int)tiraBytes[0]; //<-- longitud de registro variable.//
-	char path_bajas[]="bajas_rvariables.dat"; //<-- debe ser parametrizable por el usuario//
+	longreg= this->longReg;//(unsigned int)tiraBytes[0]; //<-- longitud de registro variable.//
+
 	fstream archivo;
-	fstream bajas (path_bajas ,ios::in | ios::out );
-	unsigned int offset=0;
-	if (bajas){
-		archivo.open(this->path.c_str(), ios::out| ios::in | ios::binary | ios::ate);
-		char* libres=new char[8];
+	fstream bajas;
+
+	string path_bajas="bajas_"+ this->path + ".bajas";
+	bajas.open(path_bajas.c_str() ,ios::in | ios::out | ios::binary );
+
+	if (bajas.good()){
+
+		bajas.seekg(0,ios::beg);
+
+		archivo.open(this->path.c_str(), ios::out| ios::in | ios::binary );
+
+		libres=new char[8];
 		bool listo=false;
-		while(!bajas.eof() || !listo){
+		unsigned int* longLibre=new unsigned int(0);
+		while(!bajas.eof() && !listo){
 			bajas.read(libres,2*sizeof(unsigned int)); //<-- copia los libres de algun reg, y el offset//
-			listo= (longreg <=(unsigned int)libres[0]);
+			memcpy(longLibre,libres,sizeof(unsigned int));
+			listo= (longreg <=(*longLibre));
 			posicion++;
 		}
 
 		if (listo){
-			unsigned int* resto=new unsigned int((unsigned int)libres[0]-longreg);
-			cout<<*resto<<endl;
+
+			unsigned int* resto=new unsigned int((*longLibre)-longreg);
+			unsigned int* offset= new unsigned int(0);
+			libres+=4;
+			memcpy(offset,libres,sizeof(unsigned int));
+			cout<<"off para copiar:"<<*offset<<endl;
+			archivo.seekp( (*offset) ,ios::beg);
+			archivo.write(tiraBytes,longreg);
+
+			*(offset)= *(offset) + longreg; //modifico offset
+			cout<<"Offset :"<<*offset<<endl;
+			cout<<"Libre: "<<*resto<<endl;
+			memcpy(libres,offset,sizeof(unsigned int));
+			libres-=4;
+
 			memcpy(libres,resto,sizeof(unsigned int));
-			bajas.seekg(posicion*(2*sizeof(unsigned int)),ios::beg);
-			bajas.write(libres,sizeof(unsigned int));
-			offset= (unsigned int)libres[1];
-			archivo.seekp(offset,ios::beg);
+
+			bajas.seekg(2*sizeof(unsigned int)*posicion,ios::beg);
+
+			bajas.write(libres,2*sizeof(unsigned int));
+
+			existiaEspacio=true;
+
+			//delete resto;
+			//delete offset;
+
+		}
+		else{
+			archivo.seekp(0,ios::end);
 			archivo.write(tiraBytes,longreg);
 		}
-
+		bajas.close();
+		//delete libres;
+		//delete longLibre;
 	}
-	else{
-		archivo.open(this->path.c_str(), ios::out| ios::in | ios::binary | ios::app);
-		cout<<"no reescribo."<<endl;
+	else {
+		archivo.open(this->path.c_str(), ios::out | ios::app);
 		archivo.seekp(0,ios::end);
 		archivo.write(tiraBytes,longreg);
 	}
-
 	archivo.close();
-	bajas.close();
+
 }
 
 
@@ -61,16 +98,28 @@ void ArchivoLibros::agregarLibro(Libro* unLibro){
 void ArchivoLibros::suprimirLibro(unsigned int id){
 	char* regBajas=new char[8];
 	unsigned int offset= this->obtenerOffset(id);
-	fstream archivo (this->path.c_str(),ios::in | ios::out );
-	archivo.seekg(offset,ios::beg);
-	archivo.read(regBajas,sizeof(unsigned int));
-	archivo.close();
-	memcpy(regBajas+sizeof(unsigned int),&offset,sizeof(unsigned int));
-	char path_bajas[]="bajas_rvariables.dat";
-	fstream archivo_bajas (path_bajas,ios::in | ios::out | ios::app);
-	archivo_bajas.seekg(0,ios::end);
-	archivo_bajas.write(regBajas,2*sizeof(unsigned int));
-	archivo_bajas.close();
+	fstream archivo;
+
+	archivo.open(this->path.c_str(),ios::in | ios::out );
+	if (archivo.good()){
+		archivo.seekg(offset,ios::beg);
+		archivo.read(regBajas,sizeof(unsigned int));
+		archivo.close();
+		memcpy(regBajas+sizeof(unsigned int),&offset,sizeof(unsigned int));
+		string path_bajas="bajas_"+this->path + ".bajas";
+
+		fstream archivo_bajas;
+
+		archivo_bajas.open(path_bajas.c_str() ,ios::in | ios::out | ios::app);
+
+		if (!archivo_bajas.good())
+			archivo_bajas.open(path_bajas.c_str() , ios::out | ios::binary |ios::app);
+
+		archivo_bajas.seekg(0,ios::end);
+		archivo_bajas.write(regBajas,2*sizeof(unsigned int));
+		archivo_bajas.close();
+	}
+
 }
 
 
@@ -84,80 +133,112 @@ Libro* ArchivoLibros::recuperarLibro(unsigned int id){
 	return obtenido;
 }
 
-
+//modificado 24/4   //
 char* ArchivoLibros::levantarRegistro(unsigned int id){
 	unsigned int offset= this->obtenerOffset(id);
+	char* tiraBytes;
 	char* charTamanio =new char[4];
-	fstream archivo (this->path.c_str(),ios::in | ios::out);
-	archivo.seekg(offset,ios::beg);
-	archivo.read(charTamanio ,sizeof(unsigned int));
-	unsigned int tamanio = (unsigned int)charTamanio[0];
-	char* tiraBytes= new char[ tamanio ];
-	memcpy(tiraBytes,&tamanio,sizeof(unsigned int));
-	archivo.read(tiraBytes+sizeof(unsigned int),tamanio-sizeof(unsigned int));
+	fstream archivo;
+	archivo.open(this->path.c_str(),ios::binary | ios::in);
+	if(archivo.good()){
+		archivo.seekg(offset,ios::beg);
+		archivo.read(charTamanio ,sizeof(unsigned int));
+		unsigned int *tamanioReg = new unsigned int(0);
+		memcpy(tamanioReg,charTamanio,sizeof(unsigned int));
+		tiraBytes= new char[ (*tamanioReg) ];
+		memcpy(tiraBytes,tamanioReg ,sizeof(unsigned int));
+		archivo.read(tiraBytes+sizeof(unsigned int),(*tamanioReg)-sizeof(unsigned int));
+	}
+
 	return tiraBytes;
 }
 
 
 //recorre todo el archivo y devuelve los libros//
 list<Libro>* ArchivoLibros::recuperacionComprensiva(){
-	fstream archivo (this->path.c_str(),ios::in | ios::out);
+	fstream archivo (this->path.c_str(),ios::binary | ios::in);
 	archivo.seekg(0,ios::beg);
 	char* charTamanio =new char[4];
 	Libro* unLibro=NULL;
 	list<Libro>* listaLibros=new list<Libro>();
-	std::list<Libro>::iterator it;
-	it=listaLibros->end();
-
+	char* tiraBytes=NULL;
 	while (!archivo.eof()){
+
+
 		archivo.read(charTamanio ,sizeof(unsigned int));
-		unsigned int tamanio = (unsigned int)charTamanio[0];
-		char* tiraBytes= new char[ tamanio ];
-		memcpy(tiraBytes,&tamanio,sizeof(unsigned int));
-		archivo.read(tiraBytes+sizeof(unsigned int),tamanio-sizeof(unsigned int));
+		unsigned int* tamanio = new unsigned int(0);
+		memcpy(tamanio,charTamanio,sizeof(unsigned int));
+		tiraBytes= new char[ (*tamanio) ];
+		memcpy(tiraBytes,tamanio,sizeof(unsigned int));
+		archivo.read(tiraBytes+sizeof(unsigned int),(*tamanio)-sizeof(unsigned int));
 		this->deserializar(tiraBytes,&unLibro);
 		listaLibros->push_back(*unLibro);
-		delete []tiraBytes;
+
 	}
 	return listaLibros;
 
 }
 
 
-
-//serializa los datos de un Libro en una tira de bytes//
 void ArchivoLibros::serializar(Libro* unLibro,char** tira){
-	unsigned int tamanioReg=(unLibro->getAutor().size()) + (unLibro->getTitulo().size())+(unLibro->getTexto().size())
-	+(unLibro->getEditorial().size()) + 6*sizeof(unsigned int);
+	unsigned int tamanioReg=(unLibro->getAutor().size()) + (unLibro->getTitulo().size())+ (unLibro->getEditorial().size())
+	+ (unLibro->getTexto().size()) + (unLibro->getPalabras().size()) + 8*sizeof(unsigned int);
+
 	this->longReg = tamanioReg;
 	unsigned int offset=0;
-	char* tiraBytes = new char[ tamanioReg ];
-	memcpy(tiraBytes, &(tamanioReg), sizeof(unsigned int));
+
+	char* tiraBytes = new char[ tamanioReg ];                       //calcula espacio de
+	memcpy(tiraBytes, &(tamanioReg), sizeof(unsigned int));         //dato de long de Reg.
+
 	offset+=sizeof(unsigned int);
+
 	unsigned int * p_id= new unsigned int(unLibro->getId());
-	memcpy(tiraBytes+ offset, p_id , sizeof(unsigned int));
+	unsigned int * cant_palabras= new unsigned int(unLibro->getCantPalabras());
+	memcpy(tiraBytes + offset, p_id , sizeof(unsigned int));
+
 	offset+=sizeof(unsigned int);
+
 	unsigned int* tamanioCampos=new unsigned int(unLibro->getTitulo().size());
 	memcpy(tiraBytes+ offset, (tamanioCampos) ,sizeof(unsigned int));
+
 	offset+=sizeof(unsigned int);
 	memcpy(tiraBytes+ offset, (unLibro->getTitulo().c_str()),*tamanioCampos);
 	offset+=*tamanioCampos;
+
 	*tamanioCampos= unLibro->getAutor().size();
 	memcpy(tiraBytes+ offset,(tamanioCampos),sizeof(unsigned int));
 	offset+=sizeof(unsigned int);
+
 	memcpy(tiraBytes+ offset,(unLibro->getAutor().c_str()),*tamanioCampos);
 	offset+=*tamanioCampos;
+
 	*tamanioCampos= unLibro->getEditorial().size();
 	memcpy(tiraBytes+ offset,(tamanioCampos),sizeof(unsigned int));
 	offset+=sizeof(unsigned int);
+
 	memcpy(tiraBytes+ offset,(unLibro->getEditorial().c_str()),*tamanioCampos);
 	offset+=*tamanioCampos;
+
 	*tamanioCampos= unLibro->getTexto().size();
 	memcpy(tiraBytes+ offset,(tamanioCampos),sizeof(unsigned int));
 	offset+=sizeof(unsigned int);
+
 	memcpy(tiraBytes+ offset,(unLibro->getTexto().c_str()),*tamanioCampos);
+	offset+=*tamanioCampos;
+
+	memcpy(tiraBytes+ offset, cant_palabras ,sizeof(unsigned int));
+	offset+=sizeof(unsigned int);
+
+	*tamanioCampos= unLibro->getPalabras().size();
+	memcpy(tiraBytes+ offset, (tamanioCampos),sizeof(unsigned int));
+	offset+=sizeof(unsigned int);
+
+	memcpy(tiraBytes+ offset,(unLibro->getPalabras().c_str()),*tamanioCampos);
+
 	*tira=tiraBytes;
-	cout<<tamanioReg<<endl;
+
+	cout<<longReg<<endl;
+
 }
 
 
@@ -165,13 +246,17 @@ void ArchivoLibros::serializar(Libro* unLibro,char** tira){
 
 //deserializa una tira de bytes convirtiendola en un Libro//
 void ArchivoLibros::deserializar(char* tiraBytes,Libro** obtenido){
+
 	unsigned int *tamanioCampo =new unsigned int(0);
 	unsigned int *id = new unsigned int(0);
-	char *titulo,*autor,*editorial,*texto;
+	unsigned int *cantPalabras= new unsigned int(0);
+
+	char *titulo,*autor,*editorial,*texto,*palabras;
 	unsigned int posicion=sizeof(unsigned int);
 
 	memcpy(id,tiraBytes+ posicion ,sizeof(unsigned int));
 	posicion+=sizeof(unsigned int);
+
 	memcpy(tamanioCampo,tiraBytes+ posicion,sizeof(unsigned int));
 	titulo=new char[*tamanioCampo];
 	posicion+=sizeof(unsigned int);
@@ -193,15 +278,26 @@ void ArchivoLibros::deserializar(char* tiraBytes,Libro** obtenido){
 	memcpy(texto,tiraBytes+ posicion,(*tamanioCampo));
 	posicion+=*tamanioCampo;
 
+	memcpy(cantPalabras,tiraBytes+ posicion,sizeof(unsigned int));
+	posicion+=sizeof(unsigned int);
+	memcpy(tamanioCampo,tiraBytes+ posicion,sizeof(unsigned int)); //tamanio de palabras//
+	posicion+=sizeof(unsigned int);
+	palabras=new char[(*tamanioCampo)];
+	memcpy(palabras,tiraBytes+ posicion,(*tamanioCampo));
+
+
 	string s_autor(autor, strlen(autor));
 	string s_titulo(titulo, strlen(titulo));
 	string s_editorial(editorial, strlen(editorial));
 	string s_texto(texto,strlen(texto));
 
-	Libro* libro= new Libro(*id,s_titulo,s_autor,s_editorial,s_texto);
+
+	string s_palabras(palabras,strlen(palabras));
+
+	Libro* libro= new Libro(*id,s_titulo,s_autor,s_editorial,s_texto,*cantPalabras,s_palabras);
 
 	*obtenido= libro;
-
+	delete tiraBytes;
 
 }
 
@@ -211,7 +307,6 @@ void ArchivoLibros::deserializar(char* tiraBytes,Libro** obtenido){
 unsigned int ArchivoLibros::obtenerOffset(unsigned int id){
 	return id;
 }
-
 
 
 

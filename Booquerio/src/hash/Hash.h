@@ -59,6 +59,9 @@ public:
 
 	unsigned int getTamanioTabla();
 
+	void setTamTabla(unsigned int t){ this->tamanioTabla=t;}
+	void setTabla(unsigned int* ta){ this->tabla=ta;}
+	void actualizarTabla_eliminacion(unsigned int tamDispersion,unsigned int pos_eliminado);
 	void mostrar();
 
 	virtual ~Hash();
@@ -95,7 +98,7 @@ private:
 	/*
 	 * Actualiza la tabla cuando se realiza una eliminacion.
 	 */
-	void actualizarTabla_eliminacion(unsigned int tamDispersion,unsigned int pos_eliminado);
+
 
 	/*
 	 * Reestructura el archivo en los casos de overflow.
