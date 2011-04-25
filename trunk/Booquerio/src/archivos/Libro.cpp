@@ -19,6 +19,22 @@ Libro::Libro(unsigned int id,string titulo, string autor, string editorial, stri
 
 }
 
+void Libro::setPalabras(string palabras, unsigned int cantidad)
+{
+	this->palabras = palabras;
+	this->cantPalabras = cantidad;
+}
+
+Libro::Libro(unsigned int id,string titulo, string autor, string editorial, string texto, unsigned int cantPalabras, string palabras) {
+	this->id=id;
+	this->titulo=titulo;
+	this->autor=autor;
+	this->editorial=editorial;
+	this->texto=texto;
+	this->cantPalabras=cantPalabras;
+	this->palabras=palabras;
+}
+
 unsigned int Libro::getId(){return this->id;}
 string Libro::getTitulo(){return this->titulo;}
 string Libro::getEditorial(){return this->editorial;}
@@ -28,11 +44,7 @@ string Libro::getPalabras(){return this->palabras;}
 unsigned int Libro::getCantPalabras(){return this->cantPalabras;}
 
 
-void Libro::setPalabras(string palabras, unsigned int cantidad)
-{
-	this->palabras = palabras;
-	this->cantPalabras = cantidad;
-}
+
 
 set<string> *Libro::getListaPalabras()
 {

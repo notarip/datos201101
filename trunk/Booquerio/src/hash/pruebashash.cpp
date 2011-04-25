@@ -63,14 +63,10 @@ int main(){
 
 	hash.mostrar();
 
-	Registro* reg6=new Registro("as");
-	for (int i=0; i<500;i++){
-		reg6->agregarAtribEntero(i);
-	}
-
-	hash.insertar(reg6);
-
+	hash.borrar("0");
+	hash.borrar("4");
 
 	hash.mostrar();
+
 
 }
