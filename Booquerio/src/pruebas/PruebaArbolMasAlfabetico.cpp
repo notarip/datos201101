@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int main5(){
+int main(){
 	string unPath = "ArbolBMas";
 
 	ArbolBMasAlfabetico* miArbol = new ArbolBMasAlfabetico(unPath,96);
@@ -101,6 +101,9 @@ int main5(){
 	miArbol->exportar("prueba");
 
 	unResultado = miArbol->insertar("julian",0);
+	miArbol->exportar("prueba");
+
+	unResultado= miArbol->eliminar("julian", 0);
 	miArbol->exportar("prueba");
 
 	delete miArbol;

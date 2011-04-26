@@ -11,8 +11,8 @@ ArbolBMas::ArbolBMas(string path, unsigned int tamanioBloque) {
 	this->archivoNodos = new ArchivoBloques(path, tamanioBloque);
 
 	this->tamanioNodo = tamanioBloque;
-	ultimaHojaVisitada = NULL;
-	ultimoValorBuscado = NULL;
+	ultimaHojaVisitada = 0;
+	ultimoValorBuscado = 0;
 
 	raiz = new Bloque();
 
@@ -21,6 +21,7 @@ ArbolBMas::ArbolBMas(string path, unsigned int tamanioBloque) {
 }
 
 resultadoOperacion* ArbolBMas::insertar(string clave, unsigned int valor) {
+
 	resultadoOperacion* resultadoRaiz = this->insertarRecursivo(this->raiz,
 			clave, valor);
 
@@ -222,12 +223,20 @@ list<Registro>::iterator ArbolBMas::agregarRegistroEnOrden(Bloque* unBloque,
 	return itRegistros;
 }
 
+resultadoOperacion* ArbolBMas::eliminar(string clave, unsigned int valor) {
+	return this->eliminarRecursivo(raiz,clave,valor);
+
+
+
+}
+
 resultadoOperacion* ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
 		string clave, unsigned int valor) {
 
 	bool bajePorUltimo = false;
 
 	//Estoy en la hoja y por lo tanto el Reg a eliminar deberia estar aqui(caso salida de la recursion)
+
 	if (bloqueActual->getAtributoBloque() == 0) {
 		list<Registro>* listaReg = bloqueActual->obtenerRegistros();
 		list<Registro>::iterator itRegistros = listaReg->begin();
@@ -245,6 +254,7 @@ resultadoOperacion* ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
 		}
 	}
 
+	//Caso Recursivo
 	else {
 		list<Registro>* listaReg = bloqueActual->obtenerRegistros();
 		Bloque* bloqueABajar = NULL;
@@ -257,11 +267,10 @@ resultadoOperacion* ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
 			itRegistros++;
 		}
 
-
 		//si llegaste al fin de la lista sin encontra un mayor => bajo por DERECHA
 		if (itRegistros == listaReg->end()) {
 			itRegistros--;
-			bool bajePorUltimo = true;
+			bajePorUltimo = true;
 			nroBloqueABajar = itRegistros->getReferenciai(2);
 			bloqueABajar = this->archivoNodos->recuperarBloque(nroBloqueABajar);
 		} else {
@@ -270,11 +279,8 @@ resultadoOperacion* ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
 			bloqueABajar = this->archivoNodos->recuperarBloque(nroBloqueABajar);
 		}
 
-
-
-
 		//llamo a la siguiente recursion
-		resultadoOperacion* resultadoHijo = insertarRecursivo(bloqueABajar,
+		resultadoOperacion* resultadoHijo = eliminarRecursivo(bloqueABajar,
 				clave, valor);
 
 		//chekeo lo sucedido con mi hijo y voy a "resolver sus problemas"
@@ -287,7 +293,7 @@ resultadoOperacion* ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
 			//verifico si mi hijo quedo en underflow
 			if (this->archivoNodos->getOcupacionBloque(bloqueABajar) < 0.5) {
 
-				//this->resolverUnderflow(bloqueABajar,nroBloqueABajar,bloqueActual, bloqueDer, bloqueIzq);
+				this->resolverUnderflow(bloqueABajar,nroBloqueABajar,bloqueActual, itRegistros, bajePorUltimo);
 				delete resultadoHijo;
 				return new resultadoOperacion(HUBO_MODIFICACION);
 
@@ -297,9 +303,6 @@ resultadoOperacion* ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
 	}
 }
 
-resultadoOperacion* ArbolBMas::eliminar(string clave, unsigned int valor) {
-	return 0;
-}
 void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqueUnderflow, Bloque* bloqueActual, list<Registro>::iterator itRegistros, bool bajePorUltimo) {
 	bool bajePorAnteultimo=false;
 
@@ -309,9 +312,9 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 		itRegistros--;
 	}
 
-
 	unsigned int bloqueDer;
 	unsigned int bloqueIzq;
+	//baje por el ultimo
 	if(bajePorUltimo){
 		bloqueDer = 0;
 		bloqueIzq = itRegistros->getReferenciai(1);
@@ -333,7 +336,7 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 	Bloque* bloqueAChequear= NULL;
 	bool usoBloqueDer= false;
 	bool underflowEnHojas = false;
-	//Si el derecho existe lo intento usar para balanceo
+	//Si el derecho existe lo intento usar para balanceo, sino usare el izquierdo
 	if (bloqueDer!=0) {
 		bloqueAChequear= this->archivoNodos->recuperarBloque(bloqueDer);
 		usoBloqueDer= true;
@@ -343,7 +346,7 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 	underflowEnHojas =bloqueUnderflow->getAtributoBloque()==0;
 
 	//Intento Balancear
-	// Si es una hoja no hace falta incluir el padre en el balanceo
+	// ***********************Si es un BALANCEO HOJA no hace falta incluir el padre en el balanceo****************************
 	if (underflowEnHojas)
 		while(archivoNodos->getOcupacionBloque(bloqueUnderflow)<0.5&&bloqueAChequear->obtenerRegistros()->size()>0) {
 			//caso derecho
@@ -356,33 +359,65 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 				bloqueUnderflow->obtenerRegistros()->push_front(bloqueAChequear->obtenerRegistros()->back());
 				bloqueAChequear->obtenerRegistros()->pop_back();
 			}
+			//subo el ultimo que pase arriba
+			string claveParaArriba;
+			if(usoBloqueDer) claveParaArriba = this->consultarClave(&bloqueAChequear->obtenerRegistros()->front());
+			else claveParaArriba = this->consultarClave(&bloqueUnderflow->obtenerRegistros()->front());
+
+			this->setearClave(&*itRegistros,claveParaArriba);
+
 		}
 	else {
-		// Balanceo en nodo interno (debo balancear con el padre)
+
+		// *******************BALANCEO en NODO INTERNO (debo balancear con el padre)****************************************
 		string claveAux=this->consultarClave(&*itRegistros);
+
+
 		while(archivoNodos->getOcupacionBloque(bloqueUnderflow)<0.5&&bloqueAChequear->obtenerRegistros()->size()>0) {
 			//caso derecho
 			if (usoBloqueDer) {
 				Registro* registroAPasar = this->crearRegistroClave(claveAux);
 
+				//ver el tema que ante una fusion un bloque alla quedado en 0 para fusionarse
+				if(bloqueUnderflow->obtenerRegistros()->size() == 0){
+					registroAPasar->agregarReferencia(bloqueUnderflow->getSiguiente());
+					bloqueUnderflow->setSiguiente(0);
+				}
+				else{
 				registroAPasar->agregarReferencia(bloqueUnderflow->obtenerRegistros()->back().getReferenciai(2));
 				bloqueUnderflow->obtenerRegistros()->back().getReferencias()->pop_back();
-				registroAPasar->agregarReferencia(bloqueAChequear->obtenerRegistros()->back().getReferenciai(1));
+				}
+
+				registroAPasar->agregarReferencia(bloqueAChequear->obtenerRegistros()->front().getReferenciai(1));
 
 				claveAux = this->consultarClave(&(bloqueAChequear->obtenerRegistros()->front()));
 
 				bloqueUnderflow->obtenerRegistros()->push_back(*registroAPasar);
-				bloqueAChequear->obtenerRegistros()->pop_front();
 
+				//antes de hacer pop del ultimo me guardo la referencia del nodo de abajo
+				if(bloqueAChequear->obtenerRegistros()->size() == 1)
+					bloqueAChequear->setSiguiente(bloqueAChequear->obtenerRegistros()->front().getReferenciai(2));
+				bloqueAChequear->obtenerRegistros()->pop_front();
 			}
 			//caso izquierdo
 			else {
 				Registro* registroAPasar = this->crearRegistroClave(claveAux);
+
 				registroAPasar->agregarReferencia(bloqueAChequear->obtenerRegistros()->back().getReferenciai(2));
+
+				//ver el tema que ante una fusion un bloque alla quedado en 0 para fusionarse
+				if ( bloqueUnderflow->obtenerRegistros()->size() == 0){
+					registroAPasar->agregarReferencia(bloqueUnderflow->getSiguiente());
+					bloqueUnderflow->setSiguiente(0);
+				}
 
 				claveAux= this->consultarClave(&(bloqueAChequear->obtenerRegistros()->back()));
 
 				unsigned int unaRef = bloqueAChequear->obtenerRegistros()->back().getReferenciai(1);
+				//antes de hacer pop del ultimo me guardo la referencia del nodo de abajo
+				if(bloqueAChequear->obtenerRegistros()->size() == 1)
+					bloqueAChequear->setSiguiente(bloqueAChequear->obtenerRegistros()->front().getReferenciai(1));
+
 				bloqueAChequear->obtenerRegistros()->pop_back();
 				bloqueAChequear->obtenerRegistros()->back().agregarReferencia(unaRef);
 
@@ -418,86 +453,236 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 		return;
 	}//fin balanceo
 
-	//Hubo Fusion de Nodos
+	//Hubo FUSION de Nodos(balanceo no efectivo)
 	else {
-		//underflow en hojas => ya tengo pasados todos al bloque underflow
+		//***********************FUSION HOJAS -> underflow en hojas => ya tengo pasados todos al bloque underflow*******************
 		if (underflowEnHojas){
-			//caso derecho
+			//caso derecho(fusion hojas)
 			if (usoBloqueDer){
 				unsigned int refSiguiente = bloqueAChequear->getSiguiente();
 				bloqueUnderflow->setSiguiente(refSiguiente);
 				//la referencia al underflow se la tengo que pasar al siguiente como 1er ref o al anterior como 2da ref
 
-				if (bajePorAnteultimo){
+				if (bajePorAnteultimo && bloqueActual->obtenerRegistros()->size() > 1){
 					itRegistros--;
 					itRegistros->agregarReferencia(nroBloqueUnderflow);
 					itRegistros++;
 				}
-				else{
-					itRegistros++;
-					itRegistros->getReferencias()->pop_front();
-					itRegistros->agregarReferencia(nroBloqueUnderflow);
-					itRegistros--;
+				else if(bloqueActual->obtenerRegistros()->size() == 1){
+					//por cuestion de comodidad guardo la referencia al bloque underflow ahi para no perderla
+					bloqueActual->setSiguiente(nroBloqueUnderflow);
 				}
+					else{
+						itRegistros++;
+						itRegistros->getReferencias()->pop_front();
+						itRegistros->getReferencias()->push_front(nroBloqueUnderflow);
+						itRegistros--;
+					}
 
 				//elimino el nodo descartado por la fusion
 				this->archivoNodos->eliminarBloque(bloqueDer);
 
-				//elimino el registro en el padre que referenciaba a dicho nodo
+				//elimino el registro en el padre que referenciaba a dicho nodo, pero guardo una referencia a este nodo hoja
+				//producto de la fusion, sera usado en probables fusion es de nodos internos(hecho unas lineas arriba)
 				bloqueActual->obtenerRegistros()->erase(itRegistros);
 
-			}
-			//caso izquierdo
-			else{
-				//actualizo el siguiente de 2 nodos anteriores al de underflow porque sino queda referenciando como siguiente al nodo borrado
-				//para llegar a el debo moverme 1 o 2 posiciones hacia atras con el iterador s/ por donde halla bajado en el underflow
-				if (bajePorUltimo){
-					itRegistros--;
-					unsigned int nrobloqueACambiarSiguiente = itRegistros->getReferenciai(1);
-					Bloque* bloqueACambiarSiguiente = this->archivoNodos->recuperarBloque(nrobloqueACambiarSiguiente);
-					bloqueACambiarSiguiente->setSiguiente(nroBloqueUnderflow);
-					this->archivoNodos->grabarBloque(bloqueACambiarSiguiente,nrobloqueACambiarSiguiente);
-					delete bloqueACambiarSiguiente;
-
-					itRegistros++;
-
-					//ademas en este caso debo agregarle una referencia a derecha en el nodo anterior apuntando al nodo underflow
-					itRegistros--;
-					itRegistros->agregarReferencia(nroBloqueUnderflow);
-					itRegistros++;
-
-
-
+				//grabo el bloque underflow casos excepcionales cuando termino la recursion guardo al actual y a los hijos
+				if (bloqueActual == raiz){
+					if (bloqueActual->obtenerRegistros()->size() == 0){
+					//hay nueva raiz
+						this->archivoNodos->grabarBloque(bloqueUnderflow,0);
+						this->archivoNodos->eliminarBloque(nroBloqueUnderflow);
+						delete raiz;
+						raiz = bloqueUnderflow;
+					}
+					else{
+					//sigue la raiz de antes
+						this->archivoNodos->grabarBloque(bloqueActual,0);
+					}
 				}
 				else{
-					itRegistros--;itRegistros--;
-					unsigned int nrobloqueACambiarSiguiente = itRegistros->getReferenciai(1);
-					Bloque* bloqueACambiarSiguiente = this->archivoNodos->recuperarBloque(nrobloqueACambiarSiguiente);
-					bloqueACambiarSiguiente->setSiguiente(nroBloqueUnderflow);
-					this->archivoNodos->grabarBloque(bloqueACambiarSiguiente,nrobloqueACambiarSiguiente);
-					delete bloqueACambiarSiguiente;
+				this->archivoNodos->grabarBloque(bloqueUnderflow,nroBloqueUnderflow);
+				}
 
-					itRegistros++;itRegistros++;
+			}
+			//caso izquierdo(fusion hojas)
+			else{
+				//la clave aca va a ser grabar el nodo underflow en el lugar del nodo que queda vacio por la fusion, y liberar
+				//el lugar donde se guardaba el nodo de underflow de esta manera no perdere la referencia como siguiente
+				//que podia tener en cualquier otra parte del arbol , ni siquiera se si esta a mi izquierda
 
+				if (bajePorUltimo){
+					if (bloqueActual->obtenerRegistros()->size() > 1){
+					//bajo estas 2 condiciones seguro tengo un registro a izquierda
+					//debo agregarle una referencia a derecha en el nodo anterior apuntando al nodo underflow(ojo ahora se guardara
+					// en la posicion donde se encontraba el bloque q ahora quedo vacio
+					itRegistros--;
+					itRegistros->agregarReferencia(bloqueIzq);
+					itRegistros++;
+					}
+					//si era el unico registro
+					else if (bloqueActual->obtenerRegistros()->size() == 1){
+						//por cuestion de comodidad guardo la referencia al bloque underflow ahi para no perderla
+						bloqueActual->setSiguiente(bloqueIzq);
+						}
+				}
+				//sino baje por el ultimo
+				else{
+					// al de la derecha le toco la referencia para que siga apuntando a donde voy a guardar el bloq.underflow
+					itRegistros++;
+					itRegistros->getReferencias()->pop_front();
+					itRegistros->getReferencias()->push_front(bloqueIzq);
+					itRegistros--;
 				}
 
 				//elimino el nodo descartado por la fusion
-				this->archivoNodos->eliminarBloque(bloqueDer);
+				this->archivoNodos->eliminarBloque(nroBloqueUnderflow);
 
 				//elimino el registro padre que referenciaba a dicho nodo
 				bloqueActual->obtenerRegistros()->erase(itRegistros);
 
+				//grabo el bloque underflow casos excepcionales cuando termino la recursion guardo al actual y a los hijos
+				if (bloqueActual == raiz){
+					if (bloqueActual->obtenerRegistros()->size() == 0){
+					//hay nueva raiz
+						this->archivoNodos->grabarBloque(bloqueUnderflow,0);
+						this->archivoNodos->eliminarBloque(nroBloqueUnderflow);
+						delete raiz;
+						raiz = bloqueUnderflow;
+					}
+					else{
+					//sigue la raiz de antes
+						this->archivoNodos->grabarBloque(bloqueActual,0);
+					}
+				}
+				else{
+				//(recordar el tip se guarda en el otro espacio)
+				this->archivoNodos->grabarBloque(bloqueUnderflow,bloqueIzq);
+				}
+
 			}
 		}
-		//fusion en internos
+		//**********************************************FUSION EN NODOS INTERNOS***********************************************
 		else{
-			/* TO DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo*/
+			//caso derecho
+			if (usoBloqueDer){
+				//bajo el que me quedo del balanceo arriba al hijo
+				Registro* registroQueBaja = this->crearRegistroClave(this->consultarClave(&*itRegistros));
+				registroQueBaja->agregarReferencia(bloqueUnderflow->obtenerRegistros()->back().getReferenciai(2));
+				bloqueUnderflow->obtenerRegistros()->back().getReferencias()->pop_back();
+				registroQueBaja->agregarReferencia(bloqueAChequear->getSiguiente());
+				bloqueAChequear->setSiguiente(0);
+
+				bloqueUnderflow->agregarRegistro(*registroQueBaja);
+
+				//aca tengo resuelto el pasaje de todos los registros al underflow
+				// => de aca en mas misma logica de la fusion de nodos hojas
+
+				//la referencia al underflow se la tengo que pasar al siguiente como 1er ref o al anterior como 2da ref
+				if (bajePorAnteultimo && bloqueActual->obtenerRegistros()->size() > 1){
+					itRegistros--;
+					itRegistros->agregarReferencia(nroBloqueUnderflow);
+					itRegistros++;
+				}
+				else if(bloqueActual->obtenerRegistros()->size() == 1){
+					//por cuestion de comodidad guardo la referencia al bloque underflow ahi para no perderla
+					bloqueActual->setSiguiente(nroBloqueUnderflow);
+				}
+					else{
+						itRegistros++;
+						itRegistros->getReferencias()->pop_front();
+						itRegistros->getReferencias()->push_front(nroBloqueUnderflow);
+						itRegistros--;
+					}
+				//elimino el nodo descartado por la fusion
+				this->archivoNodos->eliminarBloque(bloqueDer);
+
+				//elimino el registro en el padre que referenciaba a dicho nodo,
+				bloqueActual->obtenerRegistros()->erase(itRegistros);
+
+				//grabo el bloque underflow casos excepcionales cuando termino la recursion guardo al actual y a los hijos
+				if (bloqueActual == raiz){
+					if (bloqueActual->obtenerRegistros()->size() == 0){
+					//hay nueva raiz
+						this->archivoNodos->grabarBloque(bloqueUnderflow,0);
+						this->archivoNodos->eliminarBloque(nroBloqueUnderflow);
+						delete raiz;
+						raiz = bloqueUnderflow;
+					}
+					else{
+					//sigue la raiz de antes
+						this->archivoNodos->grabarBloque(bloqueActual,0);
+					}
+				}
+				else{
+				//grabo el bloque underflow
+				this->archivoNodos->grabarBloque(bloqueUnderflow,nroBloqueUnderflow);
+				}
+			}
+
+			//caso izquierdo
+			else{
+				//bajo el que me quedo del balanceo arriba al hijo
+				Registro* registroQueBaja = this->crearRegistroClave(this->consultarClave(&*itRegistros));
+				registroQueBaja->agregarReferencia(bloqueAChequear->getSiguiente());
+				bloqueAChequear->setSiguiente(0);
+
+				bloqueUnderflow->obtenerRegistros()->push_front(*registroQueBaja);
+
+				//aca tengo resuelto el pasaje de todos los registros al underflow
+				// => de aca en mas misma logica de la fusion de nodos hojas
+
+				if (bajePorUltimo){
+					if (bloqueActual->obtenerRegistros()->size() > 1){
+					//bajo estas 2 condiciones seguro tengo un registro a izquierda
+					//debo agregarle una referencia a derecha en el nodo anterior apuntando al nodo underflow(ojo ahora se guardara
+					// en la posicion donde se encontraba el bloque q ahora quedo vacio
+					itRegistros--;
+					itRegistros->agregarReferencia(bloqueIzq);
+					itRegistros++;
+					}
+				//si era el unico registro
+				else if (bloqueActual->obtenerRegistros()->size() == 1){
+				//por cuestion de comodidad guardo la referencia al bloque underflow ahi para no perderla
+						bloqueActual->setSiguiente(bloqueIzq);
+						}
+				}
+				//sino baje por el ultimo
+				else{
+				// al de la derecha le toco la referencia para que siga apuntando a donde voy a guardar el bloq.underflow
+					itRegistros++;
+					itRegistros->getReferencias()->pop_front();
+					itRegistros->getReferencias()->push_front(bloqueIzq);
+					itRegistros--;
+				}
+
+				//elimino el nodo descartado por la fusion
+				this->archivoNodos->eliminarBloque(nroBloqueUnderflow);
+
+				//elimino el registro padre que referenciaba a dicho nodo
+				bloqueActual->obtenerRegistros()->erase(itRegistros);
+
+				//grabo el bloque underflow casos excepcionales cuando termino la recursion guardo al actual y a los hijos
+				if (bloqueActual == raiz){
+					if (bloqueActual->obtenerRegistros()->size() == 0){
+					//hay nueva raiz
+						this->archivoNodos->grabarBloque(bloqueUnderflow,0);
+						this->archivoNodos->eliminarBloque(nroBloqueUnderflow);
+						delete raiz;
+						raiz = bloqueUnderflow;
+					}
+					else{
+					//sigue la raiz de antes
+						this->archivoNodos->grabarBloque(bloqueActual,0);
+					}
+				}
+				else{
+				//grabo el bloque underflow(recordar el tip se guarda en el otro espacio)
+				this->archivoNodos->grabarBloque(bloqueUnderflow,bloqueIzq);
+				}
+			}
 		}
-
-
 	}//fin fusion
-
-
 }
 
 resultadoOperacion* ArbolBMas::siguiente(Registro* regSiguiente) {

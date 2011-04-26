@@ -1,6 +1,6 @@
 #include "Hash.h"
 
-int main(){
+int main99(){
 
 
 

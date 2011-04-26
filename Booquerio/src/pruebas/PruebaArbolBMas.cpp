@@ -3,7 +3,7 @@
 
 using namespace std;
 
-int main(){
+int main4(){
 	string unPath = "ArbolBMas";
 
 	ArbolBMasNumerico* miArbol = new ArbolBMasNumerico(unPath,96);
