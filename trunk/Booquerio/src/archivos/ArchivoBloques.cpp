@@ -245,16 +245,14 @@ void ArchivoBloques::eliminarBloque(unsigned int nroBloque){
 	pathLibres += "-libres";
 	fstream archivoLibres;
 
-	cout << pathLibres << endl;
-
 	archivoLibres.open(pathLibres.c_str(),ios::binary | ios::in | ios::out | ios::ate);
-
-	cout << boolalpha << archivoLibres.good() << endl;
 
 	if (!archivoLibres.good()){
 		archivoLibres.open(pathLibres.c_str(), ios::binary | ios::out | ios::ate );}
 
 	archivoLibres.write((char*)&nroBloque , sizeof(int));
+
+	archivoLibres.close();
 }
 
 unsigned int ArchivoBloques::getBloqueLibre(){
