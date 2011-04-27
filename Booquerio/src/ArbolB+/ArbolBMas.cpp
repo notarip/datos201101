@@ -135,7 +135,7 @@ void ArbolBMas::resolverOverflow(Bloque* bloqueOverflow,
 	Registro registroASplit;
 
 	//realizo el split
-	while (archivoNodos->getOcupacionBloque(bloqueSplit) <= 0.50) {
+	while (archivoNodos->getOcupacionBloque(bloqueSplit) <= PORCENTAJE_OVERFLOW) {
 		registroASplit = listaRegistros->back();
 		listaRegistros->pop_back();
 		this->agregarRegistroEnOrden(bloqueSplit, registroASplit);
@@ -224,10 +224,12 @@ list<Registro>::iterator ArbolBMas::agregarRegistroEnOrden(Bloque* unBloque,
 }
 
 resultadoOperacion* ArbolBMas::eliminar(string clave, unsigned int valor) {
-	return this->eliminarRecursivo(raiz,clave,valor);
-
-
-
+	resultadoOperacion* resultadoRaiz =  this->eliminarRecursivo(raiz,clave,valor);
+	if (resultadoRaiz->getCodigo() == HUBO_MODIFICACION){
+		delete resultadoRaiz;
+		return new resultadoOperacion(OK);
+	}
+	return resultadoRaiz;
 }
 
 resultadoOperacion* ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
@@ -242,7 +244,7 @@ resultadoOperacion* ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
 		list<Registro>::iterator itRegistros = listaReg->begin();
 
 		while (itRegistros != listaReg->end() && compareRegistros(clave,
-				&(*itRegistros)) >= 0) {
+				&(*itRegistros)) > 0) {
 			itRegistros++;
 		}
 		// Registro a eliminar encontrado
@@ -285,19 +287,31 @@ resultadoOperacion* ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
 
 		//chekeo lo sucedido con mi hijo y voy a "resolver sus problemas"
 
+		if (resultadoHijo->getCodigo() == OK){
+			delete resultadoHijo;
+			return new resultadoOperacion (OK);
+		}
+
 		//si no hubo eliminacion sigo enviando ese mensaje hacia arriba
-		if (resultadoHijo->getCodigo() == NO_ENCONTRADO)
+		if (resultadoHijo->getCodigo() == NO_ENCONTRADO) {
+			delete resultadoHijo;
 			return resultadoHijo;
+		}
 
 		else {
 			//verifico si mi hijo quedo en underflow
-			if (this->archivoNodos->getOcupacionBloque(bloqueABajar) < 0.5) {
+			if (this->archivoNodos->getOcupacionBloque(bloqueABajar) < PORCENTAJE_UNDERFLOW) {
 
 				this->resolverUnderflow(bloqueABajar,nroBloqueABajar,bloqueActual, itRegistros, bajePorUltimo);
+				this->exportar("intermedios");
 				delete resultadoHijo;
 				return new resultadoOperacion(HUBO_MODIFICACION);
 
 			}
+			else {
+				this->archivoNodos->grabarBloque(bloqueABajar, nroBloqueABajar);
+			}
+			delete resultadoHijo;
 			return new resultadoOperacion (OK);
 		}
 	}
@@ -305,6 +319,7 @@ resultadoOperacion* ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
 
 void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqueUnderflow, Bloque* bloqueActual, list<Registro>::iterator itRegistros, bool bajePorUltimo) {
 	bool bajePorAnteultimo=false;
+	bool bajePorPrimero = itRegistros==bloqueActual->obtenerRegistros()->begin();
 
 	if (!bajePorUltimo){
 		itRegistros++;
@@ -314,24 +329,72 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 
 	unsigned int bloqueDer;
 	unsigned int bloqueIzq;
-	//baje por el ultimo
-	if(bajePorUltimo){
-		bloqueDer = 0;
-		bloqueIzq = itRegistros->getReferenciai(1);
-	}
-	//no baje por el ultimo
-	else{
-		itRegistros++;
-		bloqueDer= itRegistros->getReferenciai(1);
-		itRegistros--;
-		if (itRegistros==bloqueActual->obtenerRegistros()->begin())
+	if(bajePorPrimero && !bajePorUltimo){
+		if (bajePorAnteultimo){//=>unico
+			bloqueIzq = 0;
+			bloqueDer = itRegistros->getReferenciai(2);
+		}
+		else{//no es el unico
 			bloqueIzq= 0;
-		else {
-			itRegistros--;
-			bloqueIzq= (itRegistros)->getReferenciai(1);
 			itRegistros++;
+			bloqueDer= itRegistros->getReferenciai(1);
+			itRegistros--;
+		}
+	}else{
+		if(bajePorUltimo){
+				bloqueDer = 0;
+				bloqueIzq = itRegistros->getReferenciai(1);
+		}
+		else{
+			if(bajePorAnteultimo && !bajePorPrimero){
+				bloqueDer = itRegistros->getReferenciai(2);
+				itRegistros++;
+				bloqueIzq = itRegistros->getReferenciai(1);
+				itRegistros--;
+			}
+			else{//caso comun
+				itRegistros++;
+				bloqueDer= itRegistros->getReferenciai(1);
+				itRegistros--;
+				itRegistros--;
+				bloqueIzq= (itRegistros)->getReferenciai(1);
+				itRegistros++;
+			}
 		}
 	}
+
+//
+//	//baje por el ultimo
+//	if(bajePorUltimo){
+//		bloqueDer = 0;
+//		bloqueIzq = itRegistros->getReferenciai(1);
+//	}
+//
+//
+//
+//	//no baje por el ultimo
+//	else{
+//		if (bajePorAnteultimo){
+//			if(!bajePorPrimero){//anteultimo comun
+//			itRegistros--;
+//			bloqueIzq = (itRegistros)->getReferenciai(1);
+//			itRegistros++;
+//			bloqueDer = itRegistros->getReferenciai(2);
+//			}
+//			else{//baje por primero y anteultimo => unico
+//			bloqueIzq= 0;
+//			bloqueDer = itRegistros->getReferenciai(2);
+//			}
+//		}
+//		else{//caso comun
+//		itRegistros++;
+//		bloqueDer= itRegistros->getReferenciai(1);
+//		itRegistros--;
+//		itRegistros--;
+//		bloqueIzq= (itRegistros)->getReferenciai(1);
+//		itRegistros++;
+//		}
+//	}
 
 	Bloque* bloqueAChequear= NULL;
 	bool usoBloqueDer= false;
@@ -347,8 +410,8 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 
 	//Intento Balancear
 	// ***********************Si es un BALANCEO HOJA no hace falta incluir el padre en el balanceo****************************
-	if (underflowEnHojas)
-		while(archivoNodos->getOcupacionBloque(bloqueUnderflow)<0.5&&bloqueAChequear->obtenerRegistros()->size()>0) {
+	if (underflowEnHojas) {
+		while((archivoNodos->getOcupacionBloque(bloqueUnderflow)<PORCENTAJE_UNDERFLOW || archivoNodos->getOcupacionBloque(bloqueAChequear)<PORCENTAJE_UNDERFLOW) &&bloqueAChequear->obtenerRegistros()->size()>0) {
 			//caso derecho
 			if (usoBloqueDer) {
 				bloqueUnderflow->obtenerRegistros()->push_back(bloqueAChequear->obtenerRegistros()->front());
@@ -359,21 +422,17 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 				bloqueUnderflow->obtenerRegistros()->push_front(bloqueAChequear->obtenerRegistros()->back());
 				bloqueAChequear->obtenerRegistros()->pop_back();
 			}
-			//subo el ultimo que pase arriba
-			string claveParaArriba;
-			if(usoBloqueDer) claveParaArriba = this->consultarClave(&bloqueAChequear->obtenerRegistros()->front());
-			else claveParaArriba = this->consultarClave(&bloqueUnderflow->obtenerRegistros()->front());
-
-			this->setearClave(&*itRegistros,claveParaArriba);
-
 		}
+		//subo el ultimo que pase arriba
+		string claveParaArriba;
+	}
 	else {
 
 		// *******************BALANCEO en NODO INTERNO (debo balancear con el padre)****************************************
 		string claveAux=this->consultarClave(&*itRegistros);
 
 
-		while(archivoNodos->getOcupacionBloque(bloqueUnderflow)<0.5&&bloqueAChequear->obtenerRegistros()->size()>0) {
+		while((archivoNodos->getOcupacionBloque(bloqueUnderflow)<PORCENTAJE_UNDERFLOW || archivoNodos->getOcupacionBloque(bloqueAChequear)<PORCENTAJE_UNDERFLOW) && bloqueAChequear->obtenerRegistros()->size()>0) {
 			//caso derecho
 			if (usoBloqueDer) {
 				Registro* registroAPasar = this->crearRegistroClave(claveAux);
@@ -419,7 +478,10 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 					bloqueAChequear->setSiguiente(bloqueAChequear->obtenerRegistros()->front().getReferenciai(1));
 
 				bloqueAChequear->obtenerRegistros()->pop_back();
+
+				if(bloqueAChequear->obtenerRegistros()->size() > 0){
 				bloqueAChequear->obtenerRegistros()->back().agregarReferencia(unaRef);
+				}
 
 				bloqueUnderflow->obtenerRegistros()->push_front(*registroAPasar);
 			}
@@ -428,7 +490,7 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 	}
 
 	//Chequeo si el balanceo fue efectivo
-	if (archivoNodos->getOcupacionBloque(bloqueUnderflow)>=0.5 && archivoNodos->getOcupacionBloque(bloqueAChequear)>=0.5){
+	if (archivoNodos->getOcupacionBloque(bloqueUnderflow)>=PORCENTAJE_UNDERFLOW && archivoNodos->getOcupacionBloque(bloqueAChequear)>=PORCENTAJE_UNDERFLOW){
 		//verifico posibles cambios en  padre por el balanceo
 		//en el caso de las hojas
 		if (underflowEnHojas){
@@ -494,6 +556,7 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 						this->archivoNodos->eliminarBloque(nroBloqueUnderflow);
 						delete raiz;
 						raiz = bloqueUnderflow;
+						return;
 					}
 					else{
 					//sigue la raiz de antes
@@ -667,7 +730,7 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 					if (bloqueActual->obtenerRegistros()->size() == 0){
 					//hay nueva raiz
 						this->archivoNodos->grabarBloque(bloqueUnderflow,0);
-						this->archivoNodos->eliminarBloque(nroBloqueUnderflow);
+						this->archivoNodos->eliminarBloque(bloqueIzq);
 						delete raiz;
 						raiz = bloqueUnderflow;
 					}

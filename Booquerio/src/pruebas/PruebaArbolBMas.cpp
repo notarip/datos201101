@@ -3,7 +3,7 @@
 
 using namespace std;
 
-int main4(){
+int main(){
 	string unPath = "ArbolBMas";
 
 	ArbolBMasNumerico* miArbol = new ArbolBMasNumerico(unPath,96);
@@ -72,6 +72,42 @@ int main4(){
 	miArbol->exportar("prueba");
 
 	unResultado = miArbol->insertarNumerico(121,0);
+	miArbol->exportar("prueba");
+
+	unResultado = miArbol->eliminarNumerico(44,0);
+	miArbol->exportar("prueba");
+
+	unResultado = miArbol->eliminarNumerico(84,0);
+	miArbol->exportar("prueba");
+
+	unResultado = miArbol->eliminarNumerico(90,0);
+	miArbol->exportar("prueba");
+
+	unResultado = miArbol->eliminarNumerico(22,0);
+	miArbol->exportar("prueba");
+
+	unResultado = miArbol->eliminarNumerico(12,0);
+	miArbol->exportar("prueba");
+
+	unResultado = miArbol->eliminarNumerico(110,0);
+	miArbol->exportar("prueba");
+
+	unResultado = miArbol->eliminarNumerico(59,0);
+	miArbol->exportar("prueba");
+
+	unResultado = miArbol->eliminarNumerico(122,0);
+	miArbol->exportar("prueba");
+
+	unResultado = miArbol->eliminarNumerico(114,0);
+	miArbol->exportar("prueba");
+
+	unResultado = miArbol->eliminarNumerico(35,0);
+	miArbol->exportar("prueba");
+
+	unResultado = miArbol->insertarNumerico(150,0);
+	miArbol->exportar("prueba");
+
+	unResultado = miArbol->insertarNumerico(140,0);
 	miArbol->exportar("prueba");
 
 

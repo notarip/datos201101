@@ -8,6 +8,9 @@
 #ifndef ARBOLBMAS_H_
 #define ARBOLBMAS_H_
 
+#define PORCENTAJE_UNDERFLOW 0.4
+#define PORCENTAJE_OVERFLOW 0.5
+
 #include "../archivos/Registro.h"
 #include "../archivos/ArchivoBloques.h"
 #include "../archivos/Bloque.h"
