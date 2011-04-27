@@ -103,6 +103,7 @@ public:
 	static int verEstructuraPalabras();
 
 private:
+	static void modificarListaIds(string clavePasada,unsigned int id);
 	static int procesarLibro(int indice);
 	static int agregarIndiceAutores(Libro *unLibro);
 	static int agregarIndiceEditoriales(Libro *unLibro);
