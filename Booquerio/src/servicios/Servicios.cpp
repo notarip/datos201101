@@ -4,10 +4,10 @@
  *  Created on: 22/04/2011
  *      Author: pablo
  */
-
+#define TAMANIO_BLOQUE 4096
 #include "Servicios.h"
-
-
+#include "../hash/Hash.h"
+#include "../util/Util.h"
 int Servicios::tomarTexto(string ruta)
 {
 
@@ -254,24 +254,49 @@ int Servicios::procesarLibro(int indice)
 	return error;
 }
 
+
+void Servicios::modificarListaIds(string pathHash, string pathListaIds, string clavePasada, unsigned int idNueva){
+	Hash hash(parametro);
+	ArchivoBloques archivo(parametro2,TAMANIO_BLOQUE);
+	Registro* registro= hash.buscar(clavePasada);
+	Bloque* bloque=NULL;
+	unsigned int referencia=0;
+	if (registro){
+		referencia= registro->getAtributosEnteros()->back();
+		bloque= archivo.recuperarBloque(referencia);
+		Registro listaIds= bloque->obtenerRegistros()->front();
+		listaIds.agregarAtribEntero(idNueva);
+
+	}
+	else{
+		referencia= archivo.getBloqueLibre();
+		bloque= new Bloque();
+		Registro listaIds;
+		listaIds.agregarAtribEntero(idNueva);
+		bloque->agregarRegistro(listaIds);
+	}
+	archivo.grabarBloque(bloque,referencia);
+}
+
+
 int Servicios::agregarIndiceAutores(Libro *unLibro)
 {
-	//TODO agregar al indice de autores
-	//TODO agarrar los errores de esta operacion
+	//logica pertenece al arbol.
+
 	return 0;
 }
 
 int Servicios::agregarIndiceEditoriales(Libro *unLibro)
 {
-	//TODO agregar al indice de editoriales
-	//TODO agarrar los errores de esta operacion
+	//logica pertenece al arbol.
 	return 0;
 }
 
 int Servicios::agregarIndiceTitulos(Libro *unLibro)
 {
-	//TODO agregar al indice de titulos
-	//TODO agarrar los errores de esta operacion
+//	string path1= Parametros().getParametro(CARPETA_HASH_TITULOS);
+//	string path2= Parametros().getParametro(CARPETA_LISTA_TITULOS);
+//	modificarListaIds(path1, path2, unLibro->getAutor(),unLibro->getId());
 	return 0;
 }
 
@@ -279,11 +304,12 @@ int Servicios::agregarIndicePalabras(Libro *unLibro)
 {
 
 	set<string> *palabras = unLibro->getListaPalabras();
+	string path1= Parametros().getParametro(CARPETA_HASH_PALABRAS);
+	string path2= Parametros().getParametro(CARPETA_LISTA_PALABRAS);
 
 	for (set<string>::iterator it = palabras->begin(); it != palabras->end(); it++)
 	{
-		//TODO agregar al indice de palabras
-		//TODO agarrar los errores de esta operacion
+		modificarListaIds(path1, path2, *it,unLibro->getId());
 	}
 
 	return 0;
