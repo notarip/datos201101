@@ -49,6 +49,8 @@ resultadoOperacion ArbolBMas::insertar(string clave, unsigned int valor) {
 	} else {
 		//sino no hubo overflow
 	}
+	if (resultadoRaiz.getCodigo() == CLAVE_REPETIDA)
+		return resultadoOperacion(CLAVE_REPETIDA);
 
 	return resultadoOperacion(OK);
 }
@@ -62,9 +64,16 @@ resultadoOperacion ArbolBMas::insertarRecursivo(Bloque* bloqueActual,
 		//ver si entre en overflow o no cuando intente grabarme
 
 		/* CHEKEAR SI AGREGAR IMPLICA HACER UN REGISTRO NUEVO O SOLO AGREGAR UN ID*/
+		// => esto no se hace aqui, siempre insertar es hacer registros nuevos
 
 		Registro* registroAAgregar = this->crearRegistroClave(clave, valor);
-		this->agregarRegistroEnOrden(bloqueActual, *registroAAgregar);
+		try{
+			this->agregarRegistroEnOrden(bloqueActual, *registroAAgregar);
+		}
+		catch (ExceptionDuplicacionClaves& e){
+			//agrege un registro con clave duplicado
+			return resultadoOperacion(CLAVE_REPETIDA);
+		}
 
 		return resultadoOperacion(HUBO_MODIFICACION);
 
@@ -117,6 +126,9 @@ resultadoOperacion ArbolBMas::insertarRecursivo(Bloque* bloqueActual,
 			}
 		} else {
 			//sino hubo overflow
+		}
+		if (resultadoHijo.getCodigo() == CLAVE_REPETIDA){
+			return resultadoOperacion(CLAVE_REPETIDA);
 		}
 
 		return resultadoOperacion(OK);
@@ -214,6 +226,8 @@ list<Registro>::iterator ArbolBMas::agregarRegistroEnOrden(Bloque* unBloque,
 			claveRegistroAAgregar, &(*itRegistros)) > 0) {
 		itRegistros++;
 	}
+	if(itRegistros != listaRegistros->end()&& this->compareRegistros(claveRegistroAAgregar,&(*itRegistros)) == 0)
+		throw ExceptionDuplicacionClaves();
 
 	listaRegistros->insert(itRegistros, unRegistro);
 	--itRegistros;
@@ -291,15 +305,9 @@ resultadoOperacion ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
 			return resultadoOperacion (NO_ENCONTRADO);
 		}
 
-		//si no hubo eliminacion sigo enviando ese mensaje hacia arriba
-		if (resultadoHijo.getCodigo() == NO_ENCONTRADO) {
-			return resultadoHijo;
-		}
-
 		else {
 			//verifico si mi hijo quedo en underflow
 			if (this->archivoNodos->getOcupacionBloque(bloqueABajar) < PORCENTAJE_UNDERFLOW) {
-
 				this->resolverUnderflow(bloqueABajar,nroBloqueABajar,bloqueActual, itRegistros, bajePorUltimo);
 				this->exportar("intermedios");
 				return resultadoOperacion(HUBO_MODIFICACION);
@@ -344,6 +352,7 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 		else{
 			if(bajePorAnteultimo && !bajePorPrimero){
 				bloqueDer = itRegistros->getReferenciai(2);
+				//para verificar me parece que tengo que hacer un -- y despues un ++
 				itRegistros++;
 				bloqueIzq = itRegistros->getReferenciai(1);
 				itRegistros--;
@@ -638,6 +647,7 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 					else{
 					//sigue la raiz de antes
 						this->archivoNodos->grabarBloque(bloqueActual,0);
+						this->archivoNodos->grabarBloque(bloqueUnderflow,nroBloqueUnderflow);
 					}
 				}
 				else{
@@ -866,8 +876,8 @@ string ArbolBMas::imprimirBloque(Bloque* unBloque, unsigned int nroBloque) {
 		while (itRegistros != registros->end()) {
 					bloqueImpreso += "(";
 					bloqueImpreso += this->consultarClave(&*itRegistros);
-					bloqueImpreso += "|";
-					conversor << itRegistros->getReferenciai(1);
+					//bloqueImpreso += "|";
+					//conversor << itRegistros->getReferenciai(1);
 					bloqueImpreso += conversor.str();
 					conversor.str("");
 					bloqueImpreso += ")";

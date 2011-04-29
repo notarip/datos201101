@@ -17,6 +17,7 @@
 #include "../archivos/ExceptionBloque.h"
 #include "../util/Parametros.h"
 #include "resultadoOperacion.h"
+#include "ExceptionDuplicacionClaves.h"
 #include <sstream>
 
 using namespace std;

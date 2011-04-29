@@ -35,7 +35,7 @@ Registro* ArbolBMasNumerico::crearRegistroClave(string clave, unsigned int valor
 	buffer >> claveNumerica;
 	Registro* unRegistro = new Registro();
 	unRegistro->agregarAtribEntero(claveNumerica);
-	//unRegistro->agregarReferencia(valor);
+	unRegistro->agregarReferencia(valor);
 
 	return unRegistro;
 }

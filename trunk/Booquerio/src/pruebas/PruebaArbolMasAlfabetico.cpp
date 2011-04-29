@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int main23(){
+int main43(){
 	string unPath = "ArbolBMas";
 
 	ArbolBMasAlfabetico* miArbol = new ArbolBMasAlfabetico(unPath,96);
@@ -135,6 +135,14 @@ int main23(){
 	regEncontrado= miArbol->buscarRegistro("zoe", &resultadoOp);
 	cout<<resultadoOp.getDescripcion()<<endl;
 	cout<<regEncontrado->getString()<<endl;
+
+	regEncontrado= miArbol->buscarRegistro("diego",&resultadoOp);
+
+	while (regEncontrado!=NULL){
+		cout<<regEncontrado->getString()<<"|";
+		regEncontrado= miArbol->siguiente();
+	}
+
 
 	delete miArbol;
 	return 0;
