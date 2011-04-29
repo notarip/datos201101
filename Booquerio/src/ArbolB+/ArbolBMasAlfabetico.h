@@ -17,6 +17,7 @@ public:
 	virtual ~ArbolBMasAlfabetico();
 	virtual char compareRegistros(string clave, Registro* unRegistro );
 	virtual Registro* crearRegistroClave(string clave);
+	virtual Registro* crearRegistroClave(string clave, unsigned int valor);
 	virtual string consultarClave(Registro* unRegistro);
 	virtual void setearClave(Registro* registroAModificar, string clave);
 };

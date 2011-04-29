@@ -27,6 +27,19 @@ char ArbolBMasNumerico::compareRegistros(string clave, Registro* unRegistro) {
 		return 1;
 }
 
+Registro* ArbolBMasNumerico::crearRegistroClave(string clave, unsigned int valor) {
+	stringstream buffer(stringstream::in | stringstream::out);
+
+	buffer << clave;
+	unsigned int claveNumerica;
+	buffer >> claveNumerica;
+	Registro* unRegistro = new Registro();
+	unRegistro->agregarAtribEntero(claveNumerica);
+	//unRegistro->agregarReferencia(valor);
+
+	return unRegistro;
+}
+
 Registro* ArbolBMasNumerico::crearRegistroClave(string clave) {
 	stringstream buffer(stringstream::in | stringstream::out);
 
@@ -35,9 +48,9 @@ Registro* ArbolBMasNumerico::crearRegistroClave(string clave) {
 	buffer >> claveNumerica;
 	Registro* unRegistro = new Registro();
 	unRegistro->agregarAtribEntero(claveNumerica);
-
 	return unRegistro;
 }
+
 
 void ArbolBMasNumerico::setearClave(Registro* registroAModificar, string clave){
 
@@ -49,7 +62,7 @@ void ArbolBMasNumerico::setearClave(Registro* registroAModificar, string clave){
 	registroAModificar->getAtributosEnteros()->push_front(claveNumerica);
 }
 
-resultadoOperacion* ArbolBMasNumerico::insertarNumerico(unsigned int clave,
+resultadoOperacion ArbolBMasNumerico::insertarNumerico(unsigned int clave,
 		unsigned int valor) {
 	stringstream buffer(stringstream::in | stringstream::out);
 	buffer << clave;
@@ -69,7 +82,7 @@ Registro* ArbolBMasNumerico::buscarRegistroNumerico(unsigned int clave,
 	return buscarRegistro(claveAlfabetica, resultOperacion);
 }
 
-resultadoOperacion* ArbolBMasNumerico::eliminarNumerico(unsigned int clave,
+resultadoOperacion ArbolBMasNumerico::eliminarNumerico(unsigned int clave,
 		unsigned int valor) {
 	stringstream buffer(stringstream::in | stringstream::out);
 	buffer << clave;
@@ -85,9 +98,6 @@ string ArbolBMasNumerico::consultarClave(Registro* unRegistro){
 	buffer >> claveAlfabetica;
 
 	return claveAlfabetica;
-
-
-
 }
 
 ArbolBMasNumerico::~ArbolBMasNumerico() {

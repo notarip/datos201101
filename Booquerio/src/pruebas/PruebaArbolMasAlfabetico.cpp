@@ -15,32 +15,25 @@ int main23(){
 
 	ArbolBMasAlfabetico* miArbol = new ArbolBMasAlfabetico(unPath,96);
 
-	resultadoOperacion* unResultado = miArbol->insertar("pedro",0);
-	delete unResultado;
+	resultadoOperacion unResultado = miArbol->insertar("pedro",0);
 	miArbol->exportar("prueba");
 
 	unResultado = miArbol->insertar("gabriel",0);
-	delete unResultado;
 	miArbol->exportar("prueba");
 
 	unResultado = miArbol->insertar("juan",0);
-	delete unResultado;
 	miArbol->exportar("prueba");
 
 	unResultado = miArbol->insertar("agustina",0);
-	delete unResultado;
 	miArbol->exportar("prueba");
 
 	unResultado = miArbol->insertar("gaston",0);
-	delete unResultado;
 	miArbol->exportar("prueba");
 
 	unResultado = miArbol->insertar("maria",0);
-	delete unResultado;
 	miArbol->exportar("prueba");
 
 	unResultado = miArbol->insertar("mercedes",0);
-	delete unResultado;
 	miArbol->exportar("prueba");
 
 	unResultado = miArbol->insertar("pablo",0);

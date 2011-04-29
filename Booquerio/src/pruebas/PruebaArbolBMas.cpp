@@ -8,37 +8,25 @@ int main(){
 
 	ArbolBMasNumerico* miArbol = new ArbolBMasNumerico(unPath,96);
 
-	resultadoOperacion* unResultado = miArbol->insertarNumerico(9,0);
-	delete unResultado;
+	resultadoOperacion unResultado = miArbol->insertarNumerico(9,0);
 	miArbol->exportar("prueba");
 
 	unResultado = miArbol->insertarNumerico(8,0);
-	delete unResultado;
 	miArbol->exportar("prueba");
-
 
 	unResultado = miArbol->insertarNumerico(122,0);
-	delete unResultado;
 	miArbol->exportar("prueba");
-
 
 	unResultado = miArbol->insertarNumerico(12,0);
-	delete unResultado;
 	miArbol->exportar("prueba");
-
 
 	unResultado = miArbol->insertarNumerico(22,0);
-	delete unResultado;
 	miArbol->exportar("prueba");
-
 
 	unResultado = miArbol->insertarNumerico(35,0);
-	delete unResultado;
 	miArbol->exportar("prueba");
 
-
 	unResultado = miArbol->insertarNumerico(84,0);
-	delete unResultado;
 	miArbol->exportar("prueba");
 
 	unResultado = miArbol->insertarNumerico(25,0);
@@ -109,6 +97,9 @@ int main(){
 
 	unResultado = miArbol->insertarNumerico(140,0);
 	miArbol->exportar("prueba");
+
+	unResultado = miArbol->eliminarNumerico(35,0);
+	cout<<unResultado.getDescripcion()<<endl;
 
 	resultadoOperacion resultadoOp(OK);
 	Registro* regEncontrado= miArbol->buscarRegistroNumerico(120, &resultadoOp);
