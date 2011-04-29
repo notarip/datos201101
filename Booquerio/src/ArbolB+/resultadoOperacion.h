@@ -13,6 +13,7 @@
 #define HUBO_MODIFICACION 1
 #define ENCONTRADO 2
 #define NO_ENCONTRADO 3
+#define CLAVE_REPETIDA 4
 
 
 using namespace std;

@@ -32,6 +32,9 @@ string resultadoOperacion::getDescripcion() {
 	case 3:
 		return "NO ENCONTRADO";
 		break;
+	case 4:
+		return "CLAVE REPETIDA";
+		break;
 	default:
 		return "OK";
 		break;
