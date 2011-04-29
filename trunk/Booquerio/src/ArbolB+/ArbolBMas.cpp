@@ -842,25 +842,37 @@ string ArbolBMas::imprimirBloque(Bloque* unBloque, unsigned int nroBloque) {
 	conversor.str("");
 	bloqueImpreso += "; ";
 	list<Registro>::iterator itRegistros = registros->begin();
-	while (itRegistros != registros->end()) {
+	if (unBloque->getAtributoBloque()!=0){
+		while (itRegistros != registros->end()) {
+			if (itRegistros->getReferencias()->size() != 0) {
+				conversor << itRegistros->getReferenciai(1);
+				bloqueImpreso += conversor.str();
+				conversor.str("");
+			}
+			bloqueImpreso += "(";
+			bloqueImpreso += this->consultarClave(&*itRegistros);
+			bloqueImpreso += ")";
+			itRegistros++;
+		}
+		itRegistros--;
 		if (itRegistros->getReferencias()->size() != 0) {
-			conversor << itRegistros->getReferenciai(1);
+			conversor << itRegistros->getReferenciai(2);
 			bloqueImpreso += conversor.str();
 			conversor.str("");
 		}
-		bloqueImpreso += "(";
-		bloqueImpreso += this->consultarClave(&*itRegistros);
-		bloqueImpreso += ")";
-		itRegistros++;
+		bloqueImpreso += " ";
 	}
-	itRegistros--;
-	if (itRegistros->getReferencias()->size() != 0) {
-		conversor << itRegistros->getReferenciai(2);
-		bloqueImpreso += conversor.str();
-		conversor.str("");
-	}
-	bloqueImpreso += " ";
-	if (unBloque->getAtributoBloque() == 0) {
+	else {
+		while (itRegistros != registros->end()) {
+					bloqueImpreso += "(";
+					bloqueImpreso += this->consultarClave(&*itRegistros);
+					bloqueImpreso += "|";
+					conversor << itRegistros->getReferenciai(1);
+					bloqueImpreso += conversor.str();
+					conversor.str("");
+					bloqueImpreso += ")";
+					itRegistros++;
+		}
 		conversor << unBloque->getSiguiente();
 		bloqueImpreso += conversor.str();
 		conversor.str("");
