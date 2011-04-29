@@ -130,6 +130,19 @@ int main23(){
 	unResultado= miArbol->eliminar("julio", 0);
 	miArbol->exportar("prueba");
 
+	resultadoOperacion resultadoOp(OK);
+	Registro* regEncontrado= miArbol->buscarRegistro("santiago", &resultadoOp);
+	cout<<resultadoOp.getDescripcion()<<endl;
+	cout<<regEncontrado->getString()<<endl;
+
+	regEncontrado= miArbol->buscarRegistro("marcelo", &resultadoOp);
+	cout<<resultadoOp.getDescripcion()<<endl;
+	cout<<regEncontrado->getString()<<endl;
+
+	regEncontrado= miArbol->buscarRegistro("zoe", &resultadoOp);
+	cout<<resultadoOp.getDescripcion()<<endl;
+	cout<<regEncontrado->getString()<<endl;
 
 	delete miArbol;
+	return 0;
 }

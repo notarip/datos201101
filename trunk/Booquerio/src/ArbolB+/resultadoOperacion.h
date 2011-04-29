@@ -20,6 +20,7 @@ using namespace std;
 class resultadoOperacion {
 public:
 	resultadoOperacion(int codigo);
+	void setCodigo(int codigo);
 	virtual ~resultadoOperacion();
 	int getCodigo();
 	string getDescripcion();
