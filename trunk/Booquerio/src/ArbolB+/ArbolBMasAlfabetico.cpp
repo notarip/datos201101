@@ -21,6 +21,13 @@ char ArbolBMasAlfabetico::compareRegistros(string clave, Registro* unRegistro){
 	if (clave > claveRegistro) return 1;
 }
 
+Registro* ArbolBMasAlfabetico::crearRegistroClave(string clave, unsigned int valor){
+	Registro* unRegistro= new Registro();
+	unRegistro->setString(clave);
+	unRegistro->agregarAtribEntero(valor);
+	return unRegistro;
+}
+
 Registro* ArbolBMasAlfabetico::crearRegistroClave(string clave){
 	return new Registro(clave);
 }

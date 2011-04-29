@@ -25,9 +25,9 @@ class ArbolBMas {
 public:
 	ArbolBMas(string path, unsigned int tamanioBloque);
 	virtual ~ArbolBMas();
-	resultadoOperacion* insertar(string clave, unsigned int valor);
+	resultadoOperacion insertar(string clave, unsigned int valor);
 
-	resultadoOperacion* eliminar(string clave, unsigned int valor);
+	resultadoOperacion eliminar(string clave, unsigned int valor);
 
 	Registro* siguiente();
 
@@ -51,12 +51,13 @@ private:
 	 * 2- Como comparo las claves (alfabeticas vs numericas)
 	 * */
 	virtual char compareRegistros(string clave, Registro* unRegistro ) = 0;
+	virtual Registro* crearRegistroClave(string clave, unsigned int valor)= 0;
 	virtual Registro* crearRegistroClave(string clave)= 0;
 	virtual string consultarClave(Registro* unRegistro) = 0;
 	virtual void setearClave(Registro* registroAModificar, string clave)= 0;
 
-	resultadoOperacion* insertarRecursivo( Bloque* bloqueActual, string clave,unsigned int valor);
-	resultadoOperacion* eliminarRecursivo( Bloque* bloqueActual, string clave,unsigned int valor);
+	resultadoOperacion insertarRecursivo( Bloque* bloqueActual, string clave,unsigned int valor);
+	resultadoOperacion eliminarRecursivo( Bloque* bloqueActual, string clave,unsigned int valor);
 	void resolverOverflow(Bloque* bloqueOverflow, unsigned int nroBloqueOverflow, Bloque* bloqueActual);
 	void resolverUnderflow (Bloque* bloqueUnderflow, unsigned int nroBloqueUnderflow, Bloque* bloqueActual, list<Registro>::iterator itRegistros, bool bajePorUltimo);
 	Bloque* buscarBloqueRecursivo(string clave ,unsigned int refBloque);

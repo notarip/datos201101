@@ -20,14 +20,14 @@ ArbolBMas::ArbolBMas(string path, unsigned int tamanioBloque) {
 
 }
 
-resultadoOperacion* ArbolBMas::insertar(string clave, unsigned int valor) {
+resultadoOperacion ArbolBMas::insertar(string clave, unsigned int valor) {
 
-	resultadoOperacion* resultadoRaiz = this->insertarRecursivo(this->raiz,
-			clave, valor);
+	resultadoOperacion resultadoRaiz (OK);
+	resultadoRaiz= this->insertarRecursivo(this->raiz, clave, valor);
 
 	//tengo que ver los resultados de la raiz - overflow etc
 
-	if (resultadoRaiz->getCodigo() == HUBO_MODIFICACION) {
+	if (resultadoRaiz.getCodigo() == HUBO_MODIFICACION) {
 
 		try {
 			this->archivoNodos->grabarBloque(raiz, 0);
@@ -50,11 +50,10 @@ resultadoOperacion* ArbolBMas::insertar(string clave, unsigned int valor) {
 		//sino no hubo overflow
 	}
 
-	delete resultadoRaiz;
-	return new resultadoOperacion(OK);
+	return resultadoOperacion(OK);
 }
 
-resultadoOperacion* ArbolBMas::insertarRecursivo(Bloque* bloqueActual,
+resultadoOperacion ArbolBMas::insertarRecursivo(Bloque* bloqueActual,
 		string clave, unsigned int valor) {
 
 	//pregunto por el caso de fin de recursion, ¿Nodo Hoja?
@@ -64,10 +63,10 @@ resultadoOperacion* ArbolBMas::insertarRecursivo(Bloque* bloqueActual,
 
 		/* CHEKEAR SI AGREGAR IMPLICA HACER UN REGISTRO NUEVO O SOLO AGREGAR UN ID*/
 
-		Registro* registroAAgregar = this->crearRegistroClave(clave);
+		Registro* registroAAgregar = this->crearRegistroClave(clave, valor);
 		this->agregarRegistroEnOrden(bloqueActual, *registroAAgregar);
 
-		return new resultadoOperacion(HUBO_MODIFICACION);
+		return resultadoOperacion(HUBO_MODIFICACION);
 
 	}
 	//sino soy hoja entonces debo ver por donde sigo la recursion y
@@ -75,7 +74,7 @@ resultadoOperacion* ArbolBMas::insertarRecursivo(Bloque* bloqueActual,
 
 	else {
 
-		resultadoOperacion* resultadoHijo = NULL;
+		resultadoOperacion resultadoHijo = NULL;
 		list<Registro>* listaRegistros = bloqueActual->obtenerRegistros();
 		Bloque* bloqueABajar = NULL;
 		unsigned int nroBloqueABajar;
@@ -107,22 +106,20 @@ resultadoOperacion* ArbolBMas::insertarRecursivo(Bloque* bloqueActual,
 		//si fue modificado lo intento grabar
 		//-> ojo puede venir exception por overflow
 
-		if (resultadoHijo->getCodigo() == HUBO_MODIFICACION) {
+		if (resultadoHijo.getCodigo() == HUBO_MODIFICACION) {
 			try {
 				this->archivoNodos->grabarBloque(bloqueABajar, nroBloqueABajar);
 			} catch (ExceptionBloque& e) {
 				// => estamos en presencia de un overflow
 				this-> resolverOverflow(bloqueABajar, nroBloqueABajar,
 						bloqueActual);
-				return new resultadoOperacion(HUBO_MODIFICACION);
-				delete resultadoHijo;
+				return resultadoOperacion(HUBO_MODIFICACION);
 			}
 		} else {
 			//sino hubo overflow
-			delete resultadoHijo;
 		}
 
-		return new resultadoOperacion(OK);
+		return resultadoOperacion(OK);
 	}
 }
 
@@ -223,16 +220,15 @@ list<Registro>::iterator ArbolBMas::agregarRegistroEnOrden(Bloque* unBloque,
 	return itRegistros;
 }
 
-resultadoOperacion* ArbolBMas::eliminar(string clave, unsigned int valor) {
-	resultadoOperacion* resultadoRaiz =  this->eliminarRecursivo(raiz,clave,valor);
-	if (resultadoRaiz->getCodigo() == HUBO_MODIFICACION){
-		delete resultadoRaiz;
-		return new resultadoOperacion(OK);
+resultadoOperacion ArbolBMas::eliminar(string clave, unsigned int valor) {
+	resultadoOperacion resultadoRaiz =  this->eliminarRecursivo(raiz,clave,valor);
+	if (resultadoRaiz.getCodigo() == HUBO_MODIFICACION){
+		return resultadoOperacion(OK);
 	}
 	return resultadoRaiz;
 }
 
-resultadoOperacion* ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
+resultadoOperacion ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
 		string clave, unsigned int valor) {
 
 	bool bajePorUltimo = false;
@@ -250,9 +246,9 @@ resultadoOperacion* ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
 		// Registro a eliminar encontrado
 		if (compareRegistros(clave, &*itRegistros) == 0) {
 			listaReg->erase(itRegistros);
-			return (new resultadoOperacion(HUBO_MODIFICACION));
+			return (resultadoOperacion(HUBO_MODIFICACION));
 		} else {
-			return (new resultadoOperacion(NO_ENCONTRADO));
+			return (resultadoOperacion(NO_ENCONTRADO));
 		}
 	}
 
@@ -282,19 +278,21 @@ resultadoOperacion* ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
 		}
 
 		//llamo a la siguiente recursion
-		resultadoOperacion* resultadoHijo = eliminarRecursivo(bloqueABajar,
+		resultadoOperacion resultadoHijo = eliminarRecursivo(bloqueABajar,
 				clave, valor);
 
 		//chekeo lo sucedido con mi hijo y voy a "resolver sus problemas"
 
-		if (resultadoHijo->getCodigo() == OK){
-			delete resultadoHijo;
-			return new resultadoOperacion (OK);
+		if (resultadoHijo.getCodigo() == OK){
+			return resultadoOperacion (OK);
+		}
+
+		if (resultadoHijo.getCodigo() == NO_ENCONTRADO){
+			return resultadoOperacion (NO_ENCONTRADO);
 		}
 
 		//si no hubo eliminacion sigo enviando ese mensaje hacia arriba
-		if (resultadoHijo->getCodigo() == NO_ENCONTRADO) {
-			delete resultadoHijo;
+		if (resultadoHijo.getCodigo() == NO_ENCONTRADO) {
 			return resultadoHijo;
 		}
 
@@ -304,15 +302,13 @@ resultadoOperacion* ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
 
 				this->resolverUnderflow(bloqueABajar,nroBloqueABajar,bloqueActual, itRegistros, bajePorUltimo);
 				this->exportar("intermedios");
-				delete resultadoHijo;
-				return new resultadoOperacion(HUBO_MODIFICACION);
+				return resultadoOperacion(HUBO_MODIFICACION);
 
 			}
 			else {
 				this->archivoNodos->grabarBloque(bloqueABajar, nroBloqueABajar);
 			}
-			delete resultadoHijo;
-			return new resultadoOperacion (OK);
+			return resultadoOperacion (OK);
 		}
 	}
 }
