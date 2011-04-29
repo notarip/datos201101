@@ -27,19 +27,22 @@ public:
 	virtual ~ArbolBMas();
 	resultadoOperacion* insertar(string clave, unsigned int valor);
 
-	//busca un bloque en donde se puede encontrar una clave, sino esta en ese bloque => no esta
-	resultadoOperacion* buscarBloque(string clave, Bloque* bloqueEncontrado);
-
 	resultadoOperacion* eliminar(string clave, unsigned int valor);
 
-	resultadoOperacion* siguiente(Registro* regSiguiente);
+	Registro* siguiente();
+
+	//busca un bloque en donde se puede encontrar una clave, sino esta en ese bloque => no esta
+	Bloque* buscarBloque(string clave);
+
+	Registro* buscarRegistro (string clave, resultadoOperacion* resultOperacion);
 
 	void exportar(string path);
 
 
 private:
-	unsigned int ultimaHojaVisitada, ultimoValorBuscado;
+	list<Registro>::iterator ultimoRegistroVisitado;
 	Bloque* raiz;
+	Bloque* ultimaHojaVisitada;
 	ArchivoBloques* archivoNodos;
 	unsigned int tamanioNodo;
 
@@ -52,12 +55,11 @@ private:
 	virtual string consultarClave(Registro* unRegistro) = 0;
 	virtual void setearClave(Registro* registroAModificar, string clave)= 0;
 
-
 	resultadoOperacion* insertarRecursivo( Bloque* bloqueActual, string clave,unsigned int valor);
 	resultadoOperacion* eliminarRecursivo( Bloque* bloqueActual, string clave,unsigned int valor);
 	void resolverOverflow(Bloque* bloqueOverflow, unsigned int nroBloqueOverflow, Bloque* bloqueActual);
 	void resolverUnderflow (Bloque* bloqueUnderflow, unsigned int nroBloqueUnderflow, Bloque* bloqueActual, list<Registro>::iterator itRegistros, bool bajePorUltimo);
-	resultadoOperacion* buscarBloqueRecursivo(string clave ,unsigned int refBloque, Bloque* bloqueEncontrado );
+	Bloque* buscarBloqueRecursivo(string clave ,unsigned int refBloque);
 	list<Registro>::iterator agregarRegistroEnOrden(Bloque* unBloque,Registro unRegistro);
 
 	string exportarRecursivo(unsigned int nroBloque, unsigned int nivelRecursion);

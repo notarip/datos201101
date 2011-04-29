@@ -11,12 +11,12 @@ ArbolBMas::ArbolBMas(string path, unsigned int tamanioBloque) {
 	this->archivoNodos = new ArchivoBloques(path, tamanioBloque);
 
 	this->tamanioNodo = tamanioBloque;
-	ultimaHojaVisitada = 0;
-	ultimoValorBuscado = 0;
 
 	raiz = new Bloque();
 
 	archivoNodos->grabarBloque(raiz, 0);
+
+	ultimaHojaVisitada = raiz;
 
 }
 
@@ -57,7 +57,7 @@ resultadoOperacion* ArbolBMas::insertar(string clave, unsigned int valor) {
 resultadoOperacion* ArbolBMas::insertarRecursivo(Bloque* bloqueActual,
 		string clave, unsigned int valor) {
 
-	//pregunto por el caso de fin de recurison, ¿Nodo Hoja?
+	//pregunto por el caso de fin de recursion, ¿Nodo Hoja?
 	if (bloqueActual->getAtributoBloque() == 0) {
 		//debo escribir el registro, mi papa se encaragara de
 		//ver si entre en overflow o no cuando intente grabarme
@@ -362,39 +362,6 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 			}
 		}
 	}
-
-//
-//	//baje por el ultimo
-//	if(bajePorUltimo){
-//		bloqueDer = 0;
-//		bloqueIzq = itRegistros->getReferenciai(1);
-//	}
-//
-//
-//
-//	//no baje por el ultimo
-//	else{
-//		if (bajePorAnteultimo){
-//			if(!bajePorPrimero){//anteultimo comun
-//			itRegistros--;
-//			bloqueIzq = (itRegistros)->getReferenciai(1);
-//			itRegistros++;
-//			bloqueDer = itRegistros->getReferenciai(2);
-//			}
-//			else{//baje por primero y anteultimo => unico
-//			bloqueIzq= 0;
-//			bloqueDer = itRegistros->getReferenciai(2);
-//			}
-//		}
-//		else{//caso comun
-//		itRegistros++;
-//		bloqueDer= itRegistros->getReferenciai(1);
-//		itRegistros--;
-//		itRegistros--;
-//		bloqueIzq= (itRegistros)->getReferenciai(1);
-//		itRegistros++;
-//		}
-//	}
 
 	Bloque* bloqueAChequear= NULL;
 	bool usoBloqueDer= false;
@@ -748,50 +715,63 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 	}//fin fusion
 }
 
-resultadoOperacion* ArbolBMas::siguiente(Registro* regSiguiente) {
-	return 0;
+Registro* ArbolBMas::siguiente() {
+	this->ultimoRegistroVisitado++;
+	if(ultimoRegistroVisitado!=ultimaHojaVisitada->obtenerRegistros()->end()){
+		return &*ultimoRegistroVisitado;
+	}
+	else{
+		if(ultimaHojaVisitada->getSiguiente()!=0){
+			unsigned int nroBloqueSig= ultimaHojaVisitada->getSiguiente();
+			delete ultimaHojaVisitada;
+			ultimaHojaVisitada= this->archivoNodos->recuperarBloque(nroBloqueSig);
+			ultimoRegistroVisitado= ultimaHojaVisitada->obtenerRegistros()->begin();
+			return &(ultimaHojaVisitada->obtenerRegistros()->front());
+		}
+		else {
+			ultimoRegistroVisitado--;
+			return NULL;
+		}
+	}
 }
 
-resultadoOperacion* ArbolBMas::buscarBloque(string clave,
-		Bloque* bloqueEncontrado) {
+
+Bloque* ArbolBMas::buscarBloque(string clave) {
 	list<Registro>* listaReg = raiz->obtenerRegistros();
 
 	//si la raiz es una hoja (nivel 0) => solo puede estar ahi
 	if (raiz->getAtributoBloque() == 0) {
-		bloqueEncontrado = raiz;
-		//return resultadoOp: encontre un bloque donde puede estar
+		this->ultimaHojaVisitada = raiz;
+		return raiz;
 	}
 
 	// itero sobre los registros de la raiz
 	list<Registro>::iterator itReg = listaReg->begin();
 
 	//hasta encontrar uno mayor
-	while (compareRegistros(clave, &(*itReg)) < 0 && itReg != listaReg->end()) {
+	while (itReg != listaReg->end() && compareRegistros(clave, &(*itReg)) >= 0) {
 		itReg++;
 	}
 
 	//si llegaste al fin de la lista sin encontra un mayor => bajo por derecha
 	if (itReg == listaReg->end()) {
-		return this->buscarBloqueRecursivo(clave, (*itReg).getReferenciai(2),
-				bloqueEncontrado);
+		itReg--;
+		return this->buscarBloqueRecursivo(clave, (*itReg).getReferenciai(2));
 	}
 
 	//sino bajo por la izquierda del mayor
-	return this->buscarBloqueRecursivo(clave, (*itReg).getReferenciai(1),
-			bloqueEncontrado);
+	return this->buscarBloqueRecursivo(clave, (*itReg).getReferenciai(1));
 }
 
-resultadoOperacion* ArbolBMas::buscarBloqueRecursivo(string clave,
-		unsigned int refBloque, Bloque* bloqueEncontrado) {
+Bloque* ArbolBMas::buscarBloqueRecursivo(string clave, unsigned int refBloque) {
 
 	//bajo el bloque a mem
 	Bloque* esteBloque = archivoNodos->recuperarBloque(refBloque);
 
 	//si se trata de un nodo hoja
 	if (esteBloque->getAtributoBloque() == 0) {
-		bloqueEncontrado = esteBloque;
-		this->ultimaHojaVisitada = refBloque;
-		//return resultadoOperacion
+		this->ultimaHojaVisitada = esteBloque;
+		return esteBloque;
 
 		//si es un nodo Interno
 	} else {
@@ -800,19 +780,50 @@ resultadoOperacion* ArbolBMas::buscarBloqueRecursivo(string clave,
 		//itero por los registro del bloque
 		list<Registro>::iterator itRegistros = listaRegistros->begin();
 		//hasta encontrar uno mayor
-		while (compareRegistros(clave, &(*itRegistros)) < 0 && itRegistros
-				!= listaRegistros->end()) {
-			itRegistros++;
+		while (itRegistros != listaRegistros->end() && compareRegistros(clave, &(*itRegistros)) >= 0) {
+					itRegistros++;
 		}
 		//si llegaste al fin de la lista sin encontra un mayor => bajo por DERECHA
 		if (itRegistros == listaRegistros->end()) {
-			return this->buscarBloqueRecursivo(clave,
-					(*itRegistros).getReferenciai(2), bloqueEncontrado);
-		} else {
+			itRegistros--;
+			return this->buscarBloqueRecursivo(clave, (*itRegistros).getReferenciai(2));
+		}
+		else {
 
 			//sino bajo por la IZQUIERDA del mayor
-			return this->buscarBloqueRecursivo(clave,
-					(*itRegistros).getReferenciai(1), bloqueEncontrado);
+			return this->buscarBloqueRecursivo(clave, (*itRegistros).getReferenciai(1));
+		}
+	}
+}
+
+Registro* ArbolBMas::buscarRegistro(string clave, resultadoOperacion* resultOperacion){
+	Bloque* bloqueEncontrado= this->buscarBloque(clave);
+	list<Registro>* listaRegistros= bloqueEncontrado->obtenerRegistros();
+	list<Registro>::iterator itRegistros= listaRegistros->begin();
+	while (itRegistros != listaRegistros->end() && compareRegistros(clave, &(*itRegistros)) > 0) {
+		itRegistros++;
+	}
+	if(itRegistros!=listaRegistros->end()){
+		ultimoRegistroVisitado= itRegistros;
+		if (compareRegistros(clave, &(*itRegistros)) == 0)
+			resultOperacion->setCodigo(ENCONTRADO);
+		else resultOperacion->setCodigo(NO_ENCONTRADO);
+		return &*itRegistros;
+	}
+	else {
+		resultOperacion->setCodigo(NO_ENCONTRADO);
+		unsigned int nroBloqueSig= bloqueEncontrado->getSiguiente();
+		if (nroBloqueSig != 0){
+			delete bloqueEncontrado;
+			bloqueEncontrado= this->archivoNodos->recuperarBloque(nroBloqueSig);
+			ultimaHojaVisitada= bloqueEncontrado;
+			ultimoRegistroVisitado= bloqueEncontrado->obtenerRegistros()->begin();
+			return &(bloqueEncontrado->obtenerRegistros()->front());
+		}
+		else {
+			itRegistros--;
+			ultimoRegistroVisitado=itRegistros;
+			return &*itRegistros;
 		}
 	}
 }
@@ -913,5 +924,6 @@ void ArbolBMas::exportar(string path) {
 ArbolBMas::~ArbolBMas() {
 	delete this->archivoNodos;
 	delete raiz;
+	delete ultimaHojaVisitada;
 }
 

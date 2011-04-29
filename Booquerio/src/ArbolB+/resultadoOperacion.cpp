@@ -11,6 +11,10 @@ resultadoOperacion::resultadoOperacion(int codigo) {
 	this->codigo = codigo;
 }
 
+void resultadoOperacion::setCodigo(int codigo){
+	this->codigo= codigo;
+}
+
 resultadoOperacion::~resultadoOperacion() {
 	// TODO Auto-generated destructor stub
 }
@@ -20,16 +24,16 @@ int resultadoOperacion::getCodigo() {
 string resultadoOperacion::getDescripcion() {
 	switch (codigo) {
 	case 1:
-		return "modificacion";
+		return "HUBO MODIFICACION";
 		break;
 	case 2:
-		return "encontrado";
+		return "ENCONTRADO";
 		break;
 	case 3:
-		return "no encontrado";
+		return "NO ENCONTRADO";
 		break;
 	default:
-		return "ok";
+		return "OK";
 		break;
 	}
 

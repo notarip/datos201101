@@ -110,7 +110,26 @@ int main(){
 	unResultado = miArbol->insertarNumerico(140,0);
 	miArbol->exportar("prueba");
 
+	resultadoOperacion resultadoOp(OK);
+	Registro* regEncontrado= miArbol->buscarRegistroNumerico(120, &resultadoOp);
+	cout<<resultadoOp.getDescripcion()<<endl;
+	cout<<regEncontrado->getAtributosEnteros()->front()<<endl;
 
+	regEncontrado= miArbol->buscarRegistroNumerico(12, &resultadoOp);
+	cout<<resultadoOp.getDescripcion()<<endl;
+	cout<<regEncontrado->getAtributosEnteros()->front()<<endl;
+
+	regEncontrado= miArbol->buscarRegistroNumerico(10, &resultadoOp);
+	cout<<resultadoOp.getDescripcion()<<endl;
+	cout<<regEncontrado->getAtributosEnteros()->front()<<endl;
+
+	regEncontrado= miArbol->buscarRegistroNumerico(8,&resultadoOp);
+
+	while (regEncontrado!=NULL){
+		cout<<regEncontrado->getAtributosEnteros()->front()<<"|";
+		regEncontrado= miArbol->siguiente();
+	}
 
 	delete miArbol;
+	return 0;
 }
