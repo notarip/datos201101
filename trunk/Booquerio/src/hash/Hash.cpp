@@ -1,35 +1,27 @@
 /*
  * Hash.cpp
  *
- *  Created on: 09/04/2011
- *      Author: pablo
+ *  Created on: 29/04/2011
+ *      Author: hernan
  */
 
-//TODO revisar como devolver los errores
-//TODO implementar borrar
-//TODO agregar metodo para persistir la tabla teniendo en cuenta si viene
-//de varios registros
-//TODO en crear pasar la creacion del 1er bloque de datos a la 1er insercion
-//TODO Hernan dejame el insertar que termino de tocarlo yo
 
 #include "Hash.h"
+#include "math.h"
 
 Hash::Hash(string nombre)
 {
-	//this->pathHash = nombre //Parametros().getParametro(CARPETA_DATOS);
+
 	this->pathHash = nombre + ".hash";
 
 	if (Util().existeArchivo(this->pathHash))
 		this->abrir();
 
-
 	else {
-
 		this->crear();
 		this->abrir();
 	}
 }
-
 
 
 Hash::~Hash()
@@ -37,13 +29,11 @@ Hash::~Hash()
 
 	this->guardarTabla();
 
-
 }
 
 
-
 int Hash::crear(){
-	cout<<" creo archivo."<<endl;
+
 	/*
 	 * Se crea el registro para la lista de bloques
 	 * y se crea el bloque que va a contener la lista
@@ -54,7 +44,7 @@ int Hash::crear(){
 	Registro regTabla;
 
 	regTabla.agregarAtribEntero(1);
-	regTabla.agregarReferencia(1);
+	regTabla.agregarReferencia(0);
 
 	Bloque *bloqueTabla = new Bloque();
 	bloqueTabla->agregarRegistro(regTabla);
@@ -95,55 +85,69 @@ int Hash::crear(){
 
 int Hash::abrir(){
 
-	cout<<" abro archivo: "<<this->pathHash <<endl;
-
 	ArchivoBloques archivoLista(this->pathHash,TAMANIO_BLOQUE);
 
-		Bloque* bloqueTabla = archivoLista.recuperarBloque(0);
+	unsigned int bloqueSiguiente= 0;
 
-		Registro regTabla = bloqueTabla->obtenerRegistros()->front();
+	Bloque* bloqueTabla = archivoLista.recuperarBloque(bloqueSiguiente);
 
-		list<unsigned int> *listaDeBloques = regTabla.getAtributosEnteros();
+	Registro regTabla = bloqueTabla->obtenerRegistros()->front();
 
-		unsigned int bloqueSiguiente = regTabla.getReferencias()->front();
+	list<unsigned int> listaDeBloques;
 
+	list<unsigned int>::iterator itBloques= regTabla.getAtributosEnteros()->begin();
+	for (itBloques;itBloques!= regTabla.getAtributosEnteros()->end();itBloques++) listaDeBloques.push_back(*itBloques);
 
-		while (bloqueSiguiente > 1)
-		{
-			bloqueSiguiente = regTabla.getReferencias()->front();
+	bloqueSiguiente = regTabla.getReferencias()->front();
 
-			bloqueTabla = archivoLista.recuperarBloque(bloqueSiguiente);
+	cout<<"obtengo la ref:"<<bloqueSiguiente<<" en el bloque 0"<<endl;
 
-			regTabla = bloqueTabla->obtenerRegistros()->front();
-			listaDeBloques->assign(regTabla.getAtributosEnteros()->begin(), regTabla.getAtributosEnteros()->end());
-		}
+	while (bloqueSiguiente > 0){
 
-		this->tamanioTabla = listaDeBloques->size();
+		bloqueTabla = archivoLista.recuperarBloque(bloqueSiguiente);
 
-		this->tabla = new unsigned int[this->tamanioTabla];
+		regTabla = bloqueTabla->obtenerRegistros()->front();
 
-		unsigned int i = 0;
+		list<unsigned int>* listaParcial= regTabla.getAtributosEnteros();
 
-		list<unsigned int>::iterator it = listaDeBloques->begin();
+		list<unsigned int>::iterator it2= listaDeBloques.end();
 
-		/*funciona esto? -ver despues */
+		bloqueSiguiente = regTabla.getReferencias()->front();
 
-		while(it != listaDeBloques->end())
-		{
-			this->tabla[i] = *it;
-			it++;
-			i++;
-		}
+		cout<<"obtengo la ref:"<<bloqueSiguiente<<endl;
 
-		/********************************************************/
-		cout<<"-------------------------------------------------"<<endl;
-		cout<<"tamanio tabla: "<<this->tamanioTabla<<endl;
-		cout<<"-------------------------------------------------"<<endl;
-		cout<<"tabla: "<<endl;
-		for(int j=0;j<this->tamanioTabla;j++){ cout<<this->tabla[j];}
-		cout<<endl;
-		cout<<"-------------------------------------------------"<<endl;
-		/*********************************************************/
+		listaDeBloques.splice(it2,*listaParcial);
+
+	}
+
+	this->tamanioTabla = listaDeBloques.size();
+
+	this->tabla = new unsigned int[this->tamanioTabla];
+
+	unsigned int i = 0;
+
+	list<unsigned int>::iterator it = listaDeBloques.begin();
+
+	/*funciona esto? -ver despues */
+
+	while(it != listaDeBloques.end()){
+
+		this->tabla[i] = *it;
+
+		it++;
+
+		i++;
+	}
+
+	/********************************************************/
+	cout<<"-------------------------------------------------"<<endl;
+	cout<<"tamanio tabla: "<<this->tamanioTabla<<endl;
+	cout<<"-------------------------------------------------"<<endl;
+	cout<<"tabla: "<<endl;
+	for(int j=0;j<this->tamanioTabla;j++){ cout<<this->tabla[j];}
+	cout<<endl;
+	cout<<"-------------------------------------------------"<<endl;
+	/*********************************************************/
 
 	return 0;
 }
@@ -166,7 +170,7 @@ void Hash::insertar(Registro *registro)
 
 		unsigned int nroBloque = this->tabla[posTabla]; //hacerlo mejor esto despues//
 
-		cout<<"debo guardar en :"<<nroBloque<<endl;
+		//cout<<"debo guardar en :"<<nroBloque<<endl;
 
 		ArchivoBloques archivo(this->pathHash, TAMANIO_BLOQUE);
 
@@ -187,8 +191,8 @@ void Hash::insertar(Registro *registro)
 
 			unsigned int primerBloqueLibre= archivo.getBloqueLibre();
 
-			cout<<"Bucket "<<nroBloque<<": esta desbordado; ";
-			cout<<"hay que escribir en un nodo nuevo libre, el :"<<primerBloqueLibre<<endl;
+			//cout<<"Bucket "<<nroBloque<<": esta desbordado; ";
+			//cout<<"hay que escribir en un nodo nuevo libre, el :"<<primerBloqueLibre<<endl;
 
 			unsigned int pos_Desbordado = posTabla;
 
@@ -247,7 +251,10 @@ void Hash::borrar(string que)
 
 			actualizarTabla_eliminacion(tamDispersionBloque, posTabla);
 
-			if (tamTablaVieja > this->tamanioTabla) archivo.eliminarBloque(numBloque);
+			if ((numBloque != this->tabla[posTabla]) && (this->tamanioTabla!=1))
+				archivo.eliminarBloque(numBloque);
+
+			//if (tamTablaVieja > this->tamanioTabla) archivo.eliminarBloque(numBloque); //esta MAL!
 
 			else archivo.grabarBloque(bloqueRecuperado,numBloque);
 
@@ -256,7 +263,7 @@ void Hash::borrar(string que)
 		else archivo.grabarBloque(bloqueRecuperado,numBloque);
 
 	}
-	else cout<<"el registro a eliminar no se encontro."<<endl;
+
 }
 
 
@@ -292,7 +299,7 @@ Registro* Hash::buscar(string que){
 
 
 //probar funcion de dispersion, (que sea buena)//
-
+/*
 unsigned int Hash::hasheo(string key){
 	unsigned int i=0;
 	unsigned int parcial=0;
@@ -304,19 +311,37 @@ unsigned int Hash::hasheo(string key){
 		if (i<key.length()-1) final=final<<8;
 		i++;
 	}
-	cout<<final<<endl;
+	cout<<final<<" "<<endl;
 	final%=this->tamanioTabla;
-	cout<<"le corresponde la posicion: "<<final<<endl;
 
 	return final;
+}
+
+unsigned int Hash::hasheo(string key){
+	unsigned int final=atoi(key.c_str());
+	final%=this->tamanioTabla;
+	return final;
+}*/
+
+ unsigned int Hash::hasheo( string key )
+{
+
+	 unsigned int hashVal = 0;
+	 for( int i = 0; i < key.length( ); i++ )
+		hashVal = 37 * hashVal + key.at(i);
+	 hashVal %= this->tamanioTabla;
+	 if( hashVal < 0 )
+		hashVal += this->tamanioTabla;
+
+	 return hashVal;
 }
 
 
 
 
 void Hash::reestructurar_archivo(ArchivoBloques archivo,unsigned int nro_desbordado,unsigned int nro_libre, Registro* registro_a_ins){
-	Bloque* bloque_desbordado =archivo.recuperarBloque(nro_desbordado);
 
+	Bloque* bloque_desbordado =archivo.recuperarBloque(nro_desbordado);
 	Bloque* bloque_libre =new Bloque();
 
 	list<Registro>* lista_desbordado = bloque_desbordado->obtenerRegistros();
@@ -324,49 +349,52 @@ void Hash::reestructurar_archivo(ArchivoBloques archivo,unsigned int nro_desbord
 	list<Registro>::iterator iteradorReg_desbordado = bloque_desbordado->obtenerRegistros()->begin();
 	list<Registro>::iterator iteradorReg_libre = bloque_libre->obtenerRegistros()->begin();
 
-
 	while( iteradorReg_desbordado !=  bloque_desbordado->obtenerRegistros()->end() ){
 
 		unsigned int posTabla= this->hasheo(iteradorReg_desbordado->getString());
 
-		cout<<"tamanio tabla: "<<this->getTamanioTabla()<<endl;
+		//cout<<"tamanio tabla: "<<this->getTamanioTabla()<<endl;
 
-		cout<<"inicial: "<<nro_desbordado<<"; nuevo: "<< this->tabla[posTabla] <<" reg: "<<iteradorReg_desbordado->getString()<<"| posicion tabla: "<<posTabla<<endl;
+		//cout<<"inicial: "<<nro_desbordado<<"; nuevo: "<< this->tabla[posTabla] <<" reg: "<<iteradorReg_desbordado->getString()<<"| posicion tabla: "<<posTabla<<endl;
 
 		if (nro_libre == this->tabla[posTabla]){
 
 			Registro reg_a_mover= *iteradorReg_desbordado;
 
-			lista_libres->insert(iteradorReg_libre,reg_a_mover);
+			lista_libres->push_back(reg_a_mover);
+			//lista_libres->insert(iteradorReg_libre,reg_a_mover);
 
 			iteradorReg_desbordado=lista_desbordado->erase(iteradorReg_desbordado);
 
 			iteradorReg_libre= lista_libres->end();
 		}
-		else if ( iteradorReg_desbordado !=  bloque_desbordado->obtenerRegistros()->end()) advance(iteradorReg_desbordado,1);
-
+		//else if ( iteradorReg_desbordado !=  bloque_desbordado->obtenerRegistros()->end()) advance(iteradorReg_desbordado,1);
+		else iteradorReg_desbordado++;
 	}
 
 	unsigned posTabla= this->hasheo(registro_a_ins->getString());
 	cout<<posTabla<<endl;
-
+	/*
 	if (this->tabla[posTabla]== nro_libre){
-		cout<<"ultimo en libre."<<endl;
+		cout<<"nuevo va en libre."<<endl;
 		iteradorReg_libre= lista_libres->end();
 		lista_libres->insert(iteradorReg_libre,*registro_a_ins);
 	}
 
 	else{
-		cout<<"ultimo en desbord."<<endl;
+		cout<<"nuevo va en desbord."<<this->hasheo(registro_a_ins->getString())<<endl;
 		iteradorReg_desbordado= lista_desbordado->end();
 		lista_desbordado->insert(iteradorReg_desbordado,*registro_a_ins);
-	}
-	cout<<"desbord :"<<lista_desbordado->size()<<";nuevo :"<<lista_libres->size()<<endl;
+	}*/
+	//cout<<"***************desbord :"<<lista_desbordado->size()<<";nuevo :"<<lista_libres->size()<<endl;
 
 	archivo.grabarBloque(bloque_desbordado,nro_desbordado);
 	archivo.grabarBloque(bloque_libre,nro_libre);
-	cout<<"salgo bien"<<endl;
 
+	this->insertar(registro_a_ins);
+
+	//cout<<"salgo bien"<<endl;
+	//this->mostrar();
 }
 
 
@@ -398,12 +426,18 @@ void Hash::actualizarTabla_insercion(unsigned int tamDispersion,unsigned int pos
 
 		this->tamanioTabla*=2;
 		delete viejaTabla;
+
+		tabla[pos_desbordado]=bl_nuevo;
+	}
+	else{
+		for(int i=0; i < this->tamanioTabla ; i+=(2*tamDispersion))
+			tabla[pos_desbordado + i ]=bl_nuevo;
 	}
 
-	tabla[pos_desbordado]=bl_nuevo;
+
 
 /********************************************************************/
-	cout<<"--------------nueva tabla:------------------------"<<endl;
+	cout<<"--------------NUEVA TABLA:------------------------"<<endl;
 	for(int i=0;i<this->tamanioTabla;i++) cout<<this->tabla[i]<<" ";
 	cout<<endl;
 	cout<<"--------------------------------------------------"<<endl;
@@ -416,6 +450,7 @@ void Hash::actualizarTabla_insercion(unsigned int tamDispersion,unsigned int pos
 void Hash::actualizarTabla_eliminacion(unsigned int tamDispersion,unsigned int pos_eliminado){
 
 	int tamTabla=tamanioTabla;
+	if (tamTabla>1){
 	int salto1= pos_eliminado +tamDispersion/2 ;
 	int salto2= pos_eliminado -tamDispersion/2 ;
 	if (salto1 >= tamTabla) salto1=salto1-tamanioTabla;
@@ -429,7 +464,8 @@ void Hash::actualizarTabla_eliminacion(unsigned int tamDispersion,unsigned int p
 	int comparaciones=0;
 
 	if (sonIguales) {
-		this->tabla[pos_eliminado]=this->tabla[salto1];
+		for (int i=0; i<this->tamanioTabla; i+=(tamDispersion))
+			this->tabla[pos_eliminado + i]=this->tabla[salto1];
 		pos2=tamanioTabla/2;
 	}
 
@@ -447,32 +483,103 @@ void Hash::actualizarTabla_eliminacion(unsigned int tamDispersion,unsigned int p
 		this->tamanioTabla/=2;
 		delete viejaTabla;
 	}
+	}
 
 }
 
 
 void Hash::guardarTabla(){
 
-	Bloque* bloqueTabla= new Bloque();
-	Registro tablaNueva;
+	list<unsigned int> refASiguientes;
+	ArchivoBloques archivoHash(this->pathHash,TAMANIO_BLOQUE);
+	Bloque* bloqueTabla= archivoHash.recuperarBloque(0);
+	unsigned int refActual= bloqueTabla->obtenerRegistros()->front().getReferencias()->front();
 
+	while (refActual != 0){
+		refASiguientes.push_back(refActual);
+		bloqueTabla= archivoHash.recuperarBloque(refActual);
+		refActual= bloqueTabla->obtenerRegistros()->front().getReferencias()->front();
+	}
 
-	for (int i=0; i< this->tamanioTabla; i++){
-		tablaNueva.agregarAtribEntero(this->tabla[i]);
+	/*tengo que ver cuantos bloques voy a necesitar para guardar la lista de IDS  */
+	/*para eso establezco un maximo de IDS por bloque, que en principio seran 1000*/
+	/*chequeo la cantidad de IDS, y veo si los bloques que estaba usando antes me */
+	/*alcanzan si no me alcanzan le pido mas, si me sobran libero.				  */
+
+	float tamTabla_f= (float)this->tamanioTabla;
+
+	unsigned int cantBloquesNecesarios = (unsigned int)(ceil(tamTabla_f / 1000));
+	cout<<"1)cant de bloques que NECESITO para guardar tabla:"<<cantBloquesNecesarios<<endl;
+
+	while ((refASiguientes.size()+1) < cantBloquesNecesarios){
+
+		refActual= archivoHash.getBloqueLibre();
+		cout<<refActual<<endl;
+		refASiguientes.push_back(refActual);
+		Bloque* bloqueNuevo= new Bloque();
+		archivoHash.grabarBloque(bloqueNuevo,refActual);
+	}
+	while ((refASiguientes.size()+1) > cantBloquesNecesarios){
+
+		refActual= refASiguientes.back();
+		archivoHash.eliminarBloque(refActual);
+		refASiguientes.pop_back();
+	}
+
+	//******agrego a la lista de referencias el 0, porque el ultimo apunta a nada.*****//
+	refASiguientes.push_back(0);
+
+	list<unsigned int>::iterator itReferencias= refASiguientes.begin();
+
+	//** esto que sigue es prueba**//
+	for (itReferencias ;itReferencias!=refASiguientes.end();itReferencias++) cout<<*itReferencias;
+	cout<<endl;
+	//** fin de prueba**//
+
+	unsigned int i=0;
+	itReferencias=refASiguientes.begin();
+	while ( i< this->tamanioTabla ){
+
+		unsigned int cont= 0;
+		Registro tablaNueva;
+
+		while(cont<1000 &&  i< this->tamanioTabla){
+			tablaNueva.agregarAtribEntero(this->tabla[i]);
+			i++;
+			cont++;
+		}
+
+		/*TODO ver estas 2 lineas que siguen.*/
+		tablaNueva.agregarReferencia((*itReferencias));
+		cout<<"agrego:"<<*itReferencias<<endl;
+		Bloque* bloqueTabla= new Bloque();
+
+		bloqueTabla->agregarRegistro(tablaNueva);
+		if (itReferencias==refASiguientes.begin()){
+			archivoHash.grabarBloque(bloqueTabla,0);
+			cout<<"0"<<"|->"<<*(refASiguientes.begin())<<endl;}
+
+		else{
+			itReferencias--;
+			cout<<*itReferencias <<"|->"<< tablaNueva.getReferencias()->front()<<endl;
+			archivoHash.grabarBloque(bloqueTabla,*itReferencias);
+			itReferencias++;
+		}
+		itReferencias++;
 
 	}
-	tablaNueva.agregarReferencia(1);
 
-	list<Registro>::iterator iterador= bloqueTabla->obtenerRegistros()->begin();
+	//tablaNueva.agregarReferencia(1);
 
-	bloqueTabla->obtenerRegistros()->insert(iterador,tablaNueva);
+	//list<Registro>::iterator iterador= bloqueTabla->obtenerRegistros()->begin();
 
-	ArchivoBloques manejadorHash(this->pathHash,TAMANIO_BLOQUE);
+	//bloqueTabla->obtenerRegistros()->insert(iterador,tablaNueva);
 
-	manejadorHash.grabarBloque(bloqueTabla,0);
+	//ArchivoBloques manejadorHash(this->pathHash,TAMANIO_BLOQUE);
 
-	ArchivoBloques arch(this->pathHash,TAMANIO_BLOQUE);
+	//manejadorHash.grabarBloque(bloqueTabla,0);
 
+	//ArchivoBloques arch(this->pathHash,TAMANIO_BLOQUE);
 
 
 }
@@ -485,14 +592,17 @@ void Hash::mostrar(){
 	cout<<"******************************************"<<endl;
 	cout<<"DATOS:"<<endl;
 	cout<<"------------------------------------------"<<endl;
+	cout<<"|tamaño de tabla: "<<this->tamanioTabla<<endl;
 	cout<<"| ";
 	for(unsigned int i=0; i<this->tamanioTabla; i++){
 		cout<<this->tabla[i]<<" ";
 		if (this->tabla[i] > max) max=this->tabla[i];
 	}
-	cout<<" "<<endl;
+	cout<<endl;
+	char a;
 	cout<<"----------------------------------------- "<<endl;
 	for (unsigned int i=1;i<max+1;i++){
+		if (i%50==0){ cout<<"presione cualquier tecla para continuar..."<<endl; cin>>a;}
 		cout<<"|Bloque "<<i<<"| T.d: "<<this->tamDispersion(i)<<"]  ";
 		bloque= archivo.recuperarBloque(i);
 		list<Registro>::iterator it= bloque->obtenerRegistros()->begin();
@@ -510,3 +620,8 @@ unsigned int Hash::getTamanioTabla(){
 	return this->tamanioTabla;
 }
 
+void Hash::setTabla(unsigned int* ta){
+	this->tabla=ta;
+}
+
+unsigned int* Hash::getTabla(){ return this->tabla;}

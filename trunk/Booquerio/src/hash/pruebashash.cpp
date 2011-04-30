@@ -1,72 +1,75 @@
 #include "Hash.h"
+#include "math.h"
+#include <iostream>
 
-int main99(){
+static void f(Hash* hash,unsigned int cant){
+	Registro* reg;
+
+	for (unsigned int i=0;i<cant;i++){
+		stringstream a;
+
+		srandom(i);
+		unsigned int b= rand();
+		a<<b;
+		string str;
+		a>>str;
+		reg=new Registro(str);
+		reg->agregarAtribEntero(i);
+		hash->insertar(reg);
+
+	}
+}
 
 
+int main(){
 
 	Hash hash("unhash");
 
-
-	Registro* reg0=new Registro("0");
-	for (int i=0; i<500;i++){
-		reg0->agregarAtribEntero(i);
-	}
-
-	hash.insertar(reg0);
-
-
-	Registro* reg1=new Registro("1");
-	for (int i=0; i<500;i++){
-		reg1->agregarAtribEntero(i);
-	}
-
-	hash.insertar(reg1);
-
 	hash.mostrar();
 
+	char c=' ';
+	string str;
+	while(c!='q'){
 
-	Registro* reg2=new Registro("2");
-	for (int i=0; i<500;i++){
-		reg2->agregarAtribEntero(i);
+		cout<<"0. insertar registros aleatoriamente."<<endl;
+		cout<<"1. eliminar un registro."<<endl;
+		cout<<"2. insertar un registro nuevo."<<endl;
+		cout<<"3. buscar un registro por su clave."<<endl;
+		cin>>c;
+		switch(c){
+			case '0':{ cout<<"ingrese la cantidad de registros a insertar:";
+					  unsigned int cant;
+					  cin>>cant;
+					  f(&hash,cant);
+					  break;
+			}
+ 			case '1':{ cout<<"ingrese el Id del registro a eliminar: ";
+					  cin>>str;
+					  hash.borrar(str);
+					  break;
+ 			}
+			case '2':{ cout<<" ingrese el Id del registro a insertar:";
+					  cin>>str;
+					  Registro* reg=new Registro(str);
+					  hash.insertar(reg);
+					  break;
+			}
+			case '3':{ cout<<" ingrese el Id del registro a buscar:";
+					  cin>>str;
+					  Registro* reg=hash.buscar(str);
+					  if (reg!=NULL) cout<<reg->getString()<<endl;
+					  break;
+			}
+		    case 'q':{ break; }
+
+			default:{ cout<<"incorrecto."<<endl;
+					 break;}
+		}
+		cout<<endl;cout<<endl;
+		hash.mostrar();
 	}
-
-	hash.insertar(reg2);
-
-	hash.mostrar();
-
-
-	Registro* reg3=new Registro("3");
-	for (int i=0; i<500;i++){
-		reg3->agregarAtribEntero(i);
-	}
-
-	hash.insertar(reg3);
-
-
-	Registro* reg4=new Registro("4");
-	for (int i=0; i<500;i++){
-		reg4->agregarAtribEntero(i);
-	}
-
-	hash.insertar(reg4);
-
-	hash.mostrar();
-
-
-	Registro* reg5=new Registro("6");
-	for (int i=0; i<500;i++){
-		reg5->agregarAtribEntero(i);
-	}
-
-	hash.insertar(reg5);
-
-
-	hash.mostrar();
-
-	hash.borrar("0");
-	hash.borrar("4");
-
-	hash.mostrar();
-
 
 }
+
+
+
