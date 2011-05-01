@@ -21,7 +21,7 @@ static void f(Hash* hash,unsigned int cant){
 }
 
 
-int main(){
+int main33(){
 
 	Hash hash("unhash");
 

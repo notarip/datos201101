@@ -35,9 +35,22 @@ int Servicios::tomarTexto(string ruta)
 
 	ArchivoLibros *archivo = new ArchivoLibros(rutaArcLibros);
 
-	archivo->agregarLibro(unLibro); //tambien lo agrega al arbol primario
-
+//TODO falta que devuelva el offset
+	unsigned int offset = 0;
+	archivo->agregarLibro(unLibro);
 	archivo->~ArchivoLibros();
+
+//TODO agregar al arbol primario, para lo cual falta el offset
+	string pathArbolPrimario = Parametros().getParametro(CARPETA_DATOS);
+	pathArbolPrimario += NOMBRE_BMAS_PRIMARIO;
+
+	if (pathArbolPrimario == "") return ERROR_RUTA_BMAS_PRIMARIO;
+
+	ArbolBMasNumerico *arbolP = new ArbolBMasNumerico(pathArbolPrimario, TAMANIO_BLOQUE_BMAS_NUMERICO);
+	arbolP->insertarNumerico(unLibro->getId(),offset);
+
+	arbolP->~ArbolBMasNumerico();
+
 
 
 //agregar el libro a las listas
@@ -160,19 +173,64 @@ int Servicios::obtenerLibro(string unId)
 int Servicios::quitarArchivo(string unId)
 {
 	unsigned int id = atoi(unId.c_str());
+	unsigned int offset = 0;
 
-//TODO quitar de los indices
+//recuperar el offset del primario
+
+	string pathArbolPrimario = Parametros().getParametro(CARPETA_DATOS);
+	pathArbolPrimario += NOMBRE_BMAS_PRIMARIO;
+
+	if (pathArbolPrimario == "") return ERROR_RUTA_BMAS_PRIMARIO;
+
+	ArbolBMasNumerico *arbolP = new ArbolBMasNumerico(pathArbolPrimario, TAMANIO_BLOQUE_BMAS_NUMERICO);
+
+	resultadoOperacion *resultado = 0;
+
+	Registro* registro = arbolP->buscarRegistroNumerico(id, resultado);
+
+	//TODO ver si esta recuperando bien el offset
+	if (registro && resultado->getDescripcion() == "ENCONTRADO")
+		offset = registro->getReferencias()->front();
+	else
+		return ERROR_LIBRO_INEXISTENTE;
+
+
+//quitar de el archivo de registros variables
+	string arcLibros = Parametros().getParametro(ARCHIVO_LIBROS);
+	ArchivoLibros *archivo = new ArchivoLibros(arcLibros);
+	Libro *libro = archivo->recuperarLibro(offset);
+	archivo->suprimirLibro(offset);
+
+
+//quitar del primario
+
+
+	arbolP->eliminarNumerico(libro->getId(), offset);
+
+	arbolP->~ArbolBMasNumerico();
+
+//quitar de los indices
+
+	sacarDelArbol(NOMBRE_BMAS_AUTORES,libro->getAutor(),libro->getId());
+
+	sacarDelArbol(NOMBRE_BMAS_EDITORIALES,libro->getEditorial(),libro->getId());
+
+	sacarDelHash(NOMBRE_HASH_TITULOS,libro->getTitulo(),libro->getId());
+
+	set<string> *palabras = libro->getListaPalabras();
+
+	for (set<string>::iterator it = palabras->begin(); it != palabras->end(); it++)
+	{
+		sacarDelHash(NOMBRE_HASH_PALABRAS, *it ,libro->getId());
+	}
+
 
 //quitar de la lista de libros sin procesar
 	SinIndice *listas  = SinIndice().getInstancia();
 	return listas->sacarLibroDeTodasLasListas(id);
 
-//quitar de el archivo de registros variables
-	string arcLibros = Parametros().getParametro(ARCHIVO_LIBROS);
-	ArchivoLibros *archivo = new ArchivoLibros(arcLibros);
-	archivo->suprimirLibro(id);
 
-
+	archivo->~ArchivoLibros();
 	return 0;
 }
 
@@ -218,17 +276,11 @@ int Servicios::procesarLibro(int indice)
 		case INDICE_PALABRAS:lista = listas->getPendientesPalabras();break;
 	}
 
-	string rutaArcLibros = Parametros().getParametro(ARCHIVO_LIBROS);
-
-	if (rutaArcLibros == "") return ERROR_RUTA_ARCHIVO_LIBROS;
-
-	ArchivoLibros *archivo = new ArchivoLibros(rutaArcLibros);
-
-	Libro *libro;
-
 	for (list<unsigned int>::iterator it = lista->begin(); it != lista->end(); it++)
 	{
-		libro = archivo->recuperarLibro(*it);
+		Libro *libro = 0;
+		int error = recuperarLibro((*it), libro);
+
 		switch(indice)
 		{
 			case INDICE_AUTORES :error = agregarIndiceAutores(libro);break;
@@ -240,7 +292,7 @@ int Servicios::procesarLibro(int indice)
 		libro->~Libro();
 	}
 
-
+//limpia la lista de ids pendientes de procesar
 	switch(indice)
 	{
 		case INDICE_AUTORES :error = listas->limpiarListaAutores();break;
@@ -249,39 +301,14 @@ int Servicios::procesarLibro(int indice)
 		case INDICE_PALABRAS:error = listas->limpiarListaPalabras();break;
 	}
 
-	archivo->~ArchivoLibros();
-
 	return error;
-}
-
-
-void Servicios::modificarListaIds(string pathHash, string pathListaIds, string clavePasada, unsigned int idNueva){
-	Hash hash(parametro);
-	ArchivoBloques archivo(parametro2,TAMANIO_BLOQUE);
-	Registro* registro= hash.buscar(clavePasada);
-	Bloque* bloque=NULL;
-	unsigned int referencia=0;
-	if (registro){
-		referencia= registro->getAtributosEnteros()->back();
-		bloque= archivo.recuperarBloque(referencia);
-		Registro listaIds= bloque->obtenerRegistros()->front();
-		listaIds.agregarAtribEntero(idNueva);
-
-	}
-	else{
-		referencia= archivo.getBloqueLibre();
-		bloque= new Bloque();
-		Registro listaIds;
-		listaIds.agregarAtribEntero(idNueva);
-		bloque->agregarRegistro(listaIds);
-	}
-	archivo.grabarBloque(bloque,referencia);
 }
 
 
 int Servicios::agregarIndiceAutores(Libro *unLibro)
 {
 	//logica pertenece al arbol.
+	agregarAlArbol(NOMBRE_BMAS_AUTORES, unLibro->getAutor(), unLibro->getId());
 
 	return 0;
 }
@@ -289,14 +316,15 @@ int Servicios::agregarIndiceAutores(Libro *unLibro)
 int Servicios::agregarIndiceEditoriales(Libro *unLibro)
 {
 	//logica pertenece al arbol.
+	agregarAlArbol(NOMBRE_BMAS_EDITORIALES, unLibro->getAutor(), unLibro->getId());
+
 	return 0;
 }
 
 int Servicios::agregarIndiceTitulos(Libro *unLibro)
 {
-//	string path1= Parametros().getParametro(CARPETA_HASH_TITULOS);
-//	string path2= Parametros().getParametro(CARPETA_LISTA_TITULOS);
-//	modificarListaIds(path1, path2, unLibro->getAutor(),unLibro->getId());
+	agregarAlHash(NOMBRE_HASH_TITULOS,unLibro->getTitulo(),unLibro->getId());
+
 	return 0;
 }
 
@@ -304,13 +332,147 @@ int Servicios::agregarIndicePalabras(Libro *unLibro)
 {
 
 	set<string> *palabras = unLibro->getListaPalabras();
-	string path1= Parametros().getParametro(CARPETA_HASH_PALABRAS);
-	string path2= Parametros().getParametro(CARPETA_LISTA_PALABRAS);
 
 	for (set<string>::iterator it = palabras->begin(); it != palabras->end(); it++)
 	{
-		modificarListaIds(path1, path2, *it,unLibro->getId());
+		agregarAlHash(NOMBRE_HASH_PALABRAS, *it ,unLibro->getId());
 	}
 
 	return 0;
+}
+
+void Servicios::agregarAlHash(string nombreHash, string clavePasada, unsigned int idNueva)
+{
+	string pathHash = Parametros().getParametro(CARPETA_DATOS);
+	pathHash += nombreHash;
+	Hash *hash  = new Hash(pathHash);
+
+	Registro* registro= hash->buscar(clavePasada);
+	unsigned int offset;
+
+	if (registro){
+
+		offset = registro->getAtributosEnteros()->front();
+		ListasIds().agregarIdDeLibro(&offset,idNueva,false);
+	}
+	else{
+		ListasIds().agregarIdDeLibro(&offset, idNueva,true);
+		registro = new Registro();
+		registro->setString(clavePasada);
+		registro->agregarAtribEntero(offset);
+		hash->insertar(registro);
+	}
+
+	hash->~Hash();
+}
+
+void Servicios::agregarAlArbol(string nombreArbol, string clavePasada, unsigned int idNueva)
+{
+	string pathArbol = Parametros().getParametro(CARPETA_DATOS);
+	pathArbol += nombreArbol;
+	ArbolBMasAlfabetico *arbol  = new ArbolBMasAlfabetico(pathArbol, TAMANIO_BLOQUE_BMAS);
+
+	resultadoOperacion *resultado = 0;
+
+	Registro* registro= arbol->buscarRegistro(clavePasada, resultado);
+	unsigned int offset;
+
+
+	if (registro && resultado->getDescripcion() == "ENCONTRADO")
+	{
+		offset = registro->getAtributosEnteros()->front();
+
+		ListasIds().agregarIdDeLibro(&offset,idNueva,false);
+	}
+	else{
+		ListasIds().agregarIdDeLibro(&offset, idNueva,true);
+		arbol->insertar(clavePasada,offset);
+	}
+
+	arbol->~ArbolBMasAlfabetico();
+}
+
+void Servicios::sacarDelHash(string nombreHash, string clave, unsigned int idLibro)
+{
+
+	string pathHash = Parametros().getParametro(CARPETA_DATOS);
+	pathHash += nombreHash;
+	Hash *hash  = new Hash(pathHash);
+
+	Registro* registro= hash->buscar(clave);
+	unsigned int offset;
+
+	if (registro){
+
+		offset = registro->getAtributosEnteros()->front();
+		if (ListasIds().sacarIdDelLibro(&offset,idLibro) == LISTA_VACIA)
+			hash->borrar(clave);
+	}
+
+	hash->~Hash();
+
+}
+
+
+void Servicios::sacarDelArbol(string nombreArbol, string clave, unsigned int idLibro)
+{
+
+	string pathArbol = Parametros().getParametro(CARPETA_DATOS);
+	pathArbol += nombreArbol;
+	ArbolBMasAlfabetico *arbol  = new ArbolBMasAlfabetico(pathArbol, TAMANIO_BLOQUE_BMAS);
+
+	resultadoOperacion *resultado = 0;
+
+	Registro* registro= arbol->buscarRegistro(clave, resultado);
+	unsigned int offset;
+
+
+	if (registro && resultado->getDescripcion() == "ENCONTRADO")
+	{
+		offset = registro->getAtributosEnteros()->front();
+
+		if (ListasIds().sacarIdDelLibro(&offset,idLibro) == LISTA_VACIA)
+			//TODO por que recibe el 2do parametro ?
+			arbol->eliminar(clave,offset);
+	}
+
+	arbol->~ArbolBMasAlfabetico();
+
+}
+
+
+int Servicios::recuperarLibro(unsigned int idLibro, Libro *libro)
+{
+	unsigned int offset = 0;
+
+	string pathArbolPrimario = Parametros().getParametro(CARPETA_DATOS);
+	pathArbolPrimario += NOMBRE_BMAS_PRIMARIO;
+
+	ArbolBMasNumerico *arbolP = new ArbolBMasNumerico(pathArbolPrimario, TAMANIO_BLOQUE_BMAS_NUMERICO);
+
+	resultadoOperacion *resultado = 0;
+
+	Registro* registro = arbolP->buscarRegistroNumerico(idLibro, resultado);
+
+	//TODO ver si esta recuperando bien el offset
+	if (registro && resultado->getDescripcion() == "ENCONTRADO")
+		offset = registro->getReferencias()->front();
+	else
+		return ERROR_LIBRO_INEXISTENTE;
+
+
+	string rutaArcLibros = Parametros().getParametro(ARCHIVO_LIBROS);
+
+	if (rutaArcLibros == "") return ERROR_RUTA_ARCHIVO_LIBROS;
+
+	ArchivoLibros *archivo = new ArchivoLibros(rutaArcLibros);
+
+	libro = archivo->recuperarLibro(offset);
+
+	archivo->~ArchivoLibros();
+
+	arbolP->~ArbolBMasNumerico();
+
+	return 0;
+
 }

@@ -10,18 +10,34 @@
 
 #define ERROR_RUTA_INVALIDA -20
 #define ERROR_RUTA_ARCHIVO_LIBROS -40
+#define ERROR_RUTA_BMAS_PRIMARIO -50
+#define ERROR_LIBRO_INEXISTENTE -60
 
 #define INDICE_AUTORES 0
 #define INDICE_EDITORIALES 1
 #define INDICE_TITULOS 2
 #define INDICE_PALABRAS 3
 
+#define NOMBRE_HASH_TITULOS "hash_titulos"
+#define NOMBRE_HASH_PALABRAS "hash_palabras"
+#define NOMBRE_BMAS_AUTORES "bmas_autores"
+#define NOMBRE_BMAS_EDITORIALES "bmas_editoriales"
+#define NOMBRE_BMAS_PRIMARIO "bmas_primario"
+
+#define TAMANIO_BLOQUE_BMAS 4096
+#define TAMANIO_BLOQUE_BMAS_NUMERICO 4096
+
+
 #include <string>
 #include <stdlib.h>
+#include "ListasIds.h"
 #include "../parser/Parser.h"
 #include "../archivos/Libro.h"
 #include "../servicios/SinIndice.h"
 #include "../archivos/ArchivoLibros.h"
+#include "../hash/Hash.h"
+#include "../ArbolB+/ArbolBMasAlfabetico.h"
+#include "../ArbolB+/ArbolBMasNumerico.h"
 
 using namespace std;
 
@@ -103,12 +119,16 @@ public:
 	static int verEstructuraPalabras();
 
 private:
-	static void modificarListaIds(string clavePasada,unsigned int id);
+	static void agregarAlHash(string nombreHash, string clave, unsigned int idNueva);
+	static void agregarAlArbol(string nombreArbol, string clave, unsigned int idNueva);
+	static void sacarDelHash(string nombreHash, string clave, unsigned int idLibro);
+	static void sacarDelArbol(string nombreArbol, string clave, unsigned int idLibro);
 	static int procesarLibro(int indice);
 	static int agregarIndiceAutores(Libro *unLibro);
 	static int agregarIndiceEditoriales(Libro *unLibro);
 	static int agregarIndiceTitulos(Libro *unLibro);
 	static int agregarIndicePalabras(Libro *unLibro);
+	static int recuperarLibro(unsigned int idLibro, Libro *libro);
 
 };
 
