@@ -20,6 +20,9 @@
 #define ARCHIVO_EDITORIALES "path_arc_editoriales"
 #define ARCHIVO_LIBROS "path_arc_libros"
 #define ARCHIVO_LISTAS "path_arc_listas"
+#define ARCHIVO_LISTAS_IDS "path_arc_listas_ids"
+
+
 
 
 #include <string>

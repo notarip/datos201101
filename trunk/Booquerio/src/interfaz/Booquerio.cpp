@@ -92,6 +92,16 @@ void error_ruta_archivo_libros()
 	cout << "Error en la configuración: no se hallo el archivo que contiene los libros." << endl;
 }
 
+void error_ruta_b_mas_primario()
+{
+	cout << "Error en la configuración: no se hallo el archivo que contiene el arbol primario." << endl;
+}
+
+void error_libro_inexsistente()
+{
+	cout << "Error: el libro que se quiere eliminar es inexistente" << endl;
+}
+
 void sin_errores()
 {
 	cout << "Satisfactorio." << endl;
@@ -99,7 +109,7 @@ void sin_errores()
 
 void procesamiento_de_errores(int error)
 {
-	//TODO armar un case de errores con los mensajes
+	//armar un case de errores con los mensajes
 
 	switch(error)
 	{
@@ -108,7 +118,8 @@ void procesamiento_de_errores(int error)
 		case ERROR_ARCHIVO_LISTAS: error_archivo_listas();break;
 		case ERROR_RUTA_INVALIDA:error_ruta_libro_invalida();break;
 		case ERROR_RUTA_ARCHIVO_LIBROS:error_ruta_archivo_libros();break;
-
+		case ERROR_RUTA_BMAS_PRIMARIO:error_ruta_b_mas_primario();break;
+		case ERROR_LIBRO_INEXISTENTE:error_libro_inexsistente();break;
 	}
 }
 

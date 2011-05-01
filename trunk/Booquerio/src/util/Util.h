@@ -69,7 +69,7 @@ public:
 
 	/*
 	 *Reinicia el contador de ids
-	 *ojo por que rompe todo
+	 *ojo por que rompe toddo
 	 */
 	static void reiniciarId(unsigned int unId);
 
