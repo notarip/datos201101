@@ -28,7 +28,7 @@ public:
 	virtual ~ArbolBMas();
 	resultadoOperacion insertar(string clave, unsigned int valor);
 
-	resultadoOperacion eliminar(string clave, unsigned int valor);
+	resultadoOperacion eliminar(string clave);
 
 	Registro* siguiente();
 
@@ -58,7 +58,7 @@ private:
 	virtual void setearClave(Registro* registroAModificar, string clave)= 0;
 
 	resultadoOperacion insertarRecursivo( Bloque* bloqueActual, string clave,unsigned int valor);
-	resultadoOperacion eliminarRecursivo( Bloque* bloqueActual, string clave,unsigned int valor);
+	resultadoOperacion eliminarRecursivo( Bloque* bloqueActual, string clave);
 	void resolverOverflow(Bloque* bloqueOverflow, unsigned int nroBloqueOverflow, Bloque* bloqueActual);
 	void resolverUnderflow (Bloque* bloqueUnderflow, unsigned int nroBloqueUnderflow, Bloque* bloqueActual, list<Registro>::iterator itRegistros, bool bajePorUltimo);
 	Bloque* buscarBloqueRecursivo(string clave ,unsigned int refBloque);

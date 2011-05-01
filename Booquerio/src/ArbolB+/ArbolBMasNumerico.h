@@ -26,7 +26,7 @@ public:
 
 	Registro* buscarRegistroNumerico(unsigned int clave, resultadoOperacion* resultOperacion);
 
-	resultadoOperacion eliminarNumerico(unsigned int clave, unsigned int valor);
+	resultadoOperacion eliminarNumerico(unsigned int clave);
 };
 
 #endif /* ARBOLBMASNUMERICO_H_ */

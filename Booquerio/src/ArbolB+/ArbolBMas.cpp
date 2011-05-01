@@ -234,16 +234,15 @@ list<Registro>::iterator ArbolBMas::agregarRegistroEnOrden(Bloque* unBloque,
 	return itRegistros;
 }
 
-resultadoOperacion ArbolBMas::eliminar(string clave, unsigned int valor) {
-	resultadoOperacion resultadoRaiz =  this->eliminarRecursivo(raiz,clave,valor);
+resultadoOperacion ArbolBMas::eliminar(string clave) {
+	resultadoOperacion resultadoRaiz =  this->eliminarRecursivo(raiz,clave);
 	if (resultadoRaiz.getCodigo() == HUBO_MODIFICACION){
 		return resultadoOperacion(OK);
 	}
 	return resultadoRaiz;
 }
 
-resultadoOperacion ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
-		string clave, unsigned int valor) {
+resultadoOperacion ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,string clave) {
 
 	bool bajePorUltimo = false;
 
@@ -293,7 +292,7 @@ resultadoOperacion ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,
 
 		//llamo a la siguiente recursion
 		resultadoOperacion resultadoHijo = eliminarRecursivo(bloqueABajar,
-				clave, valor);
+				clave);
 
 		//chekeo lo sucedido con mi hijo y voy a "resolver sus problemas"
 
