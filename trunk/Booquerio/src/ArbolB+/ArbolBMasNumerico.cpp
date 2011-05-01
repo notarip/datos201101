@@ -82,13 +82,12 @@ Registro* ArbolBMasNumerico::buscarRegistroNumerico(unsigned int clave,
 	return buscarRegistro(claveAlfabetica, resultOperacion);
 }
 
-resultadoOperacion ArbolBMasNumerico::eliminarNumerico(unsigned int clave,
-		unsigned int valor) {
+resultadoOperacion ArbolBMasNumerico::eliminarNumerico(unsigned int clave) {
 	stringstream buffer(stringstream::in | stringstream::out);
 	buffer << clave;
 	string claveAlfabetica;
 	buffer >> claveAlfabetica;
-	return eliminar(claveAlfabetica, valor);
+	return eliminar(claveAlfabetica);
 }
 
 string ArbolBMasNumerico::consultarClave(Registro* unRegistro){

@@ -96,31 +96,31 @@ int main43(){
 	unResultado = miArbol->insertar("julian",0);
 	miArbol->exportar("prueba");
 
-	unResultado= miArbol->eliminar("julian", 0);
+	unResultado= miArbol->eliminar("julian");
 	miArbol->exportar("prueba");
 
-	unResultado= miArbol->eliminar("gabriel", 0);
+	unResultado= miArbol->eliminar("gabriel");
 	miArbol->exportar("prueba");
 
-	unResultado= miArbol->eliminar("agustina", 0);
+	unResultado= miArbol->eliminar("agustina");
 	miArbol->exportar("prueba");
 
-	unResultado= miArbol->eliminar("amalia", 0);
+	unResultado= miArbol->eliminar("amalia");
 	miArbol->exportar("prueba");
 
-	unResultado= miArbol->eliminar("horacio", 0);
+	unResultado= miArbol->eliminar("horacio");
 	miArbol->exportar("prueba");
 
-	unResultado= miArbol->eliminar("jose", 0);
+	unResultado= miArbol->eliminar("jose");
 	miArbol->exportar("prueba");
 
-	unResultado= miArbol->eliminar("julieta", 0);
+	unResultado= miArbol->eliminar("julieta");
 	miArbol->exportar("prueba");
 
-	unResultado= miArbol->eliminar("lucas", 0);
+	unResultado= miArbol->eliminar("lucas");
 	miArbol->exportar("prueba");
 
-	unResultado= miArbol->eliminar("julio", 0);
+	unResultado= miArbol->eliminar("julio");
 	miArbol->exportar("prueba");
 
 	resultadoOperacion resultadoOp(OK);

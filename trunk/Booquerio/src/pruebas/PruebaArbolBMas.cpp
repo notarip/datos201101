@@ -3,7 +3,7 @@
 
 using namespace std;
 
-int main(){
+int main3(){
 	string unPath = "ArbolBMas";
 
 	ArbolBMasNumerico* miArbol = new ArbolBMasNumerico(unPath,200);
@@ -109,52 +109,52 @@ int main(){
 	miArbol->exportar("prueba");
 
 	cout << "eliminacion 44" << endl;
-	unResultado = miArbol->eliminarNumerico(44,0);
+	unResultado = miArbol->eliminarNumerico(44);
 	cout << unResultado.getDescripcion() << endl;
 	miArbol->exportar("prueba");
 
 	cout << "eliminacion 84" << endl;
-	unResultado = miArbol->eliminarNumerico(84,0);
+	unResultado = miArbol->eliminarNumerico(84);
 	cout << unResultado.getDescripcion() << endl;
 	miArbol->exportar("prueba");
 
 	cout << "eliminacion 90" << endl;
-	unResultado = miArbol->eliminarNumerico(90,0);
+	unResultado = miArbol->eliminarNumerico(90);
 	cout << unResultado.getDescripcion() << endl;
 	miArbol->exportar("prueba");
 
 	cout << "eliminacion 22" << endl;
-	unResultado = miArbol->eliminarNumerico(22,0);
+	unResultado = miArbol->eliminarNumerico(22);
 	cout << unResultado.getDescripcion() << endl;
 	miArbol->exportar("prueba");
 
 	cout << "eliminacion 12" << endl;
-	unResultado = miArbol->eliminarNumerico(12,0);
+	unResultado = miArbol->eliminarNumerico(12);
 	cout << unResultado.getDescripcion() << endl;
 	miArbol->exportar("prueba");
 
 	cout << "eliminacion 110" << endl;
-	unResultado = miArbol->eliminarNumerico(110,0);
+	unResultado = miArbol->eliminarNumerico(110);
 	cout << unResultado.getDescripcion() << endl;
 	miArbol->exportar("prueba");
 
 	cout << "eliminacion 59" << endl;
-	unResultado = miArbol->eliminarNumerico(59,0);
+	unResultado = miArbol->eliminarNumerico(59);
 	cout << unResultado.getDescripcion() << endl;
 	miArbol->exportar("prueba");
 
 	cout << "eliminacion 122" << endl;
-	unResultado = miArbol->eliminarNumerico(122,0);
+	unResultado = miArbol->eliminarNumerico(122);
 	cout << unResultado.getDescripcion() << endl;
 	miArbol->exportar("prueba");
 
 	cout << "eliminacion 114" << endl;
-	unResultado = miArbol->eliminarNumerico(114,0);
+	unResultado = miArbol->eliminarNumerico(114);
 	cout << unResultado.getDescripcion() << endl;
 	miArbol->exportar("prueba");
 
 	cout << "eliminacion 35" << endl;
-	unResultado = miArbol->eliminarNumerico(35,0);
+	unResultado = miArbol->eliminarNumerico(35);
 	cout << unResultado.getDescripcion() << endl;
 	miArbol->exportar("prueba");
 
@@ -169,7 +169,7 @@ int main(){
 	miArbol->exportar("prueba");
 
 	cout << "eliminacion 35" << endl;
-	unResultado = miArbol->eliminarNumerico(35,0);
+	unResultado = miArbol->eliminarNumerico(35);
 	cout<<unResultado.getDescripcion()<<endl;
 
 	resultadoOperacion resultadoOp(OK);
