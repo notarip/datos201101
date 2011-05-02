@@ -257,7 +257,7 @@ resultadoOperacion ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,string clav
 			itRegistros++;
 		}
 		// Registro a eliminar encontrado
-		if (compareRegistros(clave, &*itRegistros) == 0) {
+		if (itRegistros != listaReg->end() && compareRegistros(clave, &*itRegistros) == 0) {
 			listaReg->erase(itRegistros);
 			return (resultadoOperacion(HUBO_MODIFICACION));
 		} else {
@@ -351,10 +351,9 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 		else{
 			if(bajePorAnteultimo && !bajePorPrimero){
 				bloqueDer = itRegistros->getReferenciai(2);
-				//para verificar me parece que tengo que hacer un -- y despues un ++
-				itRegistros++;
-				bloqueIzq = itRegistros->getReferenciai(1);
 				itRegistros--;
+				bloqueIzq = itRegistros->getReferenciai(1);
+				itRegistros++;
 			}
 			else{//caso comun
 				itRegistros++;
@@ -532,6 +531,7 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 					else{
 					//sigue la raiz de antes
 						this->archivoNodos->grabarBloque(bloqueActual,0);
+						this->archivoNodos->grabarBloque(bloqueUnderflow,nroBloqueUnderflow);
 					}
 				}
 				else{
@@ -587,6 +587,7 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 					else{
 					//sigue la raiz de antes
 						this->archivoNodos->grabarBloque(bloqueActual,0);
+						this->archivoNodos->grabarBloque(bloqueUnderflow,bloqueIzq);
 					}
 				}
 				else{
@@ -709,6 +710,7 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 					else{
 					//sigue la raiz de antes
 						this->archivoNodos->grabarBloque(bloqueActual,0);
+						this->archivoNodos->grabarBloque(bloqueUnderflow,bloqueIzq);
 					}
 				}
 				else{
@@ -928,7 +930,8 @@ void ArbolBMas::exportar(string path) {
 			itRegistros++;
 		}
 		itRegistros--;
-		textoAExportar += exportarRecursivo(itRegistros->getReferenciai(2), 0);
+		unsigned int ref2 = itRegistros->getReferenciai(2);
+		textoAExportar += exportarRecursivo(ref2, 0);
 	}
 	fstream archivo;
 	archivo.open(path.c_str(), ios::out | ios::app);
