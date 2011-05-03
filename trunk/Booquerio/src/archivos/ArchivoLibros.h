@@ -20,7 +20,7 @@ public:
 	ArchivoLibros(string path);
 	virtual ~ArchivoLibros();
 
-	void agregarLibro(Libro* unLibro);
+	unsigned int agregarLibro(Libro* unLibro);
 	void suprimirLibro(unsigned int id);
 	void serializar(Libro* unLibro,char** tiraBytes);
 	void deserializar(char* tiraBytes, Libro** unLibro);
