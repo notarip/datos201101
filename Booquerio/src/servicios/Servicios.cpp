@@ -205,7 +205,7 @@ int Servicios::quitarArchivo(string unId)
 //quitar del primario
 
 
-	arbolP->eliminarNumerico(libro->getId(), offset);
+	arbolP->eliminarNumerico(libro->getId());
 
 	arbolP->~ArbolBMasNumerico();
 
@@ -432,8 +432,7 @@ void Servicios::sacarDelArbol(string nombreArbol, string clave, unsigned int idL
 		offset = registro->getAtributosEnteros()->front();
 
 		if (ListasIds().sacarIdDelLibro(&offset,idLibro) == LISTA_VACIA)
-			//TODO por que recibe el 2do parametro ?
-			arbol->eliminar(clave,offset);
+			arbol->eliminar(clave);
 	}
 
 	arbol->~ArbolBMasAlfabetico();
