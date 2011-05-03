@@ -172,6 +172,7 @@ unsigned int Util::generarIdNuevo()
 	 string ruta = Parametros().getParametro(RUTA_ID);
 	 unsigned int id;
 	 archivo.open(ruta.c_str(), ios::in | ios::out | ios::binary);
+	 unsigned int nuevo;
 	 if (archivo.is_open())
 	 {
 
@@ -179,15 +180,24 @@ unsigned int Util::generarIdNuevo()
 
 		archivo.read(buff, sizeof(unsigned int));
 		memcpy(&id, buff, sizeof(unsigned int));
-		unsigned int nuevo = id + 1;
+		nuevo = id + 1;
 		archivo.seekp(0,ios::beg);
 		memcpy(buff, &nuevo, sizeof(unsigned int));
 		archivo.write(buff, sizeof(unsigned int));
 		delete [] buff;
 		archivo.close();
 	 }
+	 else {
+		 //si el archivo no existe devuelvo un id = 0 y lo escribo
+		 archivo.open(ruta.c_str(),ios::out | ios::binary);
+		 int aux = 0;
+		 archivo.write((char*)&aux,sizeof(unsigned int));
+		 archivo.close();
+		 nuevo = 0;
 
-	 return id;
+	 }
+
+	 return nuevo;
 
 }
 

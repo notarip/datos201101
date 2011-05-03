@@ -11,6 +11,8 @@
 #define PORCENTAJE_UNDERFLOW 0.4
 #define PORCENTAJE_OVERFLOW 0.5
 
+#include "../util/Parametros.h"
+#include "../util/Util.h"
 #include "../archivos/Registro.h"
 #include "../archivos/ArchivoBloques.h"
 #include "../archivos/Bloque.h"
@@ -25,7 +27,9 @@ using namespace std;
 class ArbolBMas {
 public:
 	ArbolBMas(string path, unsigned int tamanioBloque);
+
 	virtual ~ArbolBMas();
+
 	resultadoOperacion insertar(string clave, unsigned int valor);
 
 	resultadoOperacion eliminar(string clave);
@@ -48,8 +52,9 @@ private:
 	unsigned int tamanioNodo;
 
 	/*PARA DEFINIR UN ARBOL B+ HAY QUE INDICAR 2 ESTRATEGIAS:
-	 * 1- En cual de todos los atritutos de un registro vas a guardar la clave(identificador)
-	 * 2- Como comparo las claves (alfabeticas vs numericas)
+	 * 1- Brindar metodos al arbol para crear, consultar y cambiar la clave de un registro
+	 * 2- Como comparar las claves de 2 registros (alfabeticas vs numericas)
+	 *
 	 * */
 	virtual char compareRegistros(string clave, Registro* unRegistro ) = 0;
 	virtual Registro* crearRegistroClave(string clave, unsigned int valor)= 0;

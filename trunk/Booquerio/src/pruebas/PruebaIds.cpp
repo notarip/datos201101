@@ -8,7 +8,7 @@
 #include <iostream>
 #include "../util/Util.h"
 
-int main_10(int argc, char** argv)
+int main88(int argc, char** argv)
 {
 
 	Util().reiniciarId(0);

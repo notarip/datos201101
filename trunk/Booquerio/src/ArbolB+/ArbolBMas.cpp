@@ -8,14 +8,18 @@
 #include "ArbolBMas.h"
 
 ArbolBMas::ArbolBMas(string path, unsigned int tamanioBloque) {
+
 	this->archivoNodos = new ArchivoBloques(path, tamanioBloque);
 
 	this->tamanioNodo = tamanioBloque;
 
-	raiz = new Bloque();
-
-	archivoNodos->grabarBloque(raiz, 0);
-
+	if (Util().existeArchivo(path)){
+		raiz = archivoNodos->recuperarBloque(0);
+	}
+	else{
+		raiz = new Bloque();
+		archivoNodos->grabarBloque(raiz, 0);
+	}
 	ultimaHojaVisitada = raiz;
 
 }
@@ -308,7 +312,7 @@ resultadoOperacion ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,string clav
 			//verifico si mi hijo quedo en underflow
 			if (this->archivoNodos->getOcupacionBloque(bloqueABajar) < PORCENTAJE_UNDERFLOW) {
 				this->resolverUnderflow(bloqueABajar,nroBloqueABajar,bloqueActual, itRegistros, bajePorUltimo);
-				this->exportar("intermedios");
+				//this->exportar("intermedios");
 				return resultadoOperacion(HUBO_MODIFICACION);
 
 			}
@@ -943,7 +947,8 @@ void ArbolBMas::exportar(string path) {
 
 ArbolBMas::~ArbolBMas() {
 	delete this->archivoNodos;
+	if (ultimaHojaVisitada != raiz)
+		delete ultimaHojaVisitada;
 	delete raiz;
-	delete ultimaHojaVisitada;
 }
 
