@@ -15,7 +15,9 @@ ArchivoLibros::ArchivoLibros(string path) {
 
 
 //busca espacio en el archivo e inserta el registro variable //
-void ArchivoLibros::agregarLibro(Libro* unLibro){
+unsigned int ArchivoLibros::agregarLibro(Libro* unLibro){
+
+	unsigned int posicion_escritura=0;
 
 	char* tiraBytes=NULL;
 	char* libres;
@@ -54,13 +56,15 @@ void ArchivoLibros::agregarLibro(Libro* unLibro){
 			unsigned int* offset= new unsigned int(0);
 			libres+=4;
 			memcpy(offset,libres,sizeof(unsigned int));
-			cout<<"off para copiar:"<<*offset<<endl;
+			//cout<<"off para copiar:"<<*offset<<endl;
 			archivo.seekp( (*offset) ,ios::beg);
 			archivo.write(tiraBytes,longreg);
 
+			posicion_escritura= archivo.tellg();
+
 			*(offset)= *(offset) + longreg; //modifico offset
-			cout<<"Offset :"<<*offset<<endl;
-			cout<<"Libre: "<<*resto<<endl;
+			//cout<<"Offset :"<<*offset<<endl;
+			//cout<<"Libre: "<<*resto<<endl;
 			memcpy(libres,offset,sizeof(unsigned int));
 			libres-=4;
 
@@ -79,6 +83,7 @@ void ArchivoLibros::agregarLibro(Libro* unLibro){
 		else{
 			archivo.seekp(0,ios::end);
 			archivo.write(tiraBytes,longreg);
+			posicion_escritura= archivo.tellg();
 		}
 		bajas.close();
 		//delete libres;
@@ -87,9 +92,12 @@ void ArchivoLibros::agregarLibro(Libro* unLibro){
 	else {
 		archivo.open(this->path.c_str(), ios::out | ios::app);
 		archivo.seekp(0,ios::end);
+		posicion_escritura= archivo.tellg();
 		archivo.write(tiraBytes,longreg);
+
 	}
 	archivo.close();
+	return posicion_escritura;
 
 }
 
