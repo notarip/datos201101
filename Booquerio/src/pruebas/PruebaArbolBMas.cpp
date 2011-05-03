@@ -3,10 +3,10 @@
 
 using namespace std;
 
-int main999(){
+int main77(){
 	string unPath = "ArbolBMas";
 
-	ArbolBMasNumerico* miArbol = new ArbolBMasNumerico(unPath,4000);
+	ArbolBMasNumerico* miArbol = new ArbolBMasNumerico(unPath,4096);
 
 	cout << "insercion 9" << endl;
 	resultadoOperacion unResultado = miArbol->insertarNumerico(9,0);
@@ -153,6 +153,7 @@ int main999(){
 	cout << unResultado.getDescripcion() << endl<< endl;
 	miArbol->exportar("prueba");
 
+
 	cout << "eliminacion 35" << endl;
 	unResultado = miArbol->eliminarNumerico(35);
 	cout << unResultado.getDescripcion() << endl<< endl;
@@ -172,6 +173,11 @@ int main999(){
 	unResultado = miArbol->eliminarNumerico(35);
 	cout<<unResultado.getDescripcion()<<endl<< endl;
 
+	cout << "eliminacion 120" << endl;
+	unResultado = miArbol->eliminarNumerico(120);
+	cout<<unResultado.getDescripcion()<<endl<< endl;
+	miArbol->exportar("prueba");
+
 	resultadoOperacion resultadoOp(OK);
 
 	cout << "busqueda 120" << endl;
@@ -190,6 +196,7 @@ int main999(){
 	cout<<"encontre: " <<regEncontrado->getAtributosEnteros()->front()<<endl<< endl;
 
 	regEncontrado= miArbol->buscarRegistroNumerico(8,&resultadoOp);
+
 
 	cout << "recuperacion secuencial" <<endl;
 	while (regEncontrado!=NULL){

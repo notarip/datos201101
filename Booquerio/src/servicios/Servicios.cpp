@@ -27,6 +27,8 @@ int Servicios::tomarTexto(string ruta)
 
 	unParser->~Parser();
 
+	cout << "parsie el libro" << endl;
+
 
 //meter el libro en el archivo de registros variables
 	string rutaArcLibros = Parametros().getParametro(ARCHIVO_LIBROS);
@@ -35,10 +37,16 @@ int Servicios::tomarTexto(string ruta)
 
 	ArchivoLibros *archivo = new ArchivoLibros(rutaArcLibros);
 
+	cout << "creo archivo de libros" << endl;
+
+
 //TODO falta que devuelva el offset
 	unsigned int offset = 0;
 	archivo->agregarLibro(unLibro);
 	archivo->~ArchivoLibros();
+
+	cout << "agrego el libro" << endl;
+
 
 //TODO agregar al arbol primario, para lo cual falta el offset
 	string pathArbolPrimario = Parametros().getParametro(CARPETA_DATOS);
@@ -47,16 +55,20 @@ int Servicios::tomarTexto(string ruta)
 	if (pathArbolPrimario == "") return ERROR_RUTA_BMAS_PRIMARIO;
 
 	ArbolBMasNumerico *arbolP = new ArbolBMasNumerico(pathArbolPrimario, TAMANIO_BLOQUE_BMAS_NUMERICO);
+	cout << "id: "<< unLibro->getId() << endl;
 	arbolP->insertarNumerico(unLibro->getId(),offset);
 
-	arbolP->~ArbolBMasNumerico();
+	delete arbolP;
 
+	cout << "agrego al indice primario" << endl;
 
 
 //agregar el libro a las listas
 	SinIndice *listas = SinIndice().getInstancia();
 
 	return listas->agregarLibroPendienteATodasLasListas(unLibro->getId());
+
+	cout << "agrego a las listas no procesadas" << endl;
 
 
 }
@@ -204,7 +216,6 @@ int Servicios::quitarArchivo(string unId)
 
 //quitar del primario
 
-
 	arbolP->eliminarNumerico(libro->getId());
 
 	arbolP->~ArbolBMasNumerico();
@@ -236,19 +247,49 @@ int Servicios::quitarArchivo(string unId)
 
 int Servicios::verEstructuraAutor()
 {
-	//TODO llamar al metodo de arbol de autores que lista la estructura
+	string pathExport = Parametros().getParametro(CARPETA_SALIDA);
+	pathExport += NOMBRE_BMAS_AUTORES;
+	string pathArbol = Parametros().getParametro(CARPETA_DATOS);
+	pathArbol += NOMBRE_BMAS_AUTORES;
+
+	ArbolBMasAlfabetico* arbolA = new ArbolBMasAlfabetico(pathArbol,TAMANIO_BLOQUE_BMAS);
+	arbolA->exportar(pathExport);
+	delete arbolA;
 	return 0;
 }
 
 int Servicios::verEstructuraEditorial()
 {
-	//TODO llamar al metodo de arbol de editoriales que lista la estructura
+	string pathExport = Parametros().getParametro(CARPETA_SALIDA);
+	pathExport += NOMBRE_BMAS_EDITORIALES;
+	string pathArbol = Parametros().getParametro(CARPETA_DATOS);
+	pathArbol += NOMBRE_BMAS_EDITORIALES;
+
+	ArbolBMasAlfabetico* arbolE = new ArbolBMasAlfabetico(pathArbol,TAMANIO_BLOQUE_BMAS);
+	arbolE->exportar(pathExport);
+	delete arbolE;
 	return 0;
+
 }
 
 int Servicios::verEstructuraTitulos()
 {
 	//TODO llamar al metodo de hash de titulos que lista la estructura
+
+	/* LLEEEEEER*/
+	//me tome el atrevimiento de usar la interfaz para pruebas, este metodo por ahora va a exportar arbol primario
+	string pathExport = Parametros().getParametro(CARPETA_SALIDA);
+	pathExport += NOMBRE_BMAS_PRIMARIO;
+	string pathArbol = Parametros().getParametro(CARPETA_DATOS);
+	pathArbol += NOMBRE_BMAS_PRIMARIO;
+
+	ArbolBMasNumerico* arbolP = new ArbolBMasNumerico(pathArbol,TAMANIO_BLOQUE_BMAS);
+	arbolP->exportar(pathExport);
+	delete arbolP;
+	return 0;
+
+
+
 	return 0;
 }
 
