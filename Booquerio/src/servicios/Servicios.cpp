@@ -40,15 +40,15 @@ int Servicios::tomarTexto(string ruta)
 	cout << "creo archivo de libros" << endl;
 
 
-//TODO falta que devuelva el offset
+
 	unsigned int offset = 0;
-	archivo->agregarLibro(unLibro);
+	offset = archivo->agregarLibro(unLibro);
 	archivo->~ArchivoLibros();
 
 	cout << "agrego el libro" << endl;
 
 
-//TODO agregar al arbol primario, para lo cual falta el offset
+
 	string pathArbolPrimario = Parametros().getParametro(CARPETA_DATOS);
 	pathArbolPrimario += NOMBRE_BMAS_PRIMARIO;
 
