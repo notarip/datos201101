@@ -283,13 +283,18 @@ unsigned int ArchivoBloques::getBloqueLibre(){
 		archivoLibres.write(libresRestantes,longitud);
 	}
 
-	else { //el archivo no existe o esta vacio
+	else { //el archivo no existe o esta vacio+
+
 		archivoBloques.open(miPath.c_str(), ios::binary | ios::in | ios::ate);
 
+		//si existe devuelvo el final
 		if (archivoBloques.good()){
 			unBloqueLibre = archivoBloques.tellp() / this->tamanioBloque;
 		}
-
+		else{
+		//si el archivo no existe te devuelvo un 0
+			return 0;
+		}
 		archivoBloques.close();
 	}
 

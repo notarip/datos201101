@@ -652,7 +652,7 @@ void Hash::mostrar2(string nombre){
 		bloque= archivo.recuperarBloque(i);
 		list<Registro>::iterator it= bloque->obtenerRegistros()->begin();
 		while(it!=bloque->obtenerRegistros()->end()){
-			resultado+=it->getString()+" ";
+			resultado+=it->getString()+", ";
 			it++;
 		}
 		resultado+='\n';
