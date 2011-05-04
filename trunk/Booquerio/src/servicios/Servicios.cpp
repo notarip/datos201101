@@ -131,9 +131,13 @@ int Servicios::obtenerLibro(string unId)
 	if (arcLibros == "") return ERROR_RUTA_ARCHIVO_LIBROS;
 
  	ArchivoLibros *archivo = new ArchivoLibros(arcLibros);
-
-	Libro *unLibro = archivo->recuperarLibro(id);
-
+	Libro *unLibro = NULL;
+	//intento recuperar el libro
+	int resultadoRecuperacion = 0;
+	resultadoRecuperacion = recuperarLibro(id,&unLibro);
+	if( resultadoRecuperacion == ERROR_LIBRO_INEXISTENTE){
+		return resultadoRecuperacion;
+	};
 // BORRAR
 //	Parser *unParser = new Parser();
 //	unParser->parsear("./archivos/libros/Justin Somper - Vampiratas 3 - Emboscada en el Océano.txt");
@@ -158,7 +162,7 @@ int Servicios::obtenerLibro(string unId)
 	linea += unLibro->getEditorial();
 	linea += "\n";
 //titulo
-	linea += "Titutlo: ";
+	linea += "Titulo: ";
 	linea += unLibro->getTitulo();
 	linea += "\n";
 //texto
@@ -171,8 +175,6 @@ int Servicios::obtenerLibro(string unId)
 	memcpy(buff,linea.c_str(),tamanio);
 	libro.write(buff,tamanio);
 	delete [] buff;
-
-
 
 	libro.close();
 
@@ -196,12 +198,12 @@ int Servicios::quitarArchivo(string unId)
 
 	ArbolBMasNumerico *arbolP = new ArbolBMasNumerico(pathArbolPrimario, TAMANIO_BLOQUE_BMAS_NUMERICO);
 
-	resultadoOperacion *resultado = 0;
+	resultadoOperacion resultado(OK);
 
-	Registro* registro = arbolP->buscarRegistroNumerico(id, resultado);
+	Registro* registro = arbolP->buscarRegistroNumerico(id, &resultado);
 
 	//TODO ver si esta recuperando bien el offset
-	if (registro && resultado->getDescripcion() == "ENCONTRADO")
+	if (registro && resultado.getDescripcion() == "ENCONTRADO")
 		offset = registro->getReferencias()->front();
 	else
 		return ERROR_LIBRO_INEXISTENTE;
@@ -308,7 +310,6 @@ int Servicios::procesarLibro(int indice)
 
 	list<unsigned int> *lista;
 
-
 	switch(indice)
 	{
 		case INDICE_AUTORES :lista = listas->getPendientesAutores();break;
@@ -320,7 +321,12 @@ int Servicios::procesarLibro(int indice)
 	for (list<unsigned int>::iterator it = lista->begin(); it != lista->end(); it++)
 	{
 		Libro *libro = 0;
-		int error = recuperarLibro((*it), libro);
+		cout << "intento procesar el libro con id: " << *it << endl;
+		int error = recuperarLibro((*it), &libro);
+		cout <<"Autor: "<< libro->getAutor() <<endl;
+		cout <<"Editorial: "<< libro->getEditorial() <<endl;
+		cout <<"Titulo: "<< libro->getTitulo() <<endl;
+		cout <<"id: "<< libro->getId() <<endl;
 
 		switch(indice)
 		{
@@ -349,7 +355,9 @@ int Servicios::procesarLibro(int indice)
 int Servicios::agregarIndiceAutores(Libro *unLibro)
 {
 	//logica pertenece al arbol.
+	cout << "Agrego al Arbol" << endl;
 	agregarAlArbol(NOMBRE_BMAS_AUTORES, unLibro->getAutor(), unLibro->getId());
+	cout << "Ok, lo agregue" << endl;
 
 	return 0;
 }
@@ -357,7 +365,7 @@ int Servicios::agregarIndiceAutores(Libro *unLibro)
 int Servicios::agregarIndiceEditoriales(Libro *unLibro)
 {
 	//logica pertenece al arbol.
-	agregarAlArbol(NOMBRE_BMAS_EDITORIALES, unLibro->getAutor(), unLibro->getId());
+	agregarAlArbol(NOMBRE_BMAS_EDITORIALES, unLibro->getEditorial(), unLibro->getId());
 
 	return 0;
 }
@@ -413,24 +421,26 @@ void Servicios::agregarAlArbol(string nombreArbol, string clavePasada, unsigned 
 	pathArbol += nombreArbol;
 	ArbolBMasAlfabetico *arbol  = new ArbolBMasAlfabetico(pathArbol, TAMANIO_BLOQUE_BMAS);
 
-	resultadoOperacion *resultado = 0;
+	resultadoOperacion resultado(OK);
 
-	Registro* registro= arbol->buscarRegistro(clavePasada, resultado);
+	Registro* registro= arbol->buscarRegistro(clavePasada, &resultado);
 	unsigned int offset;
 
-
-	if (registro && resultado->getDescripcion() == "ENCONTRADO")
+	if (registro && resultado.getDescripcion() == "ENCONTRADO")
 	{
-		offset = registro->getAtributosEnteros()->front();
+		//lista ya existe
+		offset = registro->getReferenciai(1);
+		cout << "existe la lista id, lo guardo en bloque:" << offset << endl;
 
 		ListasIds().agregarIdDeLibro(&offset,idNueva,false);
 	}
 	else{
+		//debo crear la lista nueva
 		ListasIds().agregarIdDeLibro(&offset, idNueva,true);
 		arbol->insertar(clavePasada,offset);
 	}
+	delete arbol;
 
-	arbol->~ArbolBMasAlfabetico();
 }
 
 void Servicios::sacarDelHash(string nombreHash, string clave, unsigned int idLibro)
@@ -462,13 +472,13 @@ void Servicios::sacarDelArbol(string nombreArbol, string clave, unsigned int idL
 	pathArbol += nombreArbol;
 	ArbolBMasAlfabetico *arbol  = new ArbolBMasAlfabetico(pathArbol, TAMANIO_BLOQUE_BMAS);
 
-	resultadoOperacion *resultado = 0;
+	resultadoOperacion resultado(OK) ;
 
-	Registro* registro= arbol->buscarRegistro(clave, resultado);
+	Registro* registro= arbol->buscarRegistro(clave, &resultado);
 	unsigned int offset;
 
 
-	if (registro && resultado->getDescripcion() == "ENCONTRADO")
+	if (registro && resultado.getDescripcion() == "ENCONTRADO")
 	{
 		offset = registro->getAtributosEnteros()->front();
 
@@ -481,7 +491,7 @@ void Servicios::sacarDelArbol(string nombreArbol, string clave, unsigned int idL
 }
 
 
-int Servicios::recuperarLibro(unsigned int idLibro, Libro *libro)
+int Servicios::recuperarLibro(unsigned int idLibro, Libro **libro)
 {
 	unsigned int offset = 0;
 
@@ -490,15 +500,17 @@ int Servicios::recuperarLibro(unsigned int idLibro, Libro *libro)
 
 	ArbolBMasNumerico *arbolP = new ArbolBMasNumerico(pathArbolPrimario, TAMANIO_BLOQUE_BMAS_NUMERICO);
 
-	resultadoOperacion *resultado = 0;
+	resultadoOperacion resultado(OK) ;
 
-	Registro* registro = arbolP->buscarRegistroNumerico(idLibro, resultado);
+	Registro* registro = arbolP->buscarRegistroNumerico(idLibro, &resultado);
 
 	//TODO ver si esta recuperando bien el offset
-	if (registro && resultado->getDescripcion() == "ENCONTRADO")
+	if (registro && resultado.getDescripcion() == "ENCONTRADO"){
 		offset = registro->getReferencias()->front();
-	else
+	}
+	else{
 		return ERROR_LIBRO_INEXISTENTE;
+	}
 
 
 	string rutaArcLibros = Parametros().getParametro(ARCHIVO_LIBROS);
@@ -507,11 +519,11 @@ int Servicios::recuperarLibro(unsigned int idLibro, Libro *libro)
 
 	ArchivoLibros *archivo = new ArchivoLibros(rutaArcLibros);
 
-	libro = archivo->recuperarLibro(offset);
+	*libro = (archivo->recuperarLibro(offset));
 
-	archivo->~ArchivoLibros();
+	delete archivo;
 
-	arbolP->~ArbolBMasNumerico();
+	delete arbolP;
 
 	return 0;
 

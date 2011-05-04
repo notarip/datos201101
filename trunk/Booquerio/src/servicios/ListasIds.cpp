@@ -16,6 +16,7 @@ int ListasIds::agregarIdDeLibro(unsigned int *offset, unsigned int id, bool list
 	if (listaNueva)
 	{
 		*offset = archivo->getBloqueLibre();
+		cout << "pido bloque nuevo para la lista de ids, me devolvieron: " << *offset  <<endl;
 		unBloque = new Bloque();
 		unRegistro = new Registro();
 		unRegistro->agregarAtribEntero(id);
@@ -33,8 +34,8 @@ int ListasIds::agregarIdDeLibro(unsigned int *offset, unsigned int id, bool list
 		archivo->grabarBloque(unBloqueNuevo,*offset);
 	}
 
-	archivo->~ArchivoBloques();
-	unBloque->~Bloque();
+	delete archivo;
+	delete unBloque;
 
 	return 0;
 }

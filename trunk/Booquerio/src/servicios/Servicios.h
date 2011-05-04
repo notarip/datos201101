@@ -128,7 +128,7 @@ private:
 	static int agregarIndiceEditoriales(Libro *unLibro);
 	static int agregarIndiceTitulos(Libro *unLibro);
 	static int agregarIndicePalabras(Libro *unLibro);
-	static int recuperarLibro(unsigned int idLibro, Libro *libro);
+	static int recuperarLibro(unsigned int idLibro, Libro **libro);
 
 };
 
