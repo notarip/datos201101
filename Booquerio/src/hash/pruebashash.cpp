@@ -21,7 +21,7 @@ static void f(Hash* hash,unsigned int cant){
 }
 
 
-int main33(){
+int main(){
 
 	Hash hash("unhash");
 
@@ -68,6 +68,7 @@ int main33(){
 		cout<<endl;cout<<endl;
 		hash.mostrar();
 	}
+	hash.mostrar2("salida.txt");
 
 }
 

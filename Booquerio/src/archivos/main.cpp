@@ -4,63 +4,56 @@
 using namespace std;
 
 
-int main3(int argc, char** argv){
+int main234(int argc, char** argv){
 	//prueba libro//
 
-	Libro libro(43,"dsadsadsaad","fdsfdsfds","texto de prueba" , "prueba,prueba,prueba,prueba,prueba,prueba");
+	Libro libro(43,"ES EL LIBRO 1","fdsfdsfds","texto de prueba" , "prueba,prueba,prueba,prueba,prueba,prueba");
 
-	Libro libro2(43,"bcabcabcabcabcabca","abcdabcdabcdabcd","abcdabcdabcdabcda","bcdabcdabcdabcdabcdabcd");
+	Libro libro2(91,"ES EL LIBRO 2","abcdabcdabcdabcd","abcdabcdabcdabcda","bcdabcdabcdabcdabcdabcd");
 
-	Libro libro3(15, "gwfewfew","gregregre","gregregasa","reuasfewfefewewfewfewhdasd");
+	Libro libro3(15, "ES EL LIBRO 3","gregregre","gregregasa","reuasfewfefewewfewfewhdasd");
 
 	ArchivoLibros archi("archi_datos.dat");
 
+
+
 	//serializacion y deserializacion//
 
-	char* cadena;
+	Libro* libro4=NULL;
 
-	archi.serializar(&libro,&cadena);
+	unsigned int off1=archi.agregarLibro(&libro);
+	unsigned int off2=archi.agregarLibro(&libro2);
+	unsigned int off3=archi.agregarLibro(&libro3);
 
-	Libro* libro4;
-
-	archi.deserializar(cadena,&libro4);
+	libro4= archi.recuperarLibro(off1);
 
 	cout<<libro4->getId()<<";"<<libro4->getTitulo()<<";"<<libro4->getAutor()<<";"<<libro4->getEditorial()<<endl;
-
-
-	//Agregado de registros//
-	archi.agregarLibro(&libro);
-	archi.agregarLibro(&libro2);
-	archi.agregarLibro(&libro3);
-
-	//recuperacion de registros //
-	Libro* libror1;
-	Libro* libror2;
-	libror1= archi.recuperarLibro(0);
-	libror2= archi.recuperarLibro(198);
-
-	//recuperacion comprensiva//
-	cout<<"recuperacion comprensiva:"<<endl;
-	std::list<Libro>* p=new list<Libro>;
-	p=archi.recuperacionComprensiva();
-	std::list<Libro>::iterator it;
-	it= p->begin();
-	it++;
-	it++;
-	cout<<it->getId()<<";"<<it->getTexto()<<endl;
+	delete libro4;
+	libro4= archi.recuperarLibro(off2);
+	cout<<libro4->getId()<<";"<<libro4->getTitulo()<<";"<<libro4->getAutor()<<";"<<libro4->getEditorial()<<endl;
+	delete libro4;
+	Libro* libro5;
+	libro5= archi.recuperarLibro(off3);
+	cout<<libro5->getId()<<";"<<libro5->getTitulo()<<";"<<libro5->getAutor()<<";"<<libro5->getEditorial()<<endl;
+	cout<<off1<<" "<<off2<<" "<<off3<<endl;
 
 	//supresion de registros //
 
-	archi.suprimirLibro(0);
-	fstream archdebajas("bajas_rvariables.dat",ios::in);
-	char* tira=new char[8];
-	archdebajas.read(tira,8);
-	cout<<(unsigned int)tira[0]<<";"<<(unsigned int)(tira+4)[0]<<endl;
-
+	archi.suprimirLibro(off1);
+	archi.suprimirLibro(off2);
    //insercion sobre una baja logica//
 
-	Libro libro5(15, "holahola","yoyoyoyo","nononon","chauuchauchauchauchau");
+	Libro libro6(15, "ESTE ES EL LIBRO 6","yoyoyoyo","nononon","chauuchauchauchauchau");
+	Libro libro7(32, "ESTE ES EL LIBRO 7","FREFERFRE","sdadS","dsada");
+	Libro libro8(66, "ESTE ES EL LIBRO 8","ESTE ES MAS LARGO QUE LOS DEMAS","ES UNA PRUEBA","LA ULTIMA PRUEBA");
 
-	archi.agregarLibro(&libro5);
+	int off4=archi.agregarLibro(&libro6);
+	int off5=archi.agregarLibro(&libro7);
+	int off6=archi.agregarLibro(&libro8);
+	cout<<"off4: "<<off4<<" .off5: "<<off5<<" "<<off6<<endl;
+
+	Libro* libro9;
+	libro9= archi.recuperarLibro(off6);
+	cout<<libro9->getId()<<";"<<libro9->getTitulo()<<";"<<libro9->getAutor()<<";"<<libro9->getEditorial()<<endl;
 
 }
