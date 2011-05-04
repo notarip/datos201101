@@ -8,7 +8,6 @@
 #include "Libro.h"
 
 
-
 Libro::Libro(unsigned int id,string titulo, string autor, string editorial, string texto) {
 	this->id=id;
 	this->titulo=titulo;

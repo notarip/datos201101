@@ -58,10 +58,10 @@ unsigned int ArchivoLibros::agregarLibro(Libro* unLibro){
 			memcpy(offset,libres,sizeof(unsigned int));
 			//cout<<"off para copiar:"<<*offset<<endl;
 			archivo.seekp( (*offset) ,ios::beg);
+
+			posicion_escritura= archivo.tellp();
+
 			archivo.write(tiraBytes,longreg);
-
-			posicion_escritura= archivo.tellg();
-
 			*(offset)= *(offset) + longreg; //modifico offset
 			//cout<<"Offset :"<<*offset<<endl;
 			//cout<<"Libre: "<<*resto<<endl;
@@ -70,7 +70,7 @@ unsigned int ArchivoLibros::agregarLibro(Libro* unLibro){
 
 			memcpy(libres,resto,sizeof(unsigned int));
 
-			bajas.seekg(2*sizeof(unsigned int)*posicion,ios::beg);
+			bajas.seekp(2*sizeof(unsigned int)*posicion,ios::beg);
 
 			bajas.write(libres,2*sizeof(unsigned int));
 
@@ -82,8 +82,8 @@ unsigned int ArchivoLibros::agregarLibro(Libro* unLibro){
 		}
 		else{
 			archivo.seekp(0,ios::end);
+			posicion_escritura= archivo.tellp();
 			archivo.write(tiraBytes,longreg);
-			posicion_escritura= archivo.tellg();
 		}
 		bajas.close();
 		//delete libres;
@@ -92,12 +92,13 @@ unsigned int ArchivoLibros::agregarLibro(Libro* unLibro){
 	else {
 		archivo.open(this->path.c_str(), ios::out | ios::app);
 		archivo.seekp(0,ios::end);
-		posicion_escritura= archivo.tellg();
+		posicion_escritura= archivo.tellp();
 		archivo.write(tiraBytes,longreg);
 
 	}
 	archivo.close();
 	return posicion_escritura;
+	delete tiraBytes;
 
 }
 
@@ -106,6 +107,7 @@ unsigned int ArchivoLibros::agregarLibro(Libro* unLibro){
 void ArchivoLibros::suprimirLibro(unsigned int id){
 	char* regBajas=new char[8];
 	unsigned int offset= this->obtenerOffset(id);
+
 	fstream archivo;
 
 	archivo.open(this->path.c_str(),ios::in | ios::out );
@@ -144,7 +146,7 @@ Libro* ArchivoLibros::recuperarLibro(unsigned int id){
 //modificado 24/4   //
 char* ArchivoLibros::levantarRegistro(unsigned int id){
 	unsigned int offset= this->obtenerOffset(id);
-	char* tiraBytes;
+	char* tiraBytes=NULL;
 	char* charTamanio =new char[4];
 	fstream archivo;
 	archivo.open(this->path.c_str(),ios::binary | ios::in);
@@ -155,7 +157,7 @@ char* ArchivoLibros::levantarRegistro(unsigned int id){
 		memcpy(tamanioReg,charTamanio,sizeof(unsigned int));
 		tiraBytes= new char[ (*tamanioReg) ];
 		memcpy(tiraBytes,tamanioReg ,sizeof(unsigned int));
-		archivo.read(tiraBytes+sizeof(unsigned int),(*tamanioReg)-sizeof(unsigned int));
+		archivo.read(tiraBytes+4*sizeof(char),(*tamanioReg)-4*sizeof(char));
 	}
 
 	return tiraBytes;
@@ -192,7 +194,6 @@ void ArchivoLibros::serializar(Libro* unLibro,char** tira){
 	unsigned int tamanioReg=(unLibro->getAutor().size()) + (unLibro->getTitulo().size())+ (unLibro->getEditorial().size())
 	+ (unLibro->getTexto().size()) + (unLibro->getPalabras().size()) + 8*sizeof(unsigned int);
 
-	this->longReg = tamanioReg;
 	unsigned int offset=0;
 
 	char* tiraBytes = new char[ tamanioReg ];                       //calcula espacio de
@@ -242,8 +243,10 @@ void ArchivoLibros::serializar(Libro* unLibro,char** tira){
 	offset+=sizeof(unsigned int);
 
 	memcpy(tiraBytes+ offset,(unLibro->getPalabras().c_str()),*tamanioCampos);
-
+	offset+=*tamanioCampos;
 	*tira=tiraBytes;
+
+	this->longReg = offset;
 
 	cout<<longReg<<endl;
 

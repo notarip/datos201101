@@ -616,6 +616,56 @@ void Hash::mostrar(){
 }
 
 
+void Hash::mostrar2(string nombre){
+	ArchivoBloques archivo(this->pathHash,TAMANIO_BLOQUE);
+	stringstream conversor;
+	Bloque* bloque=NULL;
+	unsigned int max=0;
+	string resultado="";
+	resultado+="******************************************";
+	resultado+='\n';
+	resultado+="DATOS:";
+	resultado+="\n";
+	resultado+="------------------------------------------";
+	resultado+='\n';
+	resultado+="|tamaño de tabla: ";
+	conversor<<this->tamanioTabla;
+	resultado+=conversor.str();
+	conversor.str("");
+	resultado+='\n';
+	resultado+="| ";
+	for(unsigned int i=0; i<this->tamanioTabla; i++){
+		conversor<<this->tabla[i];
+		resultado+=conversor.str();
+		resultado+=" ";
+		if (this->tabla[i] > max) max=this->tabla[i];
+		conversor.str("");
+	}
+	resultado+='\n';
+	resultado+="----------------------------------------- ";
+	resultado+='\n';
+	for (unsigned int i=1;i<max+1;i++){
+		resultado+="|Bloque "; conversor<<i;
+		resultado+=conversor.str(); conversor.str(""); resultado+="| T.d: ";
+		conversor<<this->tamDispersion(i); resultado+=conversor.str();
+		conversor.str(""); resultado+="]  ";
+		bloque= archivo.recuperarBloque(i);
+		list<Registro>::iterator it= bloque->obtenerRegistros()->begin();
+		while(it!=bloque->obtenerRegistros()->end()){
+			resultado+=it->getString()+" ";
+			it++;
+		}
+		resultado+='\n';
+		resultado+='\n';
+	}
+	resultado+="******************************************";
+	resultado+="\n";
+	fstream archtexto;
+	archtexto.open(nombre.c_str(), ios::out | ios::app);
+	archtexto << resultado;
+	archtexto.close();
+}
+
 unsigned int Hash::getTamanioTabla(){
 	return this->tamanioTabla;
 }

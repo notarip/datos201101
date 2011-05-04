@@ -86,6 +86,8 @@ public:
 	//
 	void mostrar();
 
+	void mostrar2(string s);
+
 	//
 	// Guarda la tabla hash en el disco para que posteriormente pueda ser recuperada.
 	//
