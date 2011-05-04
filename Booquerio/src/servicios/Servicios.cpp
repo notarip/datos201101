@@ -281,24 +281,35 @@ int Servicios::verEstructuraTitulos()
 	/* LLEEEEEER*/
 	//me tome el atrevimiento de usar la interfaz para pruebas, este metodo por ahora va a exportar arbol primario
 	string pathExport = Parametros().getParametro(CARPETA_SALIDA);
-	pathExport += NOMBRE_BMAS_PRIMARIO;
-	string pathArbol = Parametros().getParametro(CARPETA_DATOS);
-	pathArbol += NOMBRE_BMAS_PRIMARIO;
+	pathExport += NOMBRE_HASH_TITULOS;
+	string pathHash = Parametros().getParametro(CARPETA_DATOS);
+	pathHash += NOMBRE_HASH_TITULOS;
 
-	ArbolBMasNumerico* arbolP = new ArbolBMasNumerico(pathArbol,TAMANIO_BLOQUE_BMAS);
-	arbolP->exportar(pathExport);
-	delete arbolP;
-	return 0;
+	//ArbolBMasNumerico* arbolP = new ArbolBMasNumerico(pathArbol,TAMANIO_BLOQUE_BMAS);
+	//arbolP->exportar(pathExport);
+	//delete arbolP;
+	//return 0;
+	Hash * hash_titulos=new Hash(pathHash);
 
-
+	hash_titulos->mostrar2(pathExport);
+	delete hash_titulos;
 
 	return 0;
 }
 
 int Servicios::verEstructuraPalabras()
 {
-	//TODO llamar al metodo de hash de palabras que lista la estructura
-	return 0;
+		string pathExport = Parametros().getParametro(CARPETA_SALIDA);
+		pathExport += NOMBRE_HASH_PALABRAS;
+		string pathHash = Parametros().getParametro(CARPETA_DATOS);
+		pathHash += NOMBRE_HASH_PALABRAS;
+
+		Hash * hash_palabras=new Hash(pathHash);
+
+		hash_palabras->mostrar2(pathExport);
+		delete hash_palabras;
+
+		return 0;
 }
 
 
@@ -321,12 +332,13 @@ int Servicios::procesarLibro(int indice)
 	for (list<unsigned int>::iterator it = lista->begin(); it != lista->end(); it++)
 	{
 		Libro *libro = 0;
-		cout << "intento procesar el libro con id: " << *it << endl;
+		cout << endl << endl <<"intento procesar el libro con id: " << *it << endl;
 		int error = recuperarLibro((*it), &libro);
 		cout <<"Autor: "<< libro->getAutor() <<endl;
 		cout <<"Editorial: "<< libro->getEditorial() <<endl;
 		cout <<"Titulo: "<< libro->getTitulo() <<endl;
-		cout <<"id: "<< libro->getId() <<endl;
+		cout <<"Id: "<< libro->getId() <<endl;
+		cout <<"Cant.palabras: " << libro->getCantPalabras() << endl;
 
 		switch(indice)
 		{
@@ -381,9 +393,13 @@ int Servicios::agregarIndicePalabras(Libro *unLibro)
 {
 
 	set<string> *palabras = unLibro->getListaPalabras();
+	set<string>::iterator it = palabras->begin();
 
-	for (set<string>::iterator it = palabras->begin(); it != palabras->end(); it++)
+	for ( ; it != palabras->end(); it++)
 	{
+		cout << palabras->size() << endl;
+
+		cout << "PALABRA A INDEXAR =" << *it <<endl;
 		agregarAlHash(NOMBRE_HASH_PALABRAS, *it ,unLibro->getId());
 	}
 
@@ -399,11 +415,13 @@ void Servicios::agregarAlHash(string nombreHash, string clavePasada, unsigned in
 	Registro* registro= hash->buscar(clavePasada);
 	unsigned int offset;
 
+	//si ya existe la lista//
 	if (registro){
 
-		offset = registro->getAtributosEnteros()->front();
+		offset = registro->getReferenciai(1);
 		ListasIds().agregarIdDeLibro(&offset,idNueva,false);
 	}
+	//no existe la lista de ids
 	else{
 		ListasIds().agregarIdDeLibro(&offset, idNueva,true);
 		registro = new Registro();
@@ -412,7 +430,7 @@ void Servicios::agregarAlHash(string nombreHash, string clavePasada, unsigned in
 		hash->insertar(registro);
 	}
 
-	hash->~Hash();
+	delete hash;
 }
 
 void Servicios::agregarAlArbol(string nombreArbol, string clavePasada, unsigned int idNueva)

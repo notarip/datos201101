@@ -10,11 +10,14 @@
 int ListasIds::agregarIdDeLibro(unsigned int *offset, unsigned int id, bool listaNueva)
 {
 	string archivoListas = Parametros().getParametro(ARCHIVO_LISTAS_IDS);
+	cout << "path al que le pido bloque libre" << archivoListas << endl;
 	ArchivoBloques *archivo = new ArchivoBloques(archivoListas,TAMANIO_B_LISTA_IDS);
 	Bloque *unBloque, *unBloqueNuevo;
 	Registro *unRegistro;
 	if (listaNueva)
 	{
+		cout << "LISTA NUEVA" << endl;
+		cout << "offset anterior: " << *offset << endl;
 		*offset = archivo->getBloqueLibre();
 		cout << "pido bloque nuevo para la lista de ids, me devolvieron: " << *offset  <<endl;
 		unBloque = new Bloque();
@@ -25,13 +28,23 @@ int ListasIds::agregarIdDeLibro(unsigned int *offset, unsigned int id, bool list
 
 	}else
 	{
+		cout << "LISTA YA EXISTENTE" << endl;
+		cout << "A" << endl;
 		unBloque = archivo->recuperarBloque(*offset);
+		cout << "B" << endl;
 		unRegistro = new Registro();
+		cout << "C" << endl;
 		*unRegistro = unBloque->obtenerRegistros()->back();
+		cout << "D" << endl;
 		unRegistro->agregarAtribEntero(id);
+		cout << "E" << endl;
 		unBloqueNuevo = new Bloque();
+		cout << "F" << endl;
 		unBloqueNuevo->agregarRegistro(*unRegistro);
+		cout << "G" << endl;
 		archivo->grabarBloque(unBloqueNuevo,*offset);
+		cout << "H" << endl;
+
 	}
 
 	delete archivo;
