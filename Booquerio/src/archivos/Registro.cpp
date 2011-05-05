@@ -27,6 +27,20 @@ Registro::Registro(string unString, unsigned int atribEntero) {
 	this->atribEnteros.push_back(atribEntero);
 }
 
+Registro::Registro(Registro* reg) {
+	this->miString= reg->getString();
+	list<unsigned int>::iterator itAtribEnteros= reg->getAtributosEnteros()->begin();
+	while(itAtribEnteros!=reg->getAtributosEnteros()->end()) {
+		this->atribEnteros.push_back(*itAtribEnteros);
+		itAtribEnteros++;
+	}
+	list<unsigned int>::iterator itRef= reg->getReferencias()->begin();
+	while(itRef!=reg->getReferencias()->end()) {
+		this->referencias.push_back(*itAtribEnteros);
+		itRef++;
+	}
+}
+
 string Registro::getString(){
 	return this->miString;
 }
