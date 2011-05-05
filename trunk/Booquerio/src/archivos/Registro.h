@@ -19,6 +19,7 @@ public:
 	Registro(string unString);
 	Registro(unsigned int atribEntero, unsigned int unaReferencia);
 	Registro (string unString, unsigned int atribEntero);
+	Registro (Registro* reg);
 	virtual ~Registro();
 
 	void setString (string stringASetear);
