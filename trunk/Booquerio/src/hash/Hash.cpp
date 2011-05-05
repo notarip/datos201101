@@ -149,6 +149,10 @@ int Hash::abrir(){
 	cout<<"-------------------------------------------------"<<endl;
 	/*********************************************************/
 
+	/*libero memoria pedida*/
+
+	delete bloqueTabla;
+
 	return 0;
 }
 
@@ -207,9 +211,14 @@ void Hash::insertar(Registro *registro)
 			this->reestructurar_archivo(archivo,bloque_desbordado,primerBloqueLibre,registro);
 
 		}
+		/*libero memoria*/
+		delete bloque;
 		cout<<"Registro insertado."<<endl;
 	}
-	else cout<<"registro duplicado."<<endl;
+	else{
+		cout<<"registro duplicado."<<endl;
+
+	}
 }
 
 
@@ -285,13 +294,17 @@ Registro* Hash::buscar(string que){
 
 	Bloque *bloque = archivoBloq.recuperarBloque(nroBloque);
 
-
 	Registro *registro = bloque->recuperarRegistro(que);
+	Registro *reg_encontrado;
 
 	if (registro==NULL) cout<<"no lo encontro. "<<endl;
 
+	else {
+		Registro *reg_encontrado= new Registro(registro);
+		delete bloque;
+		return reg_encontrado;
+	}
 	return registro;
-
 }
 
 
@@ -395,6 +408,8 @@ void Hash::reestructurar_archivo(ArchivoBloques archivo,unsigned int nro_desbord
 
 	//cout<<"salgo bien"<<endl;
 	//this->mostrar();
+	delete bloque_libre;
+	delete bloque_desbordado;
 }
 
 
@@ -497,6 +512,7 @@ void Hash::guardarTabla(){
 
 	while (refActual != 0){
 		refASiguientes.push_back(refActual);
+		delete bloqueTabla;
 		bloqueTabla= archivoHash.recuperarBloque(refActual);
 		refActual= bloqueTabla->obtenerRegistros()->front().getReferencias()->front();
 	}
@@ -518,6 +534,7 @@ void Hash::guardarTabla(){
 		refASiguientes.push_back(refActual);
 		Bloque* bloqueNuevo= new Bloque();
 		archivoHash.grabarBloque(bloqueNuevo,refActual);
+		delete bloqueNuevo;
 	}
 	while ((refASiguientes.size()+1) > cantBloquesNecesarios){
 
@@ -567,6 +584,8 @@ void Hash::guardarTabla(){
 		}
 		itReferencias++;
 
+		/*libero memoria*/
+		delete bloqueTabla;
 	}
 
 	//tablaNueva.agregarReferencia(1);
@@ -612,6 +631,7 @@ void Hash::mostrar(){
 		}
 		cout<<endl;
 	}
+	delete bloque;
 	cout<<"******************************************"<<endl;
 }
 
@@ -652,7 +672,7 @@ void Hash::mostrar2(string nombre){
 		bloque= archivo.recuperarBloque(i);
 		list<Registro>::iterator it= bloque->obtenerRegistros()->begin();
 		while(it!=bloque->obtenerRegistros()->end()){
-			resultado+=it->getString()+", ";
+			resultado+=it->getString()+" ";
 			it++;
 		}
 		resultado+='\n';
