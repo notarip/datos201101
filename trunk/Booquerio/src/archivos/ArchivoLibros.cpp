@@ -271,22 +271,22 @@ void ArchivoLibros::deserializar(char* tiraBytes,Libro** obtenido){
 	memcpy(tamanioCampo,tiraBytes+ posicion,sizeof(unsigned int));
 	titulo=new char[*tamanioCampo];
 	posicion+=sizeof(unsigned int);
-	memcpy(titulo,tiraBytes+ posicion ,(*tamanioCampo));
+	memcpy(titulo,tiraBytes+ posicion ,(*tamanioCampo));titulo[*tamanioCampo]='\0';
 	posicion+=(*tamanioCampo);
 	memcpy(tamanioCampo,tiraBytes+ posicion,sizeof(unsigned int));
 	autor=new char[(*tamanioCampo)];
 	posicion+=sizeof(unsigned int);
-	memcpy(autor,tiraBytes+ posicion,(*tamanioCampo));
+	memcpy(autor,tiraBytes+ posicion,(*tamanioCampo));autor[*tamanioCampo]='\0';
 	posicion+=*tamanioCampo;
 	memcpy(tamanioCampo,tiraBytes+ posicion,sizeof(unsigned int));
 	editorial=new char[(*tamanioCampo)];
 	posicion+=sizeof(unsigned int);
-	memcpy(editorial,tiraBytes+ posicion,(*tamanioCampo));
+	memcpy(editorial,tiraBytes+ posicion,(*tamanioCampo));editorial[*tamanioCampo]='\0';
 	posicion+=*tamanioCampo;
 	memcpy(tamanioCampo,tiraBytes+ posicion,sizeof(unsigned int));
 	texto=new char[(*tamanioCampo)];
 	posicion+=sizeof(unsigned int);
-	memcpy(texto,tiraBytes+ posicion,(*tamanioCampo));
+	memcpy(texto,tiraBytes+ posicion,(*tamanioCampo));texto[*tamanioCampo]='\0';
 	posicion+=*tamanioCampo;
 
 	memcpy(cantPalabras,tiraBytes+ posicion,sizeof(unsigned int));
@@ -294,7 +294,7 @@ void ArchivoLibros::deserializar(char* tiraBytes,Libro** obtenido){
 	memcpy(tamanioCampo,tiraBytes+ posicion,sizeof(unsigned int)); //tamanio de palabras//
 	posicion+=sizeof(unsigned int);
 	palabras=new char[(*tamanioCampo)];
-	memcpy(palabras,tiraBytes+ posicion,(*tamanioCampo));
+	memcpy(palabras,tiraBytes+ posicion,(*tamanioCampo));palabras[*tamanioCampo]='\0';
 
 
 	string s_autor(autor, strlen(autor));
