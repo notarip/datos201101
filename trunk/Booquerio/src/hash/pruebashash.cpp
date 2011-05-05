@@ -30,7 +30,7 @@ static void f2(Hash* hash,unsigned int cant){
 }
 
 
-int main(){
+int main8800(){
 
 	Hash hash("unhash");
 

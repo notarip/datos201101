@@ -10,14 +10,11 @@
 int ListasIds::agregarIdDeLibro(unsigned int *offset, unsigned int id, bool listaNueva)
 {
 	string archivoListas = Parametros().getParametro(ARCHIVO_LISTAS_IDS);
-	cout << "path al que le pido bloque libre" << archivoListas << endl;
 	ArchivoBloques *archivo = new ArchivoBloques(archivoListas,TAMANIO_B_LISTA_IDS);
 	Bloque *unBloque, *unBloqueNuevo;
 	Registro *unRegistro;
 	if (listaNueva)
 	{
-		cout << "LISTA NUEVA" << endl;
-		cout << "offset anterior: " << *offset << endl;
 		*offset = archivo->getBloqueLibre();
 		cout << "pido bloque nuevo para la lista de ids, me devolvieron: " << *offset  <<endl;
 		unBloque = new Bloque();
@@ -28,22 +25,22 @@ int ListasIds::agregarIdDeLibro(unsigned int *offset, unsigned int id, bool list
 
 	}else
 	{
-		cout << "LISTA YA EXISTENTE" << endl;
-		cout << "A" << endl;
+		//cout << "A" << endl;
+		cout << "ya existe, en que bloque la meto?" << *offset << endl;
 		unBloque = archivo->recuperarBloque(*offset);
-		cout << "B" << endl;
+		//cout << "B"<< endl;
 		unRegistro = new Registro();
-		cout << "C" << endl;
+		//cout << "C"<< endl;
 		*unRegistro = unBloque->obtenerRegistros()->back();
-		cout << "D" << endl;
+		//cout << "D"<< endl;
 		unRegistro->agregarAtribEntero(id);
-		cout << "E" << endl;
+		//cout << "E"<< endl;
 		unBloqueNuevo = new Bloque();
-		cout << "F" << endl;
+		//cout << "F"<< endl;
 		unBloqueNuevo->agregarRegistro(*unRegistro);
-		cout << "G" << endl;
+		//cout << "G"<< endl;
 		archivo->grabarBloque(unBloqueNuevo,*offset);
-		cout << "H" << endl;
+		//cout << "H"<< endl;
 
 	}
 
@@ -61,7 +58,6 @@ int ListasIds::sacarIdDelLibro(unsigned int *offset, unsigned int id)
 	Bloque *unBloque, *unBloqueNuevo;
 	Registro *unRegistro, *unRegistroNuevo;
 
-
 	unBloque = archivo->recuperarBloque(*offset);
 	unRegistro = new Registro();
 	*unRegistro = unBloque->obtenerRegistros()->back();
@@ -69,26 +65,29 @@ int ListasIds::sacarIdDelLibro(unsigned int *offset, unsigned int id)
 
 	list<unsigned int> *lista =  unRegistro->getAtributosEnteros();
 
-	for (list<unsigned int>::iterator it; it != lista->end(); it++)
+	for (list<unsigned int>::iterator it = lista->begin(); it != lista->end(); it++)
 	{
-		if (*it != id)
+		if (*it != id)	{
+			//cout<<"C"<<*it<< endl;
 			unRegistroNuevo->agregarAtribEntero(*it);
+		}
 	}
 
+
+
 	if (unRegistroNuevo->getAtributosEnteros()->size() > 0)
-	{
+	{//cout<<"A"<<endl;
 		unBloqueNuevo = new Bloque();
 		unBloqueNuevo->agregarRegistro(*unRegistroNuevo);
 		archivo->grabarBloque(unBloqueNuevo,*offset);
-		archivo->~ArchivoBloques();
+		delete archivo;
 		return 0;
 	}else
-	{
+	{//cout<<"B"<<endl;cout<<*offset<<endl;
 		archivo->eliminarBloque(*offset);
-		archivo->~ArchivoBloques();
+		delete archivo;
 		return LISTA_VACIA;
 	}
-
 
 	return 0;
 }

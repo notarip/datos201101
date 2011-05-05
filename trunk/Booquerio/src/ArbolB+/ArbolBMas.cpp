@@ -241,6 +241,7 @@ list<Registro>::iterator ArbolBMas::agregarRegistroEnOrden(Bloque* unBloque,
 resultadoOperacion ArbolBMas::eliminar(string clave) {
 	resultadoOperacion resultadoRaiz =  this->eliminarRecursivo(raiz,clave);
 	if (resultadoRaiz.getCodigo() == HUBO_MODIFICACION){
+		this->archivoNodos->grabarBloque(raiz, 0);
 		return resultadoOperacion(OK);
 	}
 	return resultadoRaiz;

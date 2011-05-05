@@ -104,20 +104,45 @@ int Servicios::listarLibros()
 	string rutaArcLibros = Parametros().getParametro(ARCHIVO_LIBROS);
 
 	if (rutaArcLibros == "") return ERROR_RUTA_ARCHIVO_LIBROS;
-
 	ArchivoLibros *archivo = new ArchivoLibros(rutaArcLibros);
+	//list<Libro> *lista = archivo->recuperacionComprensiva(); //en vez de usar el metodo de hernan
+	//uso el metodo siguiente del primario
 
-	list<Libro> *lista = archivo->recuperacionComprensiva();
+	list<Libro> *lista = new list<Libro>;
+	string pathArbolPrimario = Parametros().getParametro(CARPETA_DATOS);
+	pathArbolPrimario += NOMBRE_BMAS_PRIMARIO;
+
+	ArbolBMasNumerico* arbolPrimario = new ArbolBMasNumerico(pathArbolPrimario,TAMANIO_BLOQUE_BMAS_NUMERICO);
+	//para iniciar la recuperasion secuencial busco primero el id 0 = el primero
+	resultadoOperacion resultadoBus(OK);
+	Registro* registroObtenido = arbolPrimario->buscarRegistroNumerico(0,&resultadoBus);
+
+	unsigned int unId;
+	Libro* unLibro = NULL;
+
+	//armo las lista de libros con el metodo siguiente del arbol
+	while (	registroObtenido != NULL){
+		unId = registroObtenido->getAtributosEnteros()->front();
+		recuperarLibro(unId, &unLibro);
+		//agrego un libro a la lista de libros
+		lista->push_back(*unLibro);
+		registroObtenido = arbolPrimario->siguiente();
+	}
+
+	delete arbolPrimario;
 
 	cout << "Listado del libros: " << endl;
+	unsigned int i = 1;
 
 	for (list<Libro>::iterator it = lista->begin(); it != lista->end(); it++)
 	{
+		cout<<"**************************  "<< i << "  **************************" << endl;
 		cout << (*it).toString() << endl;
+		i++;
 	}
-
 	cout << "Fin listado del libros: " << endl;
 
+	delete lista;
 	return 0;
 }
 
@@ -189,7 +214,7 @@ int Servicios::quitarArchivo(string unId)
 	unsigned int id = atoi(unId.c_str());
 	unsigned int offset = 0;
 
-//recuperar el offset del primario
+	//recuperar el offset del primario
 
 	string pathArbolPrimario = Parametros().getParametro(CARPETA_DATOS);
 	pathArbolPrimario += NOMBRE_BMAS_PRIMARIO;
@@ -210,26 +235,46 @@ int Servicios::quitarArchivo(string unId)
 
 
 //quitar de el archivo de registros variables
+
 	string arcLibros = Parametros().getParametro(ARCHIVO_LIBROS);
 	ArchivoLibros *archivo = new ArchivoLibros(arcLibros);
 	Libro *libro = archivo->recuperarLibro(offset);
+	cout <<"Autor: "<< libro->getAutor() <<endl;
+	cout <<"Editorial: "<< libro->getEditorial() <<endl;
+	cout <<"Titulo: "<< libro->getTitulo() <<endl;
+	cout <<"Id: "<< libro->getId() <<endl;
+	cout <<"Cant.palabras: " << libro->getCantPalabras() << endl;
+	cin.get();
+
+	cout << "SACO EL LIBRO DEL ARCHIVO DE REGISTROS VARIABLES" << endl;
 	archivo->suprimirLibro(offset);
 
 
 //quitar del primario
 
+	cout << "QUITO DEL PRIMARIO EL ID" << endl;
+
 	arbolP->eliminarNumerico(libro->getId());
 
-	arbolP->~ArbolBMasNumerico();
+	delete arbolP;
 
 //quitar de los indices
 
+	cout << "SACO DE LOS INDICES" << endl;
+
+	cout << "SACO DE AUTORES" << endl;
 	sacarDelArbol(NOMBRE_BMAS_AUTORES,libro->getAutor(),libro->getId());
+	cin.get();
 
+	cout << "SACO DE EDITORIALES" << endl;
 	sacarDelArbol(NOMBRE_BMAS_EDITORIALES,libro->getEditorial(),libro->getId());
+	cin.get();
 
+	cout << "SACO DE TITULOS" << endl;
 	sacarDelHash(NOMBRE_HASH_TITULOS,libro->getTitulo(),libro->getId());
+	cin.get();
 
+	cout << "SACO PALABRAS" << endl;
 	set<string> *palabras = libro->getListaPalabras();
 
 	for (set<string>::iterator it = palabras->begin(); it != palabras->end(); it++)
@@ -239,11 +284,12 @@ int Servicios::quitarArchivo(string unId)
 
 
 //quitar de la lista de libros sin procesar
+	cout << "SACO DE LOS INDICES SIN PROCESAR" <<endl;
 	SinIndice *listas  = SinIndice().getInstancia();
 	return listas->sacarLibroDeTodasLasListas(id);
 
 
-	archivo->~ArchivoLibros();
+	delete archivo;
 	return 0;
 }
 
@@ -332,13 +378,13 @@ int Servicios::procesarLibro(int indice)
 	for (list<unsigned int>::iterator it = lista->begin(); it != lista->end(); it++)
 	{
 		Libro *libro = 0;
-		cout << endl << endl <<"intento procesar el libro con id: " << *it << endl;
 		int error = recuperarLibro((*it), &libro);
 		cout <<"Autor: "<< libro->getAutor() <<endl;
 		cout <<"Editorial: "<< libro->getEditorial() <<endl;
 		cout <<"Titulo: "<< libro->getTitulo() <<endl;
 		cout <<"Id: "<< libro->getId() <<endl;
 		cout <<"Cant.palabras: " << libro->getCantPalabras() << endl;
+		cin.get();
 
 		switch(indice)
 		{
@@ -367,9 +413,7 @@ int Servicios::procesarLibro(int indice)
 int Servicios::agregarIndiceAutores(Libro *unLibro)
 {
 	//logica pertenece al arbol.
-	cout << "Agrego al Arbol" << endl;
 	agregarAlArbol(NOMBRE_BMAS_AUTORES, unLibro->getAutor(), unLibro->getId());
-	cout << "Ok, lo agregue" << endl;
 
 	return 0;
 }
@@ -397,8 +441,6 @@ int Servicios::agregarIndicePalabras(Libro *unLibro)
 
 	for ( ; it != palabras->end(); it++)
 	{
-		cout << palabras->size() << endl;
-
 		cout << "PALABRA A INDEXAR =" << *it <<endl;
 		agregarAlHash(NOMBRE_HASH_PALABRAS, *it ,unLibro->getId());
 	}
@@ -417,12 +459,13 @@ void Servicios::agregarAlHash(string nombreHash, string clavePasada, unsigned in
 
 	//si ya existe la lista//
 	if (registro){
-
-		offset = registro->getReferenciai(1);
+		//cout << "lista ya existente" << endl;
+		offset = registro->getAtributosEnteros()->front();
 		ListasIds().agregarIdDeLibro(&offset,idNueva,false);
 	}
 	//no existe la lista de ids
 	else{
+		//cout << "lista nueva" << endl;
 		ListasIds().agregarIdDeLibro(&offset, idNueva,true);
 		registro = new Registro();
 		registro->setString(clavePasada);
@@ -448,8 +491,6 @@ void Servicios::agregarAlArbol(string nombreArbol, string clavePasada, unsigned 
 	{
 		//lista ya existe
 		offset = registro->getReferenciai(1);
-		cout << "existe la lista id, lo guardo en bloque:" << offset << endl;
-
 		ListasIds().agregarIdDeLibro(&offset,idNueva,false);
 	}
 	else{
@@ -472,14 +513,13 @@ void Servicios::sacarDelHash(string nombreHash, string clave, unsigned int idLib
 	unsigned int offset;
 
 	if (registro){
-
 		offset = registro->getAtributosEnteros()->front();
-		if (ListasIds().sacarIdDelLibro(&offset,idLibro) == LISTA_VACIA)
+		bool listaVacia = ListasIds().sacarIdDelLibro(&offset,idLibro);
+		if (listaVacia == LISTA_VACIA){
 			hash->borrar(clave);
+		}
 	}
-
-	hash->~Hash();
-
+	delete hash;
 }
 
 
@@ -489,7 +529,6 @@ void Servicios::sacarDelArbol(string nombreArbol, string clave, unsigned int idL
 	string pathArbol = Parametros().getParametro(CARPETA_DATOS);
 	pathArbol += nombreArbol;
 	ArbolBMasAlfabetico *arbol  = new ArbolBMasAlfabetico(pathArbol, TAMANIO_BLOQUE_BMAS);
-
 	resultadoOperacion resultado(OK) ;
 
 	Registro* registro= arbol->buscarRegistro(clave, &resultado);
@@ -498,13 +537,14 @@ void Servicios::sacarDelArbol(string nombreArbol, string clave, unsigned int idL
 
 	if (registro && resultado.getDescripcion() == "ENCONTRADO")
 	{
-		offset = registro->getAtributosEnteros()->front();
+		offset = registro->getReferenciai(1);
 
-		if (ListasIds().sacarIdDelLibro(&offset,idLibro) == LISTA_VACIA)
-			arbol->eliminar(clave);
+		if (ListasIds().sacarIdDelLibro(&offset,idLibro) == LISTA_VACIA){
+			resultadoOperacion resultado = arbol->eliminar(clave);
+		}
 	}
 
-	arbol->~ArbolBMasAlfabetico();
+	delete arbol;
 
 }
 
