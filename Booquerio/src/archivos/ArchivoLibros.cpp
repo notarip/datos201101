@@ -269,32 +269,37 @@ void ArchivoLibros::deserializar(char* tiraBytes,Libro** obtenido){
 	posicion+=sizeof(unsigned int);
 
 	memcpy(tamanioCampo,tiraBytes+ posicion,sizeof(unsigned int));
-	titulo=new char[*tamanioCampo];
+	titulo=new char[(*tamanioCampo)+1];
 	posicion+=sizeof(unsigned int);
-	memcpy(titulo,tiraBytes+ posicion ,(*tamanioCampo));titulo[*tamanioCampo]='\0';
+	memcpy(titulo,tiraBytes+ posicion ,(*tamanioCampo));
+	titulo[*tamanioCampo]='\0';
 	posicion+=(*tamanioCampo);
 	memcpy(tamanioCampo,tiraBytes+ posicion,sizeof(unsigned int));
-	autor=new char[(*tamanioCampo)];
+	autor=new char[(*tamanioCampo)+1];
 	posicion+=sizeof(unsigned int);
-	memcpy(autor,tiraBytes+ posicion,(*tamanioCampo));autor[*tamanioCampo]='\0';
+	memcpy(autor,tiraBytes+ posicion,(*tamanioCampo));
+	autor[*tamanioCampo]='\0';
 	posicion+=*tamanioCampo;
 	memcpy(tamanioCampo,tiraBytes+ posicion,sizeof(unsigned int));
-	editorial=new char[(*tamanioCampo)];
+	editorial=new char[(*tamanioCampo)+1];
 	posicion+=sizeof(unsigned int);
-	memcpy(editorial,tiraBytes+ posicion,(*tamanioCampo));editorial[*tamanioCampo]='\0';
+	memcpy(editorial,tiraBytes+ posicion,(*tamanioCampo));
+	editorial[*tamanioCampo]='\0';
 	posicion+=*tamanioCampo;
 	memcpy(tamanioCampo,tiraBytes+ posicion,sizeof(unsigned int));
-	texto=new char[(*tamanioCampo)];
+	texto=new char[(*tamanioCampo)+1];
 	posicion+=sizeof(unsigned int);
-	memcpy(texto,tiraBytes+ posicion,(*tamanioCampo));texto[*tamanioCampo]='\0';
+	memcpy(texto,tiraBytes+ posicion,(*tamanioCampo));
+	texto[*tamanioCampo]='\0';
 	posicion+=*tamanioCampo;
 
 	memcpy(cantPalabras,tiraBytes+ posicion,sizeof(unsigned int));
 	posicion+=sizeof(unsigned int);
 	memcpy(tamanioCampo,tiraBytes+ posicion,sizeof(unsigned int)); //tamanio de palabras//
 	posicion+=sizeof(unsigned int);
-	palabras=new char[(*tamanioCampo)];
-	memcpy(palabras,tiraBytes+ posicion,(*tamanioCampo));palabras[*tamanioCampo]='\0';
+	palabras=new char[(*tamanioCampo)+1];
+	memcpy(palabras,tiraBytes+ posicion,(*tamanioCampo));
+	palabras[*tamanioCampo]='\0';
 
 
 	string s_autor(autor, strlen(autor));
