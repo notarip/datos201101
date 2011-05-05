@@ -109,24 +109,34 @@ void ArchivoLibros::suprimirLibro(unsigned int id){
 	unsigned int offset= this->obtenerOffset(id);
 
 	fstream archivo;
-
+	//cout<<"El offset es "<<id<<endl;
 	archivo.open(this->path.c_str(),ios::in | ios::out );
+	//cout<<"El path es "<<path<<endl;
+	//cout<<boolalpha<<archivo.good()<<endl;
 	if (archivo.good()){
 		archivo.seekg(offset,ios::beg);
 		archivo.read(regBajas,sizeof(unsigned int));
 		archivo.close();
 		memcpy(regBajas+sizeof(unsigned int),&offset,sizeof(unsigned int));
-		string path_bajas="bajas_"+this->path + ".bajas";
+		string path_bajas= path;
+		path_bajas += "-libres";
+		//string path_bajas="bajas_"+this->path + ".bajas";
 
+		//cout << "A" <<endl;
 		fstream archivo_bajas;
 
-		archivo_bajas.open(path_bajas.c_str() ,ios::in | ios::out | ios::app);
+		archivo_bajas.open(path_bajas.c_str() ,ios::in |ios::binary| ios::out | ios::app);
+		//cout << "B" <<endl;
 
-		if (!archivo_bajas.good())
+		if (!archivo_bajas.good()){
+			//cout << "C" <<endl;
 			archivo_bajas.open(path_bajas.c_str() , ios::out | ios::binary |ios::app);
+		}
 
 		archivo_bajas.seekg(0,ios::end);
+		//cout << "D" <<endl;
 		archivo_bajas.write(regBajas,2*sizeof(unsigned int));
+		//cout << "E" <<endl;
 		archivo_bajas.close();
 	}
 
@@ -172,8 +182,11 @@ list<Libro>* ArchivoLibros::recuperacionComprensiva(){
 	Libro* unLibro=NULL;
 	list<Libro>* listaLibros=new list<Libro>();
 	char* tiraBytes=NULL;
-	while (!archivo.eof()){
+	archivo.seekp(0 , ios::end);
+	unsigned int finArchivo = archivo.tellp();
+	archivo.seekg(0 , ios::beg);
 
+	while ( archivo.tellg()!= finArchivo){
 
 		archivo.read(charTamanio ,sizeof(unsigned int));
 		unsigned int* tamanio = new unsigned int(0);
@@ -183,6 +196,8 @@ list<Libro>* ArchivoLibros::recuperacionComprensiva(){
 		archivo.read(tiraBytes+sizeof(unsigned int),(*tamanio)-sizeof(unsigned int));
 		this->deserializar(tiraBytes,&unLibro);
 		listaLibros->push_back(*unLibro);
+
+
 
 	}
 	return listaLibros;
@@ -248,7 +263,7 @@ void ArchivoLibros::serializar(Libro* unLibro,char** tira){
 
 	this->longReg = offset;
 
-	cout<<longReg<<endl;
+	//cout<<longReg<<endl;
 
 }
 
