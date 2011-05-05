@@ -260,9 +260,13 @@ void Hash::borrar(string que)
 
 			actualizarTabla_eliminacion(tamDispersionBloque, posTabla);
 
-			if ((numBloque != this->tabla[posTabla]) && (this->tamanioTabla!=1))
+			if ((numBloque != this->tabla[posTabla]) && (this->tamanioTabla!=1)){
+				cout<<numBloque<<" "<<this->tabla[posTabla]<<endl;
 				archivo.eliminarBloque(numBloque);
-
+				Bloque* blvacio=new Bloque();
+				archivo.grabarBloque(blvacio,numBloque);
+				delete blvacio;
+			}
 			//if (tamTablaVieja > this->tamanioTabla) archivo.eliminarBloque(numBloque); //esta MAL!
 
 			else archivo.grabarBloque(bloqueRecuperado,numBloque);
@@ -499,6 +503,12 @@ void Hash::actualizarTabla_eliminacion(unsigned int tamDispersion,unsigned int p
 		delete viejaTabla;
 	}
 	}
+	/********************************************************************/
+		cout<<"--------------NUEVA TABLA:------------------------"<<endl;
+		for(int i=0;i<this->tamanioTabla;i++) cout<<this->tabla[i]<<" ";
+		cout<<endl;
+		cout<<"--------------------------------------------------"<<endl;
+	/*********************************************************************/
 
 }
 
@@ -586,6 +596,7 @@ void Hash::guardarTabla(){
 
 		/*libero memoria*/
 		delete bloqueTabla;
+		delete tabla;
 	}
 
 	//tablaNueva.agregarReferencia(1);
@@ -625,7 +636,7 @@ void Hash::mostrar(){
 		cout<<"|Bloque "<<i<<"| T.d: "<<this->tamDispersion(i)<<"]  ";
 		bloque= archivo.recuperarBloque(i);
 		list<Registro>::iterator it= bloque->obtenerRegistros()->begin();
-		while(it!=bloque->obtenerRegistros()->end()){
+		while(it!=bloque->obtenerRegistros()->end() ){
 			cout<<it->getString()<<" ";
 			it++;
 		}
