@@ -586,3 +586,25 @@ int Servicios::recuperarLibro(unsigned int idLibro, Libro **libro)
 	return 0;
 
 }
+
+
+int Servicios::agregarVarios(string cuantos)
+{
+	int corte = atoi(cuantos.c_str());
+	string rutaLibros = Parametros().getParametro(CARPETA_LIBROS);
+	list<string> *archivos = Util().getArchivos(rutaLibros);
+	int cont = 0;
+
+	for (list<string>::iterator it = archivos->begin(); it != archivos->end(); it++)
+	{
+		cont++;
+		string pathAbs = rutaLibros + *it;
+		cout << "Agregando Texto: " << *it << "..." <<endl;
+		Servicios().tomarTexto(pathAbs);
+
+		if (cont >= corte) break;
+	}
+
+	return 0;
+
+}

@@ -51,6 +51,7 @@
 #define VER_ESTRUCTURA_AUTOR 91
 #define VER_ESTRUCTURA_TITULO 92
 #define VER_ESTRUCTURA_PALABRA 93
+#define AGREGAR_VARIOS 94
 
 
 #include <iostream>
@@ -162,6 +163,12 @@ int determinar_operacion(int cant_parm, char** parm, string *parametro)
 		return QUITAR_ARCHIVO;
 	}
 
+	if (parm[1][1] == 'z')
+	{
+		parametro->append(parm[2]);
+		return AGREGAR_VARIOS;
+	}
+
 
 	if (parm[1][1] == 'v')
 	{
@@ -201,6 +208,7 @@ int main (int argc, char** argv)
 		case VER_ESTRUCTURA_EDITORIAL:error = Servicios().verEstructuraEditorial();break;
 		case VER_ESTRUCTURA_TITULO:error = Servicios().verEstructuraTitulos();break;
 		case VER_ESTRUCTURA_PALABRA:error = Servicios().verEstructuraPalabras();break;
+		case AGREGAR_VARIOS:error = Servicios().agregarVarios(parametro);break;
 		case ERROR_DE_LLAMADA:error = ERROR_DE_LLAMADA;break;
 		default:error = ERROR_DE_LLAMADA;break;
 	}
