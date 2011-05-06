@@ -118,6 +118,8 @@ public:
 	 */
 	static int verEstructuraPalabras();
 
+	static int agregarVarios(string cuantos);
+
 private:
 	static void agregarAlHash(string nombreHash, string clave, unsigned int idNueva);
 	static void agregarAlArbol(string nombreArbol, string clave, unsigned int idNueva);
