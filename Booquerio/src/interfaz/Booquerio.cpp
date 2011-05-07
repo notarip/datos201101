@@ -51,8 +51,6 @@
 #define VER_ESTRUCTURA_AUTOR 91
 #define VER_ESTRUCTURA_TITULO 92
 #define VER_ESTRUCTURA_PALABRA 93
-#define VER_ESTRUCTURA_PRIMARIO 94
-#define AGREGAR_VARIOS 95
 
 
 #include <iostream>
@@ -75,7 +73,7 @@ void error_de_llamada()
 	cout << "Obtener Archivo: ./ejecutable -o ID_Archivo" << endl;
 	cout << "Quita Archivo: ./ejecutable -q ID_Archivo (se elminan las entradas en los otros indices)" << endl;
 	cout << "Ver Estructura: ./ejecutable -v [-e árbol de Editorial, -a árbol de Autor, -t hash de" << endl;
-	cout << "Título, -p hash de Palabra -i indice primario] \"Nombre Archivo\"" << endl;
+	cout << "Título, -p hash de Palabra] \"Nombre Archivo\"" << endl;
 
 }
 
@@ -129,12 +127,12 @@ void procesamiento_de_errores(int error)
 int determinar_operacion(int cant_parm, char** parm, string *parametro)
 {
 
-	if (cant_parm > 5 || cant_parm < 2)
+	if (cant_parm > 4 || cant_parm < 2)
 		return ERROR_DE_LLAMADA;
 
 	if (parm[1][1] == 'i')
 	{
-		if (cant_parm == 3) parametro->append(parm[2]);
+		parametro->append(parm[2]);
 		return TOMAR_TEXTO;
 	}
 	if (parm[1][1] == 'e')
@@ -154,7 +152,7 @@ int determinar_operacion(int cant_parm, char** parm, string *parametro)
 
 	if (parm[1][1] == 'o')
 	{
-		if (cant_parm == 3) parametro->append(parm[2]);
+		parametro->append(parm[2]);
 		return OBTENER_ARCHIVO;
 	}
 
@@ -164,40 +162,17 @@ int determinar_operacion(int cant_parm, char** parm, string *parametro)
 		return QUITAR_ARCHIVO;
 	}
 
-	if (parm[1][1] == 'z')
-	{
-		if (cant_parm == 3) parametro->append(parm[2]);
-		return AGREGAR_VARIOS;
-	}
-
 
 	if (parm[1][1] == 'v')
 	{
 		if (parm[2][1] == 'a')
-		{
-			if (cant_parm == 4)  parametro->append(parm[3]);
 			return VER_ESTRUCTURA_AUTOR;
-		}
 		if (parm[2][1] == 't')
-		{
-			if (cant_parm == 4)  parametro->append(parm[3]);
 			return VER_ESTRUCTURA_TITULO;
-		}
 		if (parm[2][1] == 'e')
-		{
-			if (cant_parm == 4)  parametro->append(parm[3]);
 			return VER_ESTRUCTURA_EDITORIAL;
-		}
 		if (parm[2][1] == 'p')
-		{
-			if (cant_parm == 4)  parametro->append(parm[3]);
 			return VER_ESTRUCTURA_PALABRA;
-		}
-		if (parm[2][1] == 'i')
-		{
-			if (cant_parm == 4)  parametro->append(parm[3]);
-			return VER_ESTRUCTURA_PRIMARIO;
-		}
 	}
 
 	return ERROR_DE_LLAMADA;
@@ -205,7 +180,7 @@ int determinar_operacion(int cant_parm, char** parm, string *parametro)
 
 
 
-int main (int argc, char** argv)
+int main11(int argc, char** argv)
 {
 
 	string parametro;
@@ -222,12 +197,10 @@ int main (int argc, char** argv)
 		case LISTAR_ARCHIVOS_TOMADOS:error = Servicios().listarLibros();break;
 		case OBTENER_ARCHIVO:error = Servicios().obtenerLibro(parametro);break;
 		case QUITAR_ARCHIVO:error = Servicios().quitarArchivo(parametro);break;
-		case VER_ESTRUCTURA_AUTOR:error = Servicios().verEstructuraAutor(parametro);break;
-		case VER_ESTRUCTURA_EDITORIAL:error = Servicios().verEstructuraEditorial(parametro);break;
-		case VER_ESTRUCTURA_TITULO:error = Servicios().verEstructuraTitulos(parametro);break;
-		case VER_ESTRUCTURA_PALABRA:error = Servicios().verEstructuraPalabras(parametro);break;
-		case VER_ESTRUCTURA_PRIMARIO:error = Servicios().verEstructuraPrimario(parametro);break;
-		case AGREGAR_VARIOS:error = Servicios().agregarVarios(parametro);break;
+		case VER_ESTRUCTURA_AUTOR:error = Servicios().verEstructuraAutor();break;
+		case VER_ESTRUCTURA_EDITORIAL:error = Servicios().verEstructuraEditorial();break;
+		case VER_ESTRUCTURA_TITULO:error = Servicios().verEstructuraTitulos();break;
+		case VER_ESTRUCTURA_PALABRA:error = Servicios().verEstructuraPalabras();break;
 		case ERROR_DE_LLAMADA:error = ERROR_DE_LLAMADA;break;
 		default:error = ERROR_DE_LLAMADA;break;
 	}

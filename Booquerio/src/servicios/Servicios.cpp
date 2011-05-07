@@ -13,7 +13,7 @@ int Servicios::tomarTexto(string ruta)
 
 //parsear el libro
 	Parser *unParser = new Parser();
-
+	cout << "Procesando Libro...." << endl;
 	if (unParser->parsear(ruta) != EXITOSO)
 	{
 		string rutaLibros = Parametros().getParametro(CARPETA_LIBROS);
@@ -244,6 +244,7 @@ int Servicios::quitarArchivo(string unId)
 	cout <<"Titulo: "<< libro->getTitulo() <<endl;
 	cout <<"Id: "<< libro->getId() <<endl;
 	cout <<"Cant.palabras: " << libro->getCantPalabras() << endl;
+	cout << "Presione ENTER para continuar...." << endl;
 	cin.get();
 
 	cout << "SACO EL LIBRO DEL ARCHIVO DE REGISTROS VARIABLES" << endl;
@@ -264,17 +265,21 @@ int Servicios::quitarArchivo(string unId)
 
 	cout << "SACO DE AUTORES" << endl;
 	sacarDelArbol(NOMBRE_BMAS_AUTORES,libro->getAutor(),libro->getId());
+	cout << "Presione ENTER para continuar...." << endl;
 	cin.get();
 
 	cout << "SACO DE EDITORIALES" << endl;
 	sacarDelArbol(NOMBRE_BMAS_EDITORIALES,libro->getEditorial(),libro->getId());
+	cout << "Presione ENTER para continuar...." << endl;
 	cin.get();
 
 	cout << "SACO DE TITULOS" << endl;
 	sacarDelHash(NOMBRE_HASH_TITULOS,libro->getTitulo(),libro->getId());
+	cout << "Presione ENTER para continuar...." << endl;
 	cin.get();
 
 	cout << "SACO PALABRAS" << endl;
+	cout << "Procesando la quita del indice..." << endl;
 	set<string> *palabras = libro->getListaPalabras();
 
 	for (set<string>::iterator it = palabras->begin(); it != palabras->end(); it++)
@@ -293,19 +298,10 @@ int Servicios::quitarArchivo(string unId)
 	return 0;
 }
 
-int Servicios::verEstructuraAutor(string path)
+int Servicios::verEstructuraAutor()
 {
-	string pathExport;
-	if (path == "")
-	{
-		pathExport = Parametros().getParametro(CARPETA_SALIDA);
-		pathExport += NOMBRE_BMAS_AUTORES;
-	}
-	else
-	{
-		pathExport = path;
-	}
-
+	string pathExport = Parametros().getParametro(CARPETA_SALIDA);
+	pathExport += NOMBRE_BMAS_AUTORES;
 	string pathArbol = Parametros().getParametro(CARPETA_DATOS);
 	pathArbol += NOMBRE_BMAS_AUTORES;
 
@@ -315,18 +311,10 @@ int Servicios::verEstructuraAutor(string path)
 	return 0;
 }
 
-int Servicios::verEstructuraEditorial(string path)
+int Servicios::verEstructuraEditorial()
 {
-	string pathExport;
-	if (path == "")
-	{
-		pathExport = Parametros().getParametro(CARPETA_SALIDA);
-		pathExport += NOMBRE_BMAS_EDITORIALES;
-	}
-	else
-	{
-		pathExport = path;
-	}
+	string pathExport = Parametros().getParametro(CARPETA_SALIDA);
+	pathExport += NOMBRE_BMAS_EDITORIALES;
 	string pathArbol = Parametros().getParametro(CARPETA_DATOS);
 	pathArbol += NOMBRE_BMAS_EDITORIALES;
 
@@ -337,45 +325,14 @@ int Servicios::verEstructuraEditorial(string path)
 
 }
 
-int Servicios::verEstructuraPrimario(string path)
-{
-	string pathExport;
-	if (path == "")
-	{
-		pathExport = Parametros().getParametro(CARPETA_SALIDA);
-		pathExport += NOMBRE_BMAS_PRIMARIO;
-	}
-	else
-	{
-		pathExport = path;
-	}
-	string pathArbol = Parametros().getParametro(CARPETA_DATOS);
-	pathArbol += NOMBRE_BMAS_PRIMARIO;
-
-	ArbolBMasNumerico* arbolE = new ArbolBMasNumerico(pathArbol,TAMANIO_BLOQUE_BMAS);
-	arbolE->exportar(pathExport);
-	delete arbolE;
-	return 0;
-
-
-}
-
-int Servicios::verEstructuraTitulos(string path)
+int Servicios::verEstructuraTitulos()
 {
 	//TODO llamar al metodo de hash de titulos que lista la estructura
 
 	/* LLEEEEEER*/
 	//me tome el atrevimiento de usar la interfaz para pruebas, este metodo por ahora va a exportar arbol primario
-	string pathExport;
-	if (path == "")
-	{
-		pathExport = Parametros().getParametro(CARPETA_SALIDA);
-		pathExport += NOMBRE_HASH_TITULOS;
-	}
-	else
-	{
-		pathExport = path;
-	}
+	string pathExport = Parametros().getParametro(CARPETA_SALIDA);
+	pathExport += NOMBRE_HASH_TITULOS;
 	string pathHash = Parametros().getParametro(CARPETA_DATOS);
 	pathHash += NOMBRE_HASH_TITULOS;
 
@@ -391,27 +348,19 @@ int Servicios::verEstructuraTitulos(string path)
 	return 0;
 }
 
-int Servicios::verEstructuraPalabras(string path)
+int Servicios::verEstructuraPalabras()
 {
-	string pathExport;
-	if (path == "")
-	{
-		pathExport = Parametros().getParametro(CARPETA_SALIDA);
+		string pathExport = Parametros().getParametro(CARPETA_SALIDA);
 		pathExport += NOMBRE_HASH_PALABRAS;
-	}
-	else
-	{
-		pathExport = path;
-	}
-	string pathHash = Parametros().getParametro(CARPETA_DATOS);
-	pathHash += NOMBRE_HASH_PALABRAS;
+		string pathHash = Parametros().getParametro(CARPETA_DATOS);
+		pathHash += NOMBRE_HASH_PALABRAS;
 
-	Hash * hash_palabras=new Hash(pathHash);
+		Hash * hash_palabras=new Hash(pathHash);
 
-	hash_palabras->mostrar2(pathExport);
-	delete hash_palabras;
+		hash_palabras->mostrar2(pathExport);
+		delete hash_palabras;
 
-	return 0;
+		return 0;
 }
 
 
@@ -440,6 +389,7 @@ int Servicios::procesarLibro(int indice)
 		cout <<"Titulo: "<< libro->getTitulo() <<endl;
 		cout <<"Id: "<< libro->getId() <<endl;
 		cout <<"Cant.palabras: " << libro->getCantPalabras() << endl;
+		cout << "Presione ENTER para continuar...." << endl;
 		cin.get();
 
 		switch(indice)
@@ -450,7 +400,7 @@ int Servicios::procesarLibro(int indice)
 			case INDICE_PALABRAS:error = agregarIndicePalabras(libro);break;
 		}
 
-		libro->~Libro();
+		delete libro;
 	}
 
 //limpia la lista de ids pendientes de procesar
@@ -501,6 +451,7 @@ int Servicios::agregarIndicePalabras(Libro *unLibro)
 		agregarAlHash(NOMBRE_HASH_PALABRAS, *it ,unLibro->getId());
 	}
 
+	delete palabras;
 	return 0;
 }
 
@@ -529,6 +480,7 @@ void Servicios::agregarAlHash(string nombreHash, string clavePasada, unsigned in
 		hash->insertar(registro);
 	}
 
+	delete registro;
 	delete hash;
 }
 
@@ -638,28 +590,6 @@ int Servicios::recuperarLibro(unsigned int idLibro, Libro **libro)
 	delete archivo;
 
 	delete arbolP;
-
-	return 0;
-
-}
-
-
-int Servicios::agregarVarios(string cuantos)
-{
-	int corte = atoi(cuantos.c_str());
-	string rutaLibros = Parametros().getParametro(CARPETA_LIBROS);
-	list<string> *archivos = Util().getArchivos(rutaLibros);
-	int cont = 0;
-
-	for (list<string>::iterator it = archivos->begin(); it != archivos->end(); it++)
-	{
-		cont++;
-		string pathAbs = rutaLibros + *it;
-		cout << "Agregando Texto: " << *it << "..." <<endl;
-		Servicios().tomarTexto(pathAbs);
-
-		if (cont >= corte) break;
-	}
 
 	return 0;
 
