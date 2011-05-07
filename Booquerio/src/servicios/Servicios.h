@@ -98,27 +98,31 @@ public:
 	 * Lista las estructuras del indice de
 	 * Autores
 	 */
-	static int verEstructuraAutor();
+	static int verEstructuraAutor(string path);
 
 	/*
 	 * Lista las estructuras del indice de
 	 * Editoriales
 	 */
-	static int verEstructuraEditorial();
+	static int verEstructuraEditorial(string path);
 
 	/*
 	 * Lista las estructuras del indice de
 	 * Titulos
 	 */
-	static int verEstructuraTitulos();
+	static int verEstructuraTitulos(string path);
 
 	/*
 	 * Lista las estructuras del indice de
 	 * Palabras
 	 */
-	static int verEstructuraPalabras();
+	static int verEstructuraPalabras(string path);
+
+	static int verEstructuraPrimario(string path);
 
 	static int agregarVarios(string cuantos);
+
+
 
 private:
 	static void agregarAlHash(string nombreHash, string clave, unsigned int idNueva);

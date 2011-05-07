@@ -293,10 +293,19 @@ int Servicios::quitarArchivo(string unId)
 	return 0;
 }
 
-int Servicios::verEstructuraAutor()
+int Servicios::verEstructuraAutor(string path)
 {
-	string pathExport = Parametros().getParametro(CARPETA_SALIDA);
-	pathExport += NOMBRE_BMAS_AUTORES;
+	string pathExport;
+	if (path == "")
+	{
+		pathExport = Parametros().getParametro(CARPETA_SALIDA);
+		pathExport += NOMBRE_BMAS_AUTORES;
+	}
+	else
+	{
+		pathExport = path;
+	}
+
 	string pathArbol = Parametros().getParametro(CARPETA_DATOS);
 	pathArbol += NOMBRE_BMAS_AUTORES;
 
@@ -306,10 +315,18 @@ int Servicios::verEstructuraAutor()
 	return 0;
 }
 
-int Servicios::verEstructuraEditorial()
+int Servicios::verEstructuraEditorial(string path)
 {
-	string pathExport = Parametros().getParametro(CARPETA_SALIDA);
-	pathExport += NOMBRE_BMAS_EDITORIALES;
+	string pathExport;
+	if (path == "")
+	{
+		pathExport = Parametros().getParametro(CARPETA_SALIDA);
+		pathExport += NOMBRE_BMAS_EDITORIALES;
+	}
+	else
+	{
+		pathExport = path;
+	}
 	string pathArbol = Parametros().getParametro(CARPETA_DATOS);
 	pathArbol += NOMBRE_BMAS_EDITORIALES;
 
@@ -320,14 +337,45 @@ int Servicios::verEstructuraEditorial()
 
 }
 
-int Servicios::verEstructuraTitulos()
+int Servicios::verEstructuraPrimario(string path)
+{
+	string pathExport;
+	if (path == "")
+	{
+		pathExport = Parametros().getParametro(CARPETA_SALIDA);
+		pathExport += NOMBRE_BMAS_PRIMARIO;
+	}
+	else
+	{
+		pathExport = path;
+	}
+	string pathArbol = Parametros().getParametro(CARPETA_DATOS);
+	pathArbol += NOMBRE_BMAS_PRIMARIO;
+
+	ArbolBMasNumerico* arbolE = new ArbolBMasNumerico(pathArbol,TAMANIO_BLOQUE_BMAS);
+	arbolE->exportar(pathExport);
+	delete arbolE;
+	return 0;
+
+
+}
+
+int Servicios::verEstructuraTitulos(string path)
 {
 	//TODO llamar al metodo de hash de titulos que lista la estructura
 
 	/* LLEEEEEER*/
 	//me tome el atrevimiento de usar la interfaz para pruebas, este metodo por ahora va a exportar arbol primario
-	string pathExport = Parametros().getParametro(CARPETA_SALIDA);
-	pathExport += NOMBRE_HASH_TITULOS;
+	string pathExport;
+	if (path == "")
+	{
+		pathExport = Parametros().getParametro(CARPETA_SALIDA);
+		pathExport += NOMBRE_HASH_TITULOS;
+	}
+	else
+	{
+		pathExport = path;
+	}
 	string pathHash = Parametros().getParametro(CARPETA_DATOS);
 	pathHash += NOMBRE_HASH_TITULOS;
 
@@ -343,19 +391,27 @@ int Servicios::verEstructuraTitulos()
 	return 0;
 }
 
-int Servicios::verEstructuraPalabras()
+int Servicios::verEstructuraPalabras(string path)
 {
-		string pathExport = Parametros().getParametro(CARPETA_SALIDA);
+	string pathExport;
+	if (path == "")
+	{
+		pathExport = Parametros().getParametro(CARPETA_SALIDA);
 		pathExport += NOMBRE_HASH_PALABRAS;
-		string pathHash = Parametros().getParametro(CARPETA_DATOS);
-		pathHash += NOMBRE_HASH_PALABRAS;
+	}
+	else
+	{
+		pathExport = path;
+	}
+	string pathHash = Parametros().getParametro(CARPETA_DATOS);
+	pathHash += NOMBRE_HASH_PALABRAS;
 
-		Hash * hash_palabras=new Hash(pathHash);
+	Hash * hash_palabras=new Hash(pathHash);
 
-		hash_palabras->mostrar2(pathExport);
-		delete hash_palabras;
+	hash_palabras->mostrar2(pathExport);
+	delete hash_palabras;
 
-		return 0;
+	return 0;
 }
 
 
