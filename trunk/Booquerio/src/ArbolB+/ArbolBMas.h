@@ -25,6 +25,10 @@
 using namespace std;
 
 class ArbolBMas {
+
+protected:
+	ArchivoBloques* archivoNodos;
+
 public:
 	ArbolBMas(string path, unsigned int tamanioBloque);
 
@@ -48,7 +52,6 @@ private:
 	list<Registro>::iterator ultimoRegistroVisitado;
 	Bloque* raiz;
 	Bloque* ultimaHojaVisitada;
-	ArchivoBloques* archivoNodos;
 	unsigned int tamanioNodo;
 
 	/*PARA DEFINIR UN ARBOL B+ HAY QUE INDICAR 2 ESTRATEGIAS:
@@ -71,6 +74,10 @@ private:
 
 	string exportarRecursivo(unsigned int nroBloque, unsigned int nivelRecursion);
 	string imprimirBloque(Bloque* unBloque, unsigned int nroBloque);
+
+	virtual float obtenerOcupacionBloque(Bloque* unBloque);
+	virtual void guardarBloque(Bloque* unBloque, unsigned int nroBloque);
+	virtual Bloque* obtenerBloque(unsigned int nroBloque);
 };
 
 #endif /* ARBOLBMAS_H_ */

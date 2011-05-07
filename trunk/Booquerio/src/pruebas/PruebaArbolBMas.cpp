@@ -3,10 +3,10 @@
 
 using namespace std;
 
-int main77(){
+int main23(){
 	string unPath = "ArbolBMas";
 
-	ArbolBMasNumerico* miArbol = new ArbolBMasNumerico(unPath,4096);
+	ArbolBMasNumerico* miArbol = new ArbolBMasNumerico(unPath,96);
 
 	cout << "insercion 9" << endl;
 	resultadoOperacion unResultado = miArbol->insertarNumerico(9,0);
