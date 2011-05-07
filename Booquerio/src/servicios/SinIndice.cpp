@@ -278,6 +278,8 @@ list<unsigned int> *SinIndice::getLista(int lista)
 	Bloque *unBloque = manejador->recuperarBloque(0);
 	Registro *unRegistro = unBloque->recuperarRegistro(lista);
 
+	delete manejador;
+
 	return unRegistro->getReferencias();
 
 }

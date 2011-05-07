@@ -14,7 +14,6 @@ typedef unsigned int elemLista;
 #define TAMANIO_TABLA 8
 #define BYTES_TABLA TAMANIO_TABLA*sizeof(elemLista)
 #define TAMANIO_BLOQUE 4096
-#define TAMANIO_BLOQUE_TABLA 1024
 
 #include <string.h>
 #include <fstream>
