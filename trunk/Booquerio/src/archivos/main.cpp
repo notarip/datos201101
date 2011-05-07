@@ -4,7 +4,7 @@
 using namespace std;
 
 
-int main234(int argc, char** argv){
+int main423(int argc, char** argv){
 	//prueba libro//
 
 	Libro libro(43,"ES EL LIBRO 1","fdsfdsfds","texto de prueba" , "prueba,prueba,prueba,prueba,prueba,prueba");
@@ -13,7 +13,7 @@ int main234(int argc, char** argv){
 
 	Libro libro3(15, "ES EL LIBRO 3","gregregre","gregregasa","reuasfewfefewewfewfewhdasd");
 
-	ArchivoLibros archi("archi_datos.dat");
+	ArchivoLibros archi("archi_datos");
 
 
 
@@ -41,9 +41,11 @@ int main234(int argc, char** argv){
 
 	archi.suprimirLibro(off1);
 	archi.suprimirLibro(off2);
+	char a;
+	cin>>a;
    //insercion sobre una baja logica//
 
-	Libro libro6(15, "ESTE ES EL LIBRO 6","yoyoyoyo","nononon","chauuchauchauchauchau");
+	Libro libro6(15, "ESTE ES EL LIBRO 6","yoyoyoyo","nononon","chauuuchauchau");
 	Libro libro7(32, "ESTE ES EL LIBRO 7","FREFERFRE","sdadS","dsada");
 	Libro libro8(66, "ESTE ES EL LIBRO 8","ESTE ES MAS LARGO QUE LOS DEMAS","ES UNA PRUEBA","LA ULTIMA PRUEBA");
 

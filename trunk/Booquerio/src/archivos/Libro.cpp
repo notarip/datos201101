@@ -82,6 +82,13 @@ string Libro::toString()
 	respuesta += "Palabras: ";
 	respuesta += Util().UIntToString(this->cantPalabras);
 	respuesta += "\n";
+	respuesta += "Id : ";
+	stringstream stringStreamId;
+	stringStreamId << id;
+	string stringId;
+	stringStreamId >> stringId;
+	respuesta += stringId;
+	respuesta += "\n";
 
 	return respuesta;
 }

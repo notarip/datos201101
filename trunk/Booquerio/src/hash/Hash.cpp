@@ -8,6 +8,7 @@
 
 #include "Hash.h"
 #include "math.h"
+#include <set>
 
 Hash::Hash(string nombre)
 {
@@ -263,9 +264,6 @@ void Hash::borrar(string que)
 			if ((numBloque != this->tabla[posTabla]) && (this->tamanioTabla!=1)){
 				//cout<<numBloque<<" "<<this->tabla[posTabla]<<endl;
 				archivo.eliminarBloque(numBloque);
-				Bloque* blvacio=new Bloque();
-				archivo.grabarBloque(blvacio,numBloque);
-				delete blvacio;
 			}
 			//if (tamTablaVieja > this->tamanioTabla) archivo.eliminarBloque(numBloque); //esta MAL!
 
@@ -414,6 +412,7 @@ void Hash::reestructurar_archivo(ArchivoBloques archivo,unsigned int nro_desbord
 	//this->mostrar();
 	delete bloque_libre;
 	delete bloque_desbordado;
+
 }
 
 
@@ -444,7 +443,7 @@ void Hash::actualizarTabla_insercion(unsigned int tamDispersion,unsigned int pos
 		memcpy(tabla+this->tamanioTabla,viejaTabla,this->tamanioTabla*sizeof(unsigned int));
 
 		this->tamanioTabla*=2;
-		delete viejaTabla;
+		delete []viejaTabla;
 
 		tabla[pos_desbordado]=bl_nuevo;
 	}
@@ -596,7 +595,7 @@ void Hash::guardarTabla(){
 
 		/*libero memoria*/
 		delete bloqueTabla;
-		delete tabla;
+		//delete tabla;
 	}
 
 	//tablaNueva.agregarReferencia(1);
@@ -610,7 +609,7 @@ void Hash::guardarTabla(){
 	//manejadorHash.grabarBloque(bloqueTabla,0);
 
 	//ArchivoBloques arch(this->pathHash,TAMANIO_BLOQUE);
-
+	delete tabla;
 
 }
 
@@ -628,19 +627,27 @@ void Hash::mostrar(){
 		cout<<this->tabla[i]<<" ";
 		if (this->tabla[i] > max) max=this->tabla[i];
 	}
-	cout<<endl;
 	char a;
-	cout<<"----------------------------------------- "<<endl;
-	for (unsigned int i=1;i<max+1;i++){
-		if (i%50==0){ cout<<"presione cualquier tecla para continuar..."<<endl; cin>>a;}
-		cout<<"|Bloque "<<i<<"| T.d: "<<this->tamDispersion(i)<<"]  ";
-		bloque= archivo.recuperarBloque(i);
-		list<Registro>::iterator it= bloque->obtenerRegistros()->begin();
-		while(it!=bloque->obtenerRegistros()->end() ){
-			cout<<it->getString()<<" ";
-			it++;
+	list<unsigned int> lista;
+	for (unsigned int i=0;i<this->tamanioTabla;i++){
+		lista.push_back(this->tabla[i]);
+	}
+	lista.sort();
+	lista.unique();
+	list<unsigned int>::iterator it=lista.begin();
+	cout<<endl;
+	cout<<"------------------------------------------"<<endl;
+	while(it!=lista.end()){
+		if ((*it)%50==0){ cout<<"presione cualquier tecla para continuar..."<<endl; cin>>a;}
+		cout<<"|Bloque "<<(*it)<<"| T.d: "<<this->tamDispersion((*it))<<"]  ";
+		bloque= archivo.recuperarBloque((*it));
+		list<Registro>::iterator it2= bloque->obtenerRegistros()->begin();
+		while(it2!=bloque->obtenerRegistros()->end() ){
+			cout<<it2->getString()<<" ";
+			it2++;
 		}
 		cout<<endl;
+		it++;
 	}
 	delete bloque;
 	cout<<"******************************************"<<endl;
@@ -651,7 +658,6 @@ void Hash::mostrar2(string nombre){
 	ArchivoBloques archivo(this->pathHash,TAMANIO_BLOQUE);
 	stringstream conversor;
 	Bloque* bloque=NULL;
-	unsigned int max=0;
 	string resultado="";
 	resultado+="******************************************";
 	resultado+='\n';
@@ -669,40 +675,57 @@ void Hash::mostrar2(string nombre){
 		conversor<<this->tabla[i];
 		resultado+=conversor.str();
 		resultado+=" ";
-		if (this->tabla[i] > max) max=this->tabla[i];
 		conversor.str("");
 	}
 	resultado+='\n';
 	resultado+="----------------------------------------- ";
 	resultado+='\n';
-	for (unsigned int i=1;i<max+1;i++){
-		resultado+="|Bloque "; conversor<<i;
-		resultado+=conversor.str(); conversor.str(""); resultado+="| T.d: ";
-		conversor<<this->tamDispersion(i); resultado+=conversor.str();
-		conversor.str(""); resultado+="]  ";
-		bloque= archivo.recuperarBloque(i);
-		list<Registro>::iterator it= bloque->obtenerRegistros()->begin();
-		while(it!=bloque->obtenerRegistros()->end()){
-			resultado+=it->getString()+" ";
-			it++;
+	list<unsigned int> lista;
+	for (unsigned int i=0;i<this->tamanioTabla;i++){
+		lista.push_back(this->tabla[i]);
+	}
+	lista.sort();
+	lista.unique();
+	list<unsigned int>::iterator it=lista.begin();
+	while(it!=lista.end()){
+		resultado+="|Bloque ";
+		conversor<<*it;
+		resultado+=conversor.str();
+		conversor.str("");
+		resultado+="| T.d: ";
+		conversor<<(this->tamDispersion((*it)));
+		resultado+=conversor.str();
+		conversor.str("");
+		resultado+="]  ";
+		resultado+='\n';
+		bloque= archivo.recuperarBloque((*it));
+		list<Registro>::iterator it2= bloque->obtenerRegistros()->begin();
+		while(it2!=bloque->obtenerRegistros()->end() ){
+			resultado+=it2->getString();
+			resultado+=" ";
+			it2++;
 		}
 		resultado+='\n';
-		resultado+='\n';
+		it++;
 	}
+	delete bloque;
 	resultado+="******************************************";
-	resultado+="\n";
+
 	fstream archtexto;
 	archtexto.open(nombre.c_str(), ios::out | ios::app);
 	archtexto << resultado;
 	archtexto.close();
 }
 
+
 unsigned int Hash::getTamanioTabla(){
 	return this->tamanioTabla;
 }
 
+
 void Hash::setTabla(unsigned int* ta){
 	this->tabla=ta;
 }
+
 
 unsigned int* Hash::getTabla(){ return this->tabla;}

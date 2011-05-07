@@ -13,6 +13,7 @@ static void f(Hash* hash,unsigned int cant){
 		reg=new Registro(str);
 		reg->agregarAtribEntero(i);
 		hash->insertar(reg);
+		delete reg;
 
 	}
 }
@@ -30,15 +31,14 @@ static void f2(Hash* hash,unsigned int cant){
 }
 
 
-int main8800(){
-
+int main(){
 	Hash hash("unhash");
-
 	hash.mostrar();
-
+	/*
 	char c=' ';
 	string str;
 	while(c!='q'){
+
 
 		cout<<"0. insertar registros aleatoriamente."<<endl;
 		cout<<"1. eliminar un registro."<<endl;
@@ -83,9 +83,10 @@ int main8800(){
 		}
 		cout<<endl;cout<<endl;
 		hash.mostrar();
-	}
-	hash.mostrar2("salida.txt");
 
+	}
+	hash.mostrar2("res.txt");*/
+	f(&hash,500);
 }
 
 

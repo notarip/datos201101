@@ -260,14 +260,26 @@ unsigned int ArchivoBloques::getBloqueLibre(){
 	pathLibres += "-libres";
 	fstream archivoLibres, archivoBloques;
 	unsigned int unBloqueLibre;
+	bool endOfFile = false;
+	unsigned int posInicial , posFinal;
 
 	archivoLibres.open(pathLibres.c_str(),ios::binary | ios::in | ios::out );
 
-	if (!archivoLibres.eof() && archivoLibres.good() ){
+	//me fabrico un eof porque el de fstream no me funciona
+	if (archivoLibres.good()){
+		archivoLibres.seekp(0,ios::beg);
+		posInicial = archivoLibres.tellp();
+		archivoLibres.seekp(0, ios::end);
+		posFinal = archivoLibres.tellp();
+		archivoLibres.seekp(0,ios::beg);
+		endOfFile = (posInicial == posFinal);
+	}
+	if (!endOfFile && archivoLibres.good() ){
 		//leo primer numero
 		archivoLibres.read((char*)&unBloqueLibre,sizeof(int));
 
-		unsigned int posInicial, posFinal, longitud;
+		//unsigned int posInicial, posFinal, longitud;
+		unsigned int longitud;
 		posInicial = archivoLibres.tellg();
 		archivoLibres.seekg(0, ios::end);
 		posFinal = archivoLibres.tellg();

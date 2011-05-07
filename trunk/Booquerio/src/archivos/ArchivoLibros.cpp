@@ -31,7 +31,8 @@ unsigned int ArchivoLibros::agregarLibro(Libro* unLibro){
 	fstream archivo;
 	fstream bajas;
 
-	string path_bajas="bajas_"+ this->path + ".bajas";
+	string path_bajas=this->path + "-libres";
+	cout<<"intento insertar:"<<path_bajas<<endl;
 	bajas.open(path_bajas.c_str() ,ios::in | ios::out | ios::binary );
 
 	if (bajas.good()){
@@ -118,10 +119,9 @@ void ArchivoLibros::suprimirLibro(unsigned int id){
 		archivo.read(regBajas,sizeof(unsigned int));
 		archivo.close();
 		memcpy(regBajas+sizeof(unsigned int),&offset,sizeof(unsigned int));
-		string path_bajas= path;
+		string path_bajas= this->path;
 		path_bajas += "-libres";
-		//string path_bajas="bajas_"+this->path + ".bajas";
-
+		cout<<"intento eliminar:"<<path_bajas<<endl;
 		//cout << "A" <<endl;
 		fstream archivo_bajas;
 

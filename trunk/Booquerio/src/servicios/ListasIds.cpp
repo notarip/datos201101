@@ -25,25 +25,19 @@ int ListasIds::agregarIdDeLibro(unsigned int *offset, unsigned int id, bool list
 
 	}else
 	{
-		//cout << "A" << endl;
 		cout << "ya existe, en que bloque la meto?" << *offset << endl;
 		unBloque = archivo->recuperarBloque(*offset);
-		//cout << "B"<< endl;
 		unRegistro = new Registro();
-		//cout << "C"<< endl;
 		*unRegistro = unBloque->obtenerRegistros()->back();
-		//cout << "D"<< endl;
 		unRegistro->agregarAtribEntero(id);
-		//cout << "E"<< endl;
 		unBloqueNuevo = new Bloque();
-		//cout << "F"<< endl;
 		unBloqueNuevo->agregarRegistro(*unRegistro);
-		//cout << "G"<< endl;
 		archivo->grabarBloque(unBloqueNuevo,*offset);
-		//cout << "H"<< endl;
+		delete unBloqueNuevo;
 
 	}
 
+	delete unRegistro;
 	delete archivo;
 	delete unBloque;
 
