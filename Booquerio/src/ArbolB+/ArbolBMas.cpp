@@ -14,11 +14,11 @@ ArbolBMas::ArbolBMas(string path, unsigned int tamanioBloque) {
 	this->tamanioNodo = tamanioBloque;
 
 	if (Util().existeArchivo(path)){
-		raiz = archivoNodos->recuperarBloque(0);
+		raiz = obtenerBloque(0);
 	}
 	else{
 		raiz = new Bloque();
-		archivoNodos->grabarBloque(raiz, 0);
+		guardarBloque(raiz, 0);
 	}
 	ultimaHojaVisitada = raiz;
 
@@ -34,7 +34,7 @@ resultadoOperacion ArbolBMas::insertar(string clave, unsigned int valor) {
 	if (resultadoRaiz.getCodigo() == HUBO_MODIFICACION) {
 
 		try {
-			this->archivoNodos->grabarBloque(raiz, 0);
+			guardarBloque(raiz, 0);
 
 		} catch (ExceptionBloque& e) {
 			// => estamos en presencia de un overflow en lo que antes era la raiz => nueva raiz
@@ -45,7 +45,7 @@ resultadoOperacion ArbolBMas::insertar(string clave, unsigned int valor) {
 			this-> resolverOverflow(raiz, 0, nuevaRaiz);
 
 			//grabo la nueva raiz en la pos 0
-			archivoNodos->grabarBloque(nuevaRaiz, 0);
+			guardarBloque(nuevaRaiz, 0);
 			delete raiz;
 			raiz = nuevaRaiz;
 
@@ -64,21 +64,19 @@ resultadoOperacion ArbolBMas::insertarRecursivo(Bloque* bloqueActual,
 
 	//pregunto por el caso de fin de recursion, ¿Nodo Hoja?
 	if (bloqueActual->getAtributoBloque() == 0) {
-		//debo escribir el registro, mi papa se encaragara de
+		//debo escribir el registro, mi papa se encargara de
 		//ver si entre en overflow o no cuando intente grabarme
-
-		/* CHEKEAR SI AGREGAR IMPLICA HACER UN REGISTRO NUEVO O SOLO AGREGAR UN ID*/
-		// => esto no se hace aqui, siempre insertar es hacer registros nuevos
 
 		Registro* registroAAgregar = this->crearRegistroClave(clave, valor);
 		try{
 			this->agregarRegistroEnOrden(bloqueActual, *registroAAgregar);
 		}
 		catch (ExceptionDuplicacionClaves& e){
-			//agrege un registro con clave duplicado
+			//agregue un registro con clave duplicado
+			delete registroAAgregar;
 			return resultadoOperacion(CLAVE_REPETIDA);
 		}
-
+		delete registroAAgregar;
 		return resultadoOperacion(HUBO_MODIFICACION);
 
 	}
@@ -103,11 +101,11 @@ resultadoOperacion ArbolBMas::insertarRecursivo(Bloque* bloqueActual,
 		if (itRegistros == listaRegistros->end()) {
 			itRegistros--;
 			nroBloqueABajar = itRegistros->getReferenciai(2);
-			bloqueABajar = this->archivoNodos->recuperarBloque(nroBloqueABajar);
+			bloqueABajar = obtenerBloque(nroBloqueABajar);
 		} else {
 			//sino bajo por la IZQUIERDA del mayor
 			nroBloqueABajar = itRegistros->getReferenciai(1);
-			bloqueABajar = this->archivoNodos->recuperarBloque(nroBloqueABajar);
+			bloqueABajar = obtenerBloque(nroBloqueABajar);
 		}
 
 		//llamo a la siguiente recursion
@@ -121,16 +119,16 @@ resultadoOperacion ArbolBMas::insertarRecursivo(Bloque* bloqueActual,
 
 		if (resultadoHijo.getCodigo() == HUBO_MODIFICACION) {
 			try {
-				this->archivoNodos->grabarBloque(bloqueABajar, nroBloqueABajar);
+				guardarBloque(bloqueABajar, nroBloqueABajar);
 			} catch (ExceptionBloque& e) {
 				// => estamos en presencia de un overflow
 				this-> resolverOverflow(bloqueABajar, nroBloqueABajar,
 						bloqueActual);
+				delete bloqueABajar;
 				return resultadoOperacion(HUBO_MODIFICACION);
 			}
-		} else {
-			//sino hubo overflow
 		}
+		delete bloqueABajar;
 		if (resultadoHijo.getCodigo() == CLAVE_REPETIDA){
 			return resultadoOperacion(CLAVE_REPETIDA);
 		}
@@ -146,13 +144,11 @@ void ArbolBMas::resolverOverflow(Bloque* bloqueOverflow,
 	bloqueSplit->setAtributoBloque(bloqueOverflow->getAtributoBloque());
 	list<Registro>* listaRegistros = bloqueOverflow->obtenerRegistros();
 	Registro registroASplit;
-
 	//realizo el split
-	while (archivoNodos->getOcupacionBloque(bloqueSplit) <= PORCENTAJE_OVERFLOW) {
+	while (obtenerOcupacionBloque(bloqueSplit) <= PORCENTAJE_OVERFLOW) {
 		registroASplit = listaRegistros->back();
 		listaRegistros->pop_back();
 		this->agregarRegistroEnOrden(bloqueSplit, registroASplit);
-		//bloqueSplit->agregarRegistro(registroASplit);
 	}
 
 	Registro registroASubir = bloqueSplit->obtenerRegistros()->front();
@@ -172,7 +168,8 @@ void ArbolBMas::resolverOverflow(Bloque* bloqueOverflow,
 
 	//GRABO el nuevo bloque producto de split donde me diga archivoNodos
 	unsigned int posLibre = archivoNodos->getBloqueLibre();
-	archivoNodos->grabarBloque(bloqueSplit, posLibre);
+	guardarBloque(bloqueSplit, posLibre);
+	delete bloqueSplit;
 
 	//el siguiente a overflow ahora es el bloquesplit
 	bloqueOverflow->setSiguiente(posLibre);
@@ -183,7 +180,7 @@ void ArbolBMas::resolverOverflow(Bloque* bloqueOverflow,
 	}
 
 	//GRABO el bloque q antes me dio overflow
-	archivoNodos->grabarBloque(bloqueOverflow, nroBloqueOverflow);
+	guardarBloque(bloqueOverflow, nroBloqueOverflow);
 
 	//me agrego a mi bloque un orientador con la referencia a este nuevo nodo
 	//el lugar donde va ese registro orientador quedo guardado en itregistros
@@ -217,7 +214,7 @@ void ArbolBMas::resolverOverflow(Bloque* bloqueOverflow,
 		posAgregado->getReferencias()->pop_front();
 		posAgregado->getReferencias()->push_front(posLibre);
 	}
-
+	delete registroOrientador;
 }
 
 list<Registro>::iterator ArbolBMas::agregarRegistroEnOrden(Bloque* unBloque,
@@ -241,7 +238,7 @@ list<Registro>::iterator ArbolBMas::agregarRegistroEnOrden(Bloque* unBloque,
 resultadoOperacion ArbolBMas::eliminar(string clave) {
 	resultadoOperacion resultadoRaiz =  this->eliminarRecursivo(raiz,clave);
 	if (resultadoRaiz.getCodigo() == HUBO_MODIFICACION){
-		this->archivoNodos->grabarBloque(raiz, 0);
+		guardarBloque(raiz, 0);
 		return resultadoOperacion(OK);
 	}
 	return resultadoRaiz;
@@ -288,11 +285,11 @@ resultadoOperacion ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,string clav
 			itRegistros--;
 			bajePorUltimo = true;
 			nroBloqueABajar = itRegistros->getReferenciai(2);
-			bloqueABajar = this->archivoNodos->recuperarBloque(nroBloqueABajar);
+			bloqueABajar = obtenerBloque(nroBloqueABajar);
 		} else {
 			//sino bajo por la IZQUIERDA del mayor
 			nroBloqueABajar = itRegistros->getReferenciai(1);
-			bloqueABajar = this->archivoNodos->recuperarBloque(nroBloqueABajar);
+			bloqueABajar = obtenerBloque(nroBloqueABajar);
 		}
 
 		//llamo a la siguiente recursion
@@ -302,24 +299,26 @@ resultadoOperacion ArbolBMas::eliminarRecursivo(Bloque* bloqueActual,string clav
 		//chekeo lo sucedido con mi hijo y voy a "resolver sus problemas"
 
 		if (resultadoHijo.getCodigo() == OK){
+			delete bloqueABajar;
 			return resultadoOperacion (OK);
 		}
 
 		if (resultadoHijo.getCodigo() == NO_ENCONTRADO){
+			delete bloqueABajar;
 			return resultadoOperacion (NO_ENCONTRADO);
 		}
 
 		else {
 			//verifico si mi hijo quedo en underflow
-			if (this->archivoNodos->getOcupacionBloque(bloqueABajar) < PORCENTAJE_UNDERFLOW) {
+			if (obtenerOcupacionBloque(bloqueABajar) < PORCENTAJE_UNDERFLOW) {
 				this->resolverUnderflow(bloqueABajar,nroBloqueABajar,bloqueActual, itRegistros, bajePorUltimo);
-				//this->exportar("intermedios");
 				return resultadoOperacion(HUBO_MODIFICACION);
 
 			}
 			else {
-				this->archivoNodos->grabarBloque(bloqueABajar, nroBloqueABajar);
+				guardarBloque(bloqueABajar, nroBloqueABajar);
 			}
+			delete bloqueABajar;
 			return resultadoOperacion (OK);
 		}
 	}
@@ -376,17 +375,17 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 	bool underflowEnHojas = false;
 	//Si el derecho existe lo intento usar para balanceo, sino usare el izquierdo
 	if (bloqueDer!=0) {
-		bloqueAChequear= this->archivoNodos->recuperarBloque(bloqueDer);
+		bloqueAChequear= obtenerBloque(bloqueDer);
 		usoBloqueDer= true;
 	}
-	else bloqueAChequear= this->archivoNodos->recuperarBloque(bloqueIzq);
+	else bloqueAChequear= obtenerBloque(bloqueIzq);
 
 	underflowEnHojas =bloqueUnderflow->getAtributoBloque()==0;
 
 	//Intento Balancear
 	// ***********************Si es un BALANCEO HOJA no hace falta incluir el padre en el balanceo****************************
 	if (underflowEnHojas) {
-		while((archivoNodos->getOcupacionBloque(bloqueUnderflow)<PORCENTAJE_UNDERFLOW || archivoNodos->getOcupacionBloque(bloqueAChequear)<PORCENTAJE_UNDERFLOW) &&bloqueAChequear->obtenerRegistros()->size()>0) {
+		while((obtenerOcupacionBloque(bloqueUnderflow)<PORCENTAJE_UNDERFLOW || obtenerOcupacionBloque(bloqueAChequear)<PORCENTAJE_UNDERFLOW) &&bloqueAChequear->obtenerRegistros()->size()>0) {
 			//caso derecho
 			if (usoBloqueDer) {
 				bloqueUnderflow->obtenerRegistros()->push_back(bloqueAChequear->obtenerRegistros()->front());
@@ -407,7 +406,7 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 		string claveAux=this->consultarClave(&*itRegistros);
 
 
-		while((archivoNodos->getOcupacionBloque(bloqueUnderflow)<PORCENTAJE_UNDERFLOW || archivoNodos->getOcupacionBloque(bloqueAChequear)<PORCENTAJE_UNDERFLOW) && bloqueAChequear->obtenerRegistros()->size()>0) {
+		while((obtenerOcupacionBloque(bloqueUnderflow)<PORCENTAJE_UNDERFLOW || obtenerOcupacionBloque(bloqueAChequear)<PORCENTAJE_UNDERFLOW) && bloqueAChequear->obtenerRegistros()->size()>0) {
 			//caso derecho
 			if (usoBloqueDer) {
 				Registro* registroAPasar = this->crearRegistroClave(claveAux);
@@ -427,6 +426,7 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 				claveAux = this->consultarClave(&(bloqueAChequear->obtenerRegistros()->front()));
 
 				bloqueUnderflow->obtenerRegistros()->push_back(*registroAPasar);
+				delete registroAPasar;
 
 				//antes de hacer pop del ultimo me guardo la referencia del nodo de abajo
 				if(bloqueAChequear->obtenerRegistros()->size() == 1)
@@ -459,13 +459,14 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 				}
 
 				bloqueUnderflow->obtenerRegistros()->push_front(*registroAPasar);
+				delete registroAPasar;
 			}
 		}
 		this->setearClave(&*itRegistros,claveAux);
 	}
 
 	//Chequeo si el balanceo fue efectivo
-	if (archivoNodos->getOcupacionBloque(bloqueUnderflow)>=PORCENTAJE_UNDERFLOW && archivoNodos->getOcupacionBloque(bloqueAChequear)>=PORCENTAJE_UNDERFLOW){
+	if (obtenerOcupacionBloque(bloqueUnderflow)>=PORCENTAJE_UNDERFLOW && obtenerOcupacionBloque(bloqueAChequear)>=PORCENTAJE_UNDERFLOW){
 		//verifico posibles cambios en  padre por el balanceo
 		//en el caso de las hojas
 		if (underflowEnHojas){
@@ -478,15 +479,16 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 		}
 
 		//grabo los nodos producto de el balanceo
-		this->archivoNodos->grabarBloque(bloqueUnderflow, nroBloqueUnderflow);
+		guardarBloque(bloqueUnderflow, nroBloqueUnderflow);
 		//caso derecho
 		if (usoBloqueDer){
-		this->archivoNodos->grabarBloque(bloqueAChequear, bloqueDer);
+		guardarBloque(bloqueAChequear, bloqueDer);
 		}
 		//caso izquierdo
 		else{
-		this->archivoNodos->grabarBloque(bloqueAChequear, bloqueIzq);
+		guardarBloque(bloqueAChequear, bloqueIzq);
 		}
+		delete bloqueAChequear;
 		return;
 	}//fin balanceo
 
@@ -527,20 +529,21 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 				if (bloqueActual == raiz){
 					if (bloqueActual->obtenerRegistros()->size() == 0){
 					//hay nueva raiz
-						this->archivoNodos->grabarBloque(bloqueUnderflow,0);
+						guardarBloque(bloqueUnderflow,0);
 						this->archivoNodos->eliminarBloque(nroBloqueUnderflow);
 						delete raiz;
 						raiz = bloqueUnderflow;
+						delete bloqueAChequear;
 						return;
 					}
 					else{
 					//sigue la raiz de antes
-						this->archivoNodos->grabarBloque(bloqueActual,0);
-						this->archivoNodos->grabarBloque(bloqueUnderflow,nroBloqueUnderflow);
+						guardarBloque(bloqueActual,0);
+						guardarBloque(bloqueUnderflow,nroBloqueUnderflow);
 					}
 				}
 				else{
-				this->archivoNodos->grabarBloque(bloqueUnderflow,nroBloqueUnderflow);
+				guardarBloque(bloqueUnderflow,nroBloqueUnderflow);
 				}
 
 			}
@@ -584,20 +587,20 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 				if (bloqueActual == raiz){
 					if (bloqueActual->obtenerRegistros()->size() == 0){
 					//hay nueva raiz
-						this->archivoNodos->grabarBloque(bloqueUnderflow,0);
+						guardarBloque(bloqueUnderflow,0);
 						this->archivoNodos->eliminarBloque(nroBloqueUnderflow);
 						delete raiz;
 						raiz = bloqueUnderflow;
 					}
 					else{
 					//sigue la raiz de antes
-						this->archivoNodos->grabarBloque(bloqueActual,0);
-						this->archivoNodos->grabarBloque(bloqueUnderflow,bloqueIzq);
+						guardarBloque(bloqueActual,0);
+						guardarBloque(bloqueUnderflow,bloqueIzq);
 					}
 				}
 				else{
 				//(recordar el tip se guarda en el otro espacio)
-				this->archivoNodos->grabarBloque(bloqueUnderflow,bloqueIzq);
+				guardarBloque(bloqueUnderflow,bloqueIzq);
 				}
 
 			}
@@ -614,6 +617,7 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 				bloqueAChequear->setSiguiente(0);
 
 				bloqueUnderflow->agregarRegistro(*registroQueBaja);
+				delete registroQueBaja;
 
 				//aca tengo resuelto el pasaje de todos los registros al underflow
 				// => de aca en mas misma logica de la fusion de nodos hojas
@@ -644,20 +648,20 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 				if (bloqueActual == raiz){
 					if (bloqueActual->obtenerRegistros()->size() == 0){
 					//hay nueva raiz
-						this->archivoNodos->grabarBloque(bloqueUnderflow,0);
+						guardarBloque(bloqueUnderflow,0);
 						this->archivoNodos->eliminarBloque(nroBloqueUnderflow);
 						delete raiz;
 						raiz = bloqueUnderflow;
 					}
 					else{
 					//sigue la raiz de antes
-						this->archivoNodos->grabarBloque(bloqueActual,0);
-						this->archivoNodos->grabarBloque(bloqueUnderflow,nroBloqueUnderflow);
+						guardarBloque(bloqueActual,0);
+						guardarBloque(bloqueUnderflow,nroBloqueUnderflow);
 					}
 				}
 				else{
 				//grabo el bloque underflow
-				this->archivoNodos->grabarBloque(bloqueUnderflow,nroBloqueUnderflow);
+				guardarBloque(bloqueUnderflow,nroBloqueUnderflow);
 				}
 			}
 
@@ -669,6 +673,7 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 				bloqueAChequear->setSiguiente(0);
 
 				bloqueUnderflow->obtenerRegistros()->push_front(*registroQueBaja);
+				delete registroQueBaja;
 
 				//aca tengo resuelto el pasaje de todos los registros al underflow
 				// => de aca en mas misma logica de la fusion de nodos hojas
@@ -707,23 +712,24 @@ void ArbolBMas::resolverUnderflow(Bloque* bloqueUnderflow, unsigned int nroBloqu
 				if (bloqueActual == raiz){
 					if (bloqueActual->obtenerRegistros()->size() == 0){
 					//hay nueva raiz
-						this->archivoNodos->grabarBloque(bloqueUnderflow,0);
+						guardarBloque(bloqueUnderflow,0);
 						this->archivoNodos->eliminarBloque(bloqueIzq);
 						delete raiz;
 						raiz = bloqueUnderflow;
 					}
 					else{
 					//sigue la raiz de antes
-						this->archivoNodos->grabarBloque(bloqueActual,0);
-						this->archivoNodos->grabarBloque(bloqueUnderflow,bloqueIzq);
+						guardarBloque(bloqueActual,0);
+						guardarBloque(bloqueUnderflow,bloqueIzq);
 					}
 				}
 				else{
 				//grabo el bloque underflow(recordar el tip se guarda en el otro espacio)
-				this->archivoNodos->grabarBloque(bloqueUnderflow,bloqueIzq);
+				guardarBloque(bloqueUnderflow,bloqueIzq);
 				}
 			}
 		}
+		delete bloqueAChequear;
 	}//fin fusion
 }
 
@@ -736,7 +742,7 @@ Registro* ArbolBMas::siguiente() {
 		if(ultimaHojaVisitada->getSiguiente()!=0){
 			unsigned int nroBloqueSig= ultimaHojaVisitada->getSiguiente();
 			delete ultimaHojaVisitada;
-			ultimaHojaVisitada= this->archivoNodos->recuperarBloque(nroBloqueSig);
+			ultimaHojaVisitada= obtenerBloque(nroBloqueSig);
 			ultimoRegistroVisitado= ultimaHojaVisitada->obtenerRegistros()->begin();
 			return &(ultimaHojaVisitada->obtenerRegistros()->front());
 		}
@@ -778,7 +784,7 @@ Bloque* ArbolBMas::buscarBloque(string clave) {
 Bloque* ArbolBMas::buscarBloqueRecursivo(string clave, unsigned int refBloque) {
 
 	//bajo el bloque a mem
-	Bloque* esteBloque = archivoNodos->recuperarBloque(refBloque);
+	Bloque* esteBloque = obtenerBloque(refBloque);
 
 	//si se trata de un nodo hoja
 	if (esteBloque->getAtributoBloque() == 0) {
@@ -826,8 +832,8 @@ Registro* ArbolBMas::buscarRegistro(string clave, resultadoOperacion* resultOper
 		resultOperacion->setCodigo(NO_ENCONTRADO);
 		unsigned int nroBloqueSig= bloqueEncontrado->getSiguiente();
 		if (nroBloqueSig != 0){
-			delete bloqueEncontrado;
-			bloqueEncontrado= this->archivoNodos->recuperarBloque(nroBloqueSig);
+			bloqueEncontrado= obtenerBloque(nroBloqueSig);
+			delete ultimaHojaVisitada;
 			ultimaHojaVisitada= bloqueEncontrado;
 			ultimoRegistroVisitado= bloqueEncontrado->obtenerRegistros()->begin();
 			return &(bloqueEncontrado->obtenerRegistros()->front());
@@ -848,10 +854,12 @@ string ArbolBMas::imprimirBloque(Bloque* unBloque, unsigned int nroBloque) {
 	bloqueImpreso += conversor.str();
 	conversor.str("");
 	bloqueImpreso += ": ";
+	bloqueImpreso += "Nivel ";
 	conversor << unBloque->getAtributoBloque();
 	bloqueImpreso += conversor.str();
 	conversor.str("");
 	bloqueImpreso += ", ";
+	bloqueImpreso += "Cant. Elem.";
 	list<Registro>* registros = unBloque->obtenerRegistros();
 	conversor << registros->size();
 	bloqueImpreso += conversor.str();
@@ -866,6 +874,15 @@ string ArbolBMas::imprimirBloque(Bloque* unBloque, unsigned int nroBloque) {
 				conversor.str("");
 			}
 			bloqueImpreso += "(";
+			if(itRegistros->getString()!=""){
+				if(itRegistros->getAtributosEnteros()->size()>0){
+					conversor << itRegistros->getAtributosEnteros()->front();
+					bloqueImpreso += conversor.str();
+					conversor.str("");
+				}
+				else bloqueImpreso += "0";
+				bloqueImpreso += "|";
+			}
 			bloqueImpreso += this->consultarClave(&*itRegistros);
 			bloqueImpreso += ")";
 			itRegistros++;
@@ -881,14 +898,26 @@ string ArbolBMas::imprimirBloque(Bloque* unBloque, unsigned int nroBloque) {
 	else {
 		while (itRegistros != registros->end()) {
 					bloqueImpreso += "(";
+					if(itRegistros->getString()!=""){
+						if(itRegistros->getAtributosEnteros()->size()>0){
+							conversor << itRegistros->getAtributosEnteros()->front();
+							bloqueImpreso += conversor.str();
+							conversor.str("");
+						}
+						else bloqueImpreso += "0";
+						bloqueImpreso += "|";
+					}
+
 					bloqueImpreso += this->consultarClave(&*itRegistros);
-					//bloqueImpreso += "|";
-					//conversor << itRegistros->getReferenciai(1);
+					bloqueImpreso += "|";
+					conversor << itRegistros->getReferenciai(1);
 					bloqueImpreso += conversor.str();
 					conversor.str("");
 					bloqueImpreso += ")";
 					itRegistros++;
 		}
+		bloqueImpreso += "; ";
+		bloqueImpreso += "Bloque Siguiente: ";
 		conversor << unBloque->getSiguiente();
 		bloqueImpreso += conversor.str();
 		conversor.str("");
@@ -906,6 +935,7 @@ string ArbolBMas::exportarRecursivo(unsigned int nroBloque,
 		textoAExportar += '\t';
 	textoAExportar += imprimirBloque(bloqueLeido, nroBloque);
 	if (bloqueLeido->getAtributoBloque() == 0) {
+		delete bloqueLeido;
 		return textoAExportar;
 	}
 	list<Registro>* listaReg = bloqueLeido->obtenerRegistros();
@@ -918,13 +948,14 @@ string ArbolBMas::exportarRecursivo(unsigned int nroBloque,
 	itRegistros--;
 	textoAExportar += exportarRecursivo(itRegistros->getReferenciai(2),
 			nivelRecursion);
+	delete bloqueLeido;
 	return textoAExportar;
 }
 
 void ArbolBMas::exportar(string path) {
 	string textoAExportar = "";
-
-	textoAExportar += this->imprimirBloque(this->raiz, 0);
+	Bloque* bloqueLeido = this->archivoNodos->recuperarBloque(0);
+	textoAExportar += this->imprimirBloque(bloqueLeido, 0);
 	if (raiz->getAtributoBloque() != 0) {
 
 		list<Registro>* listaReg = raiz->obtenerRegistros();
@@ -938,12 +969,31 @@ void ArbolBMas::exportar(string path) {
 		unsigned int ref2 = itRegistros->getReferenciai(2);
 		textoAExportar += exportarRecursivo(ref2, 0);
 	}
+	textoAExportar += "\nNOTA: Entre parentesis se listan, respectivamente, la cantidad de caracteres "
+			"que la clave comparte con la previa (cuando corresponda), el remanente de la clave que "
+			"esta almacenada en el registro y la referencia al bloque en el que se encuentra la lista "
+			"de IDs correspondientes al mismo en el caso de tratarse de un arbol cuya clave es string.\n"
+			"En caso de tener el arbol que indiza al archivo de libros se ubica primero la clave numerica "
+			"y luego el offset en el cual se ubica el libro en dicho archivo.\n";
 	fstream archivo;
 	archivo.open(path.c_str(), ios::out | ios::app);
 	archivo << textoAExportar;
 	archivo << "-------------------------------------------------------------"
 			<< endl;
 	archivo.close();
+	delete bloqueLeido;
+}
+
+float ArbolBMas::obtenerOcupacionBloque(Bloque* unBloque){
+	return this->archivoNodos->getOcupacionBloque(unBloque);
+}
+
+void ArbolBMas::guardarBloque(Bloque* unBloque, unsigned int nroBloque){
+	this->archivoNodos->grabarBloque(unBloque, nroBloque);
+}
+
+Bloque* ArbolBMas::obtenerBloque(unsigned int nroBloque){
+	return this->archivoNodos->recuperarBloque(nroBloque);
 }
 
 ArbolBMas::~ArbolBMas() {

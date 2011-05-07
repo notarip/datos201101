@@ -10,10 +10,10 @@
 
 using namespace std;
 
-int main800(){
+int main43(){
 	string unPath = "ArbolBMas";
 
-	ArbolBMasAlfabetico* miArbol = new ArbolBMasAlfabetico(unPath,128);
+	ArbolBMasAlfabetico* miArbol = new ArbolBMasAlfabetico(unPath,120);
 
 	cout << "insercion pedro" << endl;
 	resultadoOperacion unResultado = miArbol->insertar("pedro",0);
@@ -160,6 +160,26 @@ int main800(){
 	cout << unResultado.getDescripcion() << endl << endl;
 	miArbol->exportar("prueba");
 
+	cout << "insercion mariano" << endl;
+	unResultado = miArbol->insertar("mariano",0);
+	cout << unResultado.getDescripcion() << endl << endl;
+	miArbol->exportar("prueba");
+
+	cout << "insercion mara" << endl;
+	unResultado = miArbol->insertar("mara",0);
+	cout << unResultado.getDescripcion() << endl << endl;
+	miArbol->exportar("prueba");
+
+	cout << "insercion marcelo" << endl;
+	unResultado = miArbol->insertar("marcelo",0);
+	cout << unResultado.getDescripcion() << endl << endl;
+	miArbol->exportar("prueba");
+
+	cout << "insercion marcela" << endl;
+	unResultado = miArbol->insertar("marcela",0);
+	cout << unResultado.getDescripcion() << endl << endl;
+	miArbol->exportar("prueba");
+
 	cout << "eliminacion julian" << endl;
 	unResultado= miArbol->eliminar("julian");
 	cout << unResultado.getDescripcion() << endl << endl;
@@ -246,7 +266,7 @@ int main800(){
 		regEncontrado= miArbol->siguiente();
 	}
 
-	cout <<endl<<endl <<"FIN DE PRUEBA CAMPEON ALFABETICO" << endl;
+	cout <<endl<<endl <<"FIN DE PRUEBA ALFABETICO CAMPEON" << endl;
 
 	delete miArbol;
 	return 0;
