@@ -101,6 +101,7 @@ unsigned int ArchivoLibros::agregarLibro(Libro* unLibro){
 	return posicion_escritura;
 	delete tiraBytes;
 
+
 }
 
 
@@ -328,7 +329,7 @@ void ArchivoLibros::deserializar(char* tiraBytes,Libro** obtenido){
 	Libro* libro= new Libro(*id,s_titulo,s_autor,s_editorial,s_texto,*cantPalabras,s_palabras);
 
 	*obtenido= libro;
-	delete tiraBytes;
+	delete []tiraBytes;
 
 }
 

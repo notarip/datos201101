@@ -218,7 +218,7 @@ void Hash::insertar(Registro *registro)
 	}
 	else{
 		//cout<<"registro duplicado."<<endl;
-
+		delete registroOld;
 	}
 }
 
@@ -303,9 +303,10 @@ Registro* Hash::buscar(string que){
 	}
 	else {
 		Registro *reg_encontrado= new Registro(registro);
-		delete bloque;
+		delete registro;
 		return reg_encontrado;
 	}
+	if (bloque!=NULL) delete bloque;
 	return registro;
 }
 
@@ -525,7 +526,7 @@ void Hash::guardarTabla(){
 		bloqueTabla= archivoHash.recuperarBloque(refActual);
 		refActual= bloqueTabla->obtenerRegistros()->front().getReferencias()->front();
 	}
-
+	if (bloqueTabla!=NULL) delete bloqueTabla;
 	/*tengo que ver cuantos bloques voy a necesitar para guardar la lista de IDS  */
 	/*para eso establezco un maximo de IDS por bloque, que en principio seran 1000*/
 	/*chequeo la cantidad de IDS, y veo si los bloques que estaba usando antes me */
@@ -609,7 +610,7 @@ void Hash::guardarTabla(){
 	//manejadorHash.grabarBloque(bloqueTabla,0);
 
 	//ArchivoBloques arch(this->pathHash,TAMANIO_BLOQUE);
-	delete tabla;
+	delete []tabla;
 
 }
 
@@ -648,8 +649,9 @@ void Hash::mostrar(){
 		}
 		cout<<endl;
 		it++;
+		delete bloque;
 	}
-	delete bloque;
+
 	cout<<"******************************************"<<endl;
 }
 

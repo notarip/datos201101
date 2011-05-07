@@ -31,9 +31,8 @@ static void f2(Hash* hash,unsigned int cant){
 }
 
 
-int main(){
+int main323(){
 	Hash hash("unhash");
-	hash.mostrar();
 	/*
 	char c=' ';
 	string str;
@@ -86,7 +85,8 @@ int main(){
 
 	}
 	hash.mostrar2("res.txt");*/
-	f(&hash,500);
+	f(&hash,20000);
+	hash.mostrar();
 }
 
 
