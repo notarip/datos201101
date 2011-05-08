@@ -120,8 +120,6 @@ void ArchivoBloques::grabarBloque(Bloque* unBloque, unsigned int nroBloque) {
 	//plancho la tira de bytes:
 
 	archivo.write(tiraBytes, tamanioBloque);
-	/*OJO QUE SE PLANCHA CON BASURA ASI COMO ESTA AHORA   => IGUAL NO AFECTA
-	 **/
 
 	archivo.close();
 
@@ -278,7 +276,7 @@ unsigned int ArchivoBloques::getBloqueLibre(){
 		//leo primer numero
 		archivoLibres.read((char*)&unBloqueLibre,sizeof(int));
 
-		//unsigned int posInicial, posFinal, longitud;
+
 		unsigned int longitud;
 		posInicial = archivoLibres.tellg();
 		archivoLibres.seekg(0, ios::end);

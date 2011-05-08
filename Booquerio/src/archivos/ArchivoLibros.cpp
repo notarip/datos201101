@@ -26,13 +26,12 @@ unsigned int ArchivoLibros::agregarLibro(Libro* unLibro){
 	bool existiaEspacio=false;
 
 	this->serializar(unLibro,&tiraBytes);
-	longreg= this->longReg;//(unsigned int)tiraBytes[0]; //<-- longitud de registro variable.//
+	longreg= this->longReg; //<-- longitud de registro variable.//
 
 	fstream archivo;
 	fstream bajas;
 
 	string path_bajas=this->path + "-libres";
-	//cout<<"intento insertar:"<<path_bajas<<endl;
 	bajas.open(path_bajas.c_str() ,ios::in | ios::out | ios::binary );
 
 	if (bajas.good()){
@@ -123,21 +122,16 @@ void ArchivoLibros::suprimirLibro(unsigned int id){
 		string path_bajas= this->path;
 		path_bajas += "-libres";
 		//cout<<"intento eliminar:"<<path_bajas<<endl;
-		//cout << "A" <<endl;
 		fstream archivo_bajas;
 
 		archivo_bajas.open(path_bajas.c_str() ,ios::in |ios::binary| ios::out | ios::app);
-		//cout << "B" <<endl;
 
 		if (!archivo_bajas.good()){
-			//cout << "C" <<endl;
 			archivo_bajas.open(path_bajas.c_str() , ios::out | ios::binary |ios::app);
 		}
 
 		archivo_bajas.seekg(0,ios::end);
-		//cout << "D" <<endl;
 		archivo_bajas.write(regBajas,2*sizeof(unsigned int));
-		//cout << "E" <<endl;
 		archivo_bajas.close();
 	}
 
@@ -154,7 +148,7 @@ Libro* ArchivoLibros::recuperarLibro(unsigned int id){
 	return obtenido;
 }
 
-//modificado 24/4   //
+
 char* ArchivoLibros::levantarRegistro(unsigned int id){
 	unsigned int offset= this->obtenerOffset(id);
 	char* tiraBytes=NULL;

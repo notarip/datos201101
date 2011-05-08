@@ -62,7 +62,6 @@ int Hash::crear(){
 
 	/*
 	 * Se crea el primer bloque de datos vacio
-	 * TODO: este se deberia crear al primer insert
 	 */
 	Bloque *bloqueUno = new Bloque();
 	unsigned int posLibreUno = manejadorHash.getBloqueLibre();
@@ -128,8 +127,6 @@ int Hash::abrir(){
 	unsigned int i = 0;
 
 	list<unsigned int>::iterator it = listaDeBloques.begin();
-
-	/*funciona esto? -ver despues */
 
 	while(it != listaDeBloques.end()){
 
@@ -311,34 +308,6 @@ Registro* Hash::buscar(string que){
 }
 
 
-
-
-
-//probar funcion de dispersion, (que sea buena)//
-/*
-unsigned int Hash::hasheo(string key){
-	unsigned int i=0;
-	unsigned int parcial=0;
-	unsigned int final=0;
-	while(i<4 && i<key.length()){
-		parcial=0;
-		parcial=(unsigned int)key[i];
-		final+=parcial;
-		if (i<key.length()-1) final=final<<8;
-		i++;
-	}
-	cout<<final<<" "<<endl;
-	final%=this->tamanioTabla;
-
-	return final;
-}
-
-unsigned int Hash::hasheo(string key){
-	unsigned int final=atoi(key.c_str());
-	final%=this->tamanioTabla;
-	return final;
-}*/
-
  unsigned int Hash::hasheo( string key )
 {
 
@@ -378,13 +347,11 @@ void Hash::reestructurar_archivo(ArchivoBloques archivo,unsigned int nro_desbord
 			Registro reg_a_mover= *iteradorReg_desbordado;
 
 			lista_libres->push_back(reg_a_mover);
-			//lista_libres->insert(iteradorReg_libre,reg_a_mover);
 
 			iteradorReg_desbordado=lista_desbordado->erase(iteradorReg_desbordado);
 
 			iteradorReg_libre= lista_libres->end();
 		}
-		//else if ( iteradorReg_desbordado !=  bloque_desbordado->obtenerRegistros()->end()) advance(iteradorReg_desbordado,1);
 		else iteradorReg_desbordado++;
 	}
 
@@ -598,18 +565,6 @@ void Hash::guardarTabla(){
 		delete bloqueTabla;
 		//delete tabla;
 	}
-
-	//tablaNueva.agregarReferencia(1);
-
-	//list<Registro>::iterator iterador= bloqueTabla->obtenerRegistros()->begin();
-
-	//bloqueTabla->obtenerRegistros()->insert(iterador,tablaNueva);
-
-	//ArchivoBloques manejadorHash(this->pathHash,TAMANIO_BLOQUE);
-
-	//manejadorHash.grabarBloque(bloqueTabla,0);
-
-	//ArchivoBloques arch(this->pathHash,TAMANIO_BLOQUE);
 	delete []tabla;
 
 }

@@ -1,4 +1,4 @@
-#include "Hash.h"
+#include "../hash/Hash.h"
 #include "math.h"
 #include <iostream>
 
