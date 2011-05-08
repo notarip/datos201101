@@ -497,13 +497,13 @@ int Servicios::agregarIndiceTitulos(Libro *unLibro)
 
 int Servicios::agregarIndicePalabras(Libro *unLibro)
 {
-
+cout<<unLibro->getPalabras()<<endl;cin.get();
 	set<string> *palabras = unLibro->getListaPalabras();
 	set<string>::iterator it = palabras->begin();
 
 	for ( ; it != palabras->end(); it++)
 	{
-		cout << "PALABRA A INDEXAR =" << *it <<endl;
+		cout << "PALABRA A INDEXAR =" << "-"<<*it <<"-"<<endl;if ((*it)==" ") continue;
 		agregarAlHash(NOMBRE_HASH_PALABRAS, *it ,unLibro->getId());
 	}
 

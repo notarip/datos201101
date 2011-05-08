@@ -14,7 +14,7 @@
 #include "../util/Parametros.h"
 
 
-#define TAMANIO_B_LISTA_IDS 4096
+#define TAMANIO_B_LISTA_IDS 1024
 #define LISTA_VACIA 1
 
 
