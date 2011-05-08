@@ -46,33 +46,35 @@ Bloque* ArbolBMasAlfabetico::aplicarFrontCoding (Bloque* unBloque){
 	bloqueFontCoding->setSiguiente(unBloque->getSiguiente());
 	list<Registro>* listaReg= unBloque->obtenerRegistros();
 	list<Registro>::iterator itRegistros= listaReg->begin();
-	if(itRegistros!=listaReg->end()){Registro unRegistro(*itRegistros);
-	//unRegistro.agregarAtribEntero(0);
-	itRegistros++;
-	bloqueFontCoding->agregarRegistro(unRegistro);
-	unsigned int coincidencias;
-	string previo= unRegistro.getString();
-	char* stringFront;
-	string actual= "";
-	bool coincidio= true;
-	unsigned int caracteresNoCoincidentes= 0;
-	while(itRegistros!=listaReg->end()){
-		coincidio= true;
+	if(itRegistros!=listaReg->end()){
 		Registro unRegistro(*itRegistros);
-		stringFront= NULL;
-		actual=unRegistro.getString();
-		coincidencias= 0;
-		while(coincidencias<actual.size()&&coincidencias<previo.size()&&coincidio){
-			if(actual.at(coincidencias)==previo.at(coincidencias)){
-				coincidencias++;
+	//unRegistro.agregarAtribEntero(0);
+		itRegistros++;
+		bloqueFontCoding->agregarRegistro(unRegistro);
+		unsigned int coincidencias;
+		string previo= unRegistro.getString();
+		char* stringFront;
+		string actual= "";
+		bool coincidio= true;
+		unsigned int caracteresNoCoincidentes= 0;
+		while(itRegistros!=listaReg->end()){
+			coincidio= true;
+			Registro unRegistro(*itRegistros);
+			stringFront= NULL;
+			actual=unRegistro.getString();
+			coincidencias= 0;
+			while(coincidencias<actual.size()&&coincidencias<previo.size()&&coincidio){
+				if(actual.at(coincidencias)==previo.at(coincidencias)){
+					coincidencias++;
+				}
+				else{
+					coincidio=false;
+				}
 			}
-			else{
-				coincidio=false;
-			}
-		}
 		caracteresNoCoincidentes= actual.size()-coincidencias;
 		stringFront=new char[caracteresNoCoincidentes+1];
 		stringFront[caracteresNoCoincidentes]='\0';
+		//copy(dest,cuanto,desde donde)
 		actual.copy(stringFront,caracteresNoCoincidentes,coincidencias);
 		previo=actual;
 		unRegistro.setString(stringFront);
@@ -81,7 +83,8 @@ Bloque* ArbolBMasAlfabetico::aplicarFrontCoding (Bloque* unBloque){
 		bloqueFontCoding->agregarRegistro(unRegistro);
 		itRegistros++;
 		delete []stringFront;
-	}}
+	}
+	}
 	return bloqueFontCoding;
 }
 
@@ -94,7 +97,6 @@ Bloque* ArbolBMasAlfabetico::deshacerFrontCoding(Bloque* unBloque) {
 	Registro unRegistro(*itRegistros);
 	string previo= itRegistros->getString();
 	*itRegistros++;
-	//unRegistro.getAtributosEnteros()->pop_front();
 	bloqueDescomprimido->agregarRegistro(unRegistro);
 	unsigned int coincidencias;
 	string actual="";
