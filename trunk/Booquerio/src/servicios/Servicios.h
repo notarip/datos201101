@@ -24,8 +24,8 @@
 #define NOMBRE_BMAS_EDITORIALES "bmas_editoriales"
 #define NOMBRE_BMAS_PRIMARIO "bmas_primario"
 
-#define TAMANIO_BLOQUE_BMAS 4096
-#define TAMANIO_BLOQUE_BMAS_NUMERICO 4096
+#define TAMANIO_BLOQUE_BMAS 1024
+#define TAMANIO_BLOQUE_BMAS_NUMERICO 1024
 
 
 #include <string>
