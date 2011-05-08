@@ -27,7 +27,7 @@ int Servicios::tomarTexto(string ruta)
 
 	unParser->~Parser();
 
-	cout << "parsie el libro" << endl;
+	//cout << "parsie el libro" << endl;
 
 
 //meter el libro en el archivo de registros variables
@@ -37,7 +37,7 @@ int Servicios::tomarTexto(string ruta)
 
 	ArchivoLibros *archivo = new ArchivoLibros(rutaArcLibros);
 
-	cout << "creo archivo de libros" << endl;
+	//cout << "creo archivo de libros" << endl;
 
 
 
@@ -45,7 +45,7 @@ int Servicios::tomarTexto(string ruta)
 	offset = archivo->agregarLibro(unLibro);
 	archivo->~ArchivoLibros();
 
-	cout << "agrego el libro" << endl;
+	//cout << "agrego el libro" << endl;
 
 
 
@@ -55,12 +55,12 @@ int Servicios::tomarTexto(string ruta)
 	if (pathArbolPrimario == "") return ERROR_RUTA_BMAS_PRIMARIO;
 
 	ArbolBMasNumerico *arbolP = new ArbolBMasNumerico(pathArbolPrimario, TAMANIO_BLOQUE_BMAS_NUMERICO);
-	cout << "id: "<< unLibro->getId() << endl;
+	//cout << "id: "<< unLibro->getId() << endl;
 	arbolP->insertarNumerico(unLibro->getId(),offset);
 
 	delete arbolP;
 
-	cout << "agrego al indice primario" << endl;
+	//cout << "agrego al indice primario" << endl;
 
 
 //agregar el libro a las listas
@@ -68,7 +68,7 @@ int Servicios::tomarTexto(string ruta)
 
 	return listas->agregarLibroPendienteATodasLasListas(unLibro->getId());
 
-	cout << "agrego a las listas no procesadas" << endl;
+	//cout << "agrego a las listas no procesadas" << endl;
 
 
 }
@@ -239,21 +239,21 @@ int Servicios::quitarArchivo(string unId)
 	string arcLibros = Parametros().getParametro(ARCHIVO_LIBROS);
 	ArchivoLibros *archivo = new ArchivoLibros(arcLibros);
 	Libro *libro = archivo->recuperarLibro(offset);
-	cout <<"Autor: "<< libro->getAutor() <<endl;
-	cout <<"Editorial: "<< libro->getEditorial() <<endl;
-	cout <<"Titulo: "<< libro->getTitulo() <<endl;
-	cout <<"Id: "<< libro->getId() <<endl;
-	cout <<"Cant.palabras: " << libro->getCantPalabras() << endl;
-	cout << "Presione ENTER para continuar...." << endl;
-	cin.get();
+//	cout <<"Autor: "<< libro->getAutor() <<endl;
+//	cout <<"Editorial: "<< libro->getEditorial() <<endl;
+//	cout <<"Titulo: "<< libro->getTitulo() <<endl;
+//	cout <<"Id: "<< libro->getId() <<endl;
+//	cout <<"Cant.palabras: " << libro->getCantPalabras() << endl;
+//	cout << "Presione ENTER para continuar...." << endl;
+//	cin.get();
 
-	cout << "SACO EL LIBRO DEL ARCHIVO DE REGISTROS VARIABLES" << endl;
+//	cout << "SACO EL LIBRO DEL ARCHIVO DE REGISTROS VARIABLES" << endl;
 	archivo->suprimirLibro(offset);
 
 
 //quitar del primario
 
-	cout << "QUITO DEL PRIMARIO EL ID" << endl;
+	//cout << "QUITO DEL PRIMARIO EL ID" << endl;
 
 	arbolP->eliminarNumerico(libro->getId());
 
@@ -261,25 +261,25 @@ int Servicios::quitarArchivo(string unId)
 
 //quitar de los indices
 
-	cout << "SACO DE LOS INDICES" << endl;
+	//cout << "SACO DE LOS INDICES" << endl;
 
-	cout << "SACO DE AUTORES" << endl;
+	//cout << "SACO DE AUTORES" << endl;
 	sacarDelArbol(NOMBRE_BMAS_AUTORES,libro->getAutor(),libro->getId());
-	cout << "Presione ENTER para continuar...." << endl;
-	cin.get();
+	//cout << "Presione ENTER para continuar...." << endl;
+	//cin.get();
 
-	cout << "SACO DE EDITORIALES" << endl;
+	//cout << "SACO DE EDITORIALES" << endl;
 	sacarDelArbol(NOMBRE_BMAS_EDITORIALES,libro->getEditorial(),libro->getId());
-	cout << "Presione ENTER para continuar...." << endl;
-	cin.get();
+	///cout << "Presione ENTER para continuar...." << endl;
+	//cin.get();
 
-	cout << "SACO DE TITULOS" << endl;
+	//cout << "SACO DE TITULOS" << endl;
 	sacarDelHash(NOMBRE_HASH_TITULOS,libro->getTitulo(),libro->getId());
-	cout << "Presione ENTER para continuar...." << endl;
-	cin.get();
+	//cout << "Presione ENTER para continuar...." << endl;
+	//cin.get();
 
-	cout << "SACO PALABRAS" << endl;
-	cout << "Procesando la quita del indice..." << endl;
+	//cout << "SACO PALABRAS" << endl;
+	//cout << "Procesando la quita del indice..." << endl;
 	set<string> *palabras = libro->getListaPalabras();
 
 	for (set<string>::iterator it = palabras->begin(); it != palabras->end(); it++)
@@ -289,7 +289,7 @@ int Servicios::quitarArchivo(string unId)
 
 
 //quitar de la lista de libros sin procesar
-	cout << "SACO DE LOS INDICES SIN PROCESAR" <<endl;
+	//cout << "SACO DE LOS INDICES SIN PROCESAR" <<endl;
 	SinIndice *listas  = SinIndice().getInstancia();
 	return listas->sacarLibroDeTodasLasListas(id);
 
@@ -497,13 +497,13 @@ int Servicios::agregarIndiceTitulos(Libro *unLibro)
 
 int Servicios::agregarIndicePalabras(Libro *unLibro)
 {
-cout<<unLibro->getPalabras()<<endl;cin.get();
+//cout<<unLibro->getPalabras()<<endl;cin.get();
 	set<string> *palabras = unLibro->getListaPalabras();
 	set<string>::iterator it = palabras->begin();
 
 	for ( ; it != palabras->end(); it++)
 	{
-		cout << "PALABRA A INDEXAR =" << "-"<<*it <<"-"<<endl;if ((*it)==" ") continue;
+		//cout << "PALABRA A INDEXAR =" << "-"<<*it <<"-"<<endl;if ((*it)==" ") continue;
 		agregarAlHash(NOMBRE_HASH_PALABRAS, *it ,unLibro->getId());
 	}
 

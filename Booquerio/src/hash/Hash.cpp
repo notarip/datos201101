@@ -619,13 +619,13 @@ void Hash::mostrar(){
 	ArchivoBloques archivo(this->pathHash,TAMANIO_BLOQUE);
 	Bloque* bloque=NULL;
 	unsigned int max=0;
-	cout<<"******************************************"<<endl;
-	cout<<"DATOS:"<<endl;
-	cout<<"------------------------------------------"<<endl;
-	cout<<"|tamaño de tabla: "<<this->tamanioTabla<<endl;
-	cout<<"| ";
+	//cout<<"******************************************"<<endl;
+	//cout<<"DATOS:"<<endl;
+	//cout<<"------------------------------------------"<<endl;
+	//cout<<"|tamaño de tabla: "<<this->tamanioTabla<<endl;
+	//cout<<"| ";
 	for(unsigned int i=0; i<this->tamanioTabla; i++){
-		cout<<this->tabla[i]<<" ";
+		//cout<<this->tabla[i]<<" ";
 		if (this->tabla[i] > max) max=this->tabla[i];
 	}
 	char a;
@@ -636,23 +636,23 @@ void Hash::mostrar(){
 	lista.sort();
 	lista.unique();
 	list<unsigned int>::iterator it=lista.begin();
-	cout<<endl;
-	cout<<"------------------------------------------"<<endl;
+	//cout<<endl;
+	//cout<<"------------------------------------------"<<endl;
 	while(it!=lista.end()){
-		if ((*it)%50==0){ cout<<"presione cualquier tecla para continuar..."<<endl; cin>>a;}
-		cout<<"|Bloque "<<(*it)<<"| T.d: "<<this->tamDispersion((*it))<<"]  ";
+		//if ((*it)%50==0){ cout<<"presione cualquier tecla para continuar..."<<endl; cin>>a;}
+		//cout<<"|Bloque "<<(*it)<<"| T.d: "<<this->tamDispersion((*it))<<"]  ";
 		bloque= archivo.recuperarBloque((*it));
 		list<Registro>::iterator it2= bloque->obtenerRegistros()->begin();
 		while(it2!=bloque->obtenerRegistros()->end() ){
-			cout<<it2->getString()<<" ";
+			//cout<<it2->getString()<<" ";
 			it2++;
 		}
-		cout<<endl;
+		//cout<<endl;
 		it++;
 		delete bloque;
 	}
 
-	cout<<"******************************************"<<endl;
+	//cout<<"******************************************"<<endl;
 }
 
 
