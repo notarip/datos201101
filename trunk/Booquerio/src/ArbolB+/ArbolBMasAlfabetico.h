@@ -21,11 +21,14 @@ private:
 	virtual Registro* crearRegistroClave(string clave, unsigned int valor);
 	virtual string consultarClave(Registro* unRegistro);
 	virtual void setearClave(Registro* registroAModificar, string clave);
-	virtual float obtenerOcupacionBloque(Bloque* unBloque);
-	virtual void guardarBloque (Bloque* unBloque, unsigned int nroBloque);
-	virtual Bloque* obtenerBloque(unsigned int nroBloque);
-	Bloque* aplicarFrontCoding(Bloque* unBloque);
-	Bloque* deshacerFrontCoding(Bloque* unBloque);
+
+//	DESCOMENTAR EN CASO DE QUERER APLICAR FRONTCODING
+
+//	virtual float obtenerOcupacionBloque(Bloque* unBloque);
+//	virtual void guardarBloque (Bloque* unBloque, unsigned int nroBloque);
+//	virtual Bloque* obtenerBloque(unsigned int nroBloque);
+//	Bloque* aplicarFrontCoding(Bloque* unBloque);
+//	Bloque* deshacerFrontCoding(Bloque* unBloque);
 };
 
 #endif /* ARBOLBMASALFABETICO_H_ */

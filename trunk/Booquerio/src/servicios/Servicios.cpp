@@ -367,10 +367,7 @@ int Servicios::verEstructuraPrimario(string path)
 
 int Servicios::verEstructuraTitulos(string path)
 {
-	//TODO llamar al metodo de hash de titulos que lista la estructura
 
-	/* LLEEEEEER*/
-	//me tome el atrevimiento de usar la interfaz para pruebas, este metodo por ahora va a exportar arbol primario
 	string pathExport;
 	if (path == "")
 	{
@@ -384,10 +381,6 @@ int Servicios::verEstructuraTitulos(string path)
 	string pathHash = Parametros().getParametro(CARPETA_DATOS);
 	pathHash += NOMBRE_HASH_TITULOS;
 
-	//ArbolBMasNumerico* arbolP = new ArbolBMasNumerico(pathArbol,TAMANIO_BLOQUE_BMAS);
-	//arbolP->exportar(pathExport);
-	//delete arbolP;
-	//return 0;
 	Hash * hash_titulos=new Hash(pathHash);
 
 	hash_titulos->mostrar2(pathExport);
@@ -626,7 +619,6 @@ int Servicios::recuperarLibro(unsigned int idLibro, Libro **libro)
 
 	Registro* registro = arbolP->buscarRegistroNumerico(idLibro, &resultado);
 
-	//TODO ver si esta recuperando bien el offset
 	if (registro && resultado.getDescripcion() == "ENCONTRADO"){
 		offset = registro->getReferencias()->front();
 	}

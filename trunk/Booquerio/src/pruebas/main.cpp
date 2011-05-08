@@ -1,5 +1,5 @@
-#include "ArchivoLibros.h"
-#include "Libro.h"
+#include "../archivos/ArchivoLibros.h"
+#include "../archivos/Libro.h"
 #include <iostream>
 using namespace std;
 
