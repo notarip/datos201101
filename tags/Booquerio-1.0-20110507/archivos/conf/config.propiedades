@@ -1,0 +1,14 @@
+P1=prueba 1;
+P2=prueba 2;
+p3=prueba3;
+factor_editoriales=1;
+path_datos=./archivos/datos/;
+path_libros=./archivos/libros/;
+path_arc_stopWords=./archivos/conf/stopWords.csv;
+path_arc_editoriales=./archivos/conf/editoriales.csv;
+path_id=./archivos/datos/id.dat;
+path_arc_listas=./archivos/datos/listas.dat;
+path_arc_libros=./archivos/datos/libros.dat;
+path_salidas=./archivos/salidas/;
+path_arc_listas_ids=./archivos/datos/listas_ids.dat;
+
