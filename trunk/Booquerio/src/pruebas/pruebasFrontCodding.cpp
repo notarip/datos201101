@@ -43,11 +43,12 @@ Bloque* deshacerFrontCoding(Bloque* unBloque) {
 }
 
 
-int main(int argc, char** argv)
+
+int main_ppp(int argc, char** argv)
 {
 
 	list<string> lista;
-	Util().levantarCSV("./archivos/conf/editoriales.csv",&lista);
+	Util().levantarCSV("./archivos/pruebas/testFront.csv",&lista);
 	Bloque *unBloque = new Bloque();
 
 	for (list<string>::iterator it = lista.begin(); it != lista.end(); it++)
@@ -121,14 +122,28 @@ int main(int argc, char** argv)
 	cout << "-----------------------------------" << endl;
 	unBloque = deshacerFrontCoding(bloqueFontCoding);
 	listaR = unBloque->obtenerRegistros();
-
+	list<string>::iterator itOri = lista.begin();
+	string ok;
+	int good = 0;
+	int	bad = 0;
 	for (list<Registro>::iterator it = listaR->begin(); it != listaR->end(); it++)
 	{
 		int coinsidencias = (*it).getAtributosEnteros()->size() > 0 ? (*it).getAtributosEnteros()->front():0;
-		cout << coinsidencias << " | " << (*it).getString() << endl;
+		if ((*it).getString() == (*itOri))
+		{
+			ok = " ---> GOOD";
+			good++;
+		}
+		else
+		{
+			ok = " ---> BAD";
+			bad++;
+		}
+		cout << coinsidencias << " | " << (*it).getString() << " = " <<(*itOri)  << ok << endl;
+		itOri++;
 	}
 
-
+	cout << "Errores: " << bad << "  Sin error: " << good;
 
 	return 0;
 }
