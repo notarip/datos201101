@@ -239,14 +239,14 @@ void Util::levantarCSV(string ruta , list<string> *lista)
 {
     string linea;
     int tamanio;
-    fstream *archivo;
-    archivo->open(ruta.c_str(), ios::binary | ios::in);
-    archivo->seekg(0, ios::end);
-    tamanio = archivo->tellg();
-    archivo->seekg(0);
+    fstream archivo;
+    archivo.open(ruta.c_str(), ios::binary | ios::in);
+    archivo.seekg(0, ios::end);
+    tamanio = archivo.tellg();
+    archivo.seekg(0);
 
     char* buff = new char[tamanio];
-    archivo->read(buff, tamanio);
+    archivo.read(buff, tamanio);
     linea.assign(buff);
     delete [] buff;
 
@@ -269,6 +269,6 @@ void Util::levantarCSV(string ruta , list<string> *lista)
 		lista->push_back(palabra);
 		posIni = posFin + 1;
     }
-    archivo->close();
+    archivo.close();
 
 }
