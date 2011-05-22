@@ -235,3 +235,40 @@ string Util::UIntToString(unsigned int numero)
         return ss.str();
 }
 
+void Util::levantarCSV(string ruta , list<string> *lista)
+{
+    string linea;
+    int tamanio;
+    fstream *archivo;
+    archivo->open(ruta.c_str(), ios::binary | ios::in);
+    archivo->seekg(0, ios::end);
+    tamanio = archivo->tellg();
+    archivo->seekg(0);
+
+    char* buff = new char[tamanio];
+    archivo->read(buff, tamanio);
+    linea.assign(buff);
+    delete [] buff;
+
+
+    unsigned int posIni = 0;
+    unsigned int posFin;
+    bool fin = false;
+    string palabra;
+
+    while (!fin)
+    {
+		posFin = linea.find(',',posIni);
+		if (posFin == string::npos) //no encontro la coma (caso de ultima palabra)
+		{
+			posFin = linea.find('\n',posIni);
+			fin = true;
+		}
+
+		palabra = linea.substr(posIni, posFin - posIni); //string a almacenar
+		lista->push_back(palabra);
+		posIni = posFin + 1;
+    }
+    archivo->close();
+
+}

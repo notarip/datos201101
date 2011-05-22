@@ -204,7 +204,7 @@ int determinar_operacion(int cant_parm, char** parm, string *parametro)
 }
 
 
-int main(int argc, char** argv)
+int mainpp(int argc, char** argv)
 {
 
 	string parametro;

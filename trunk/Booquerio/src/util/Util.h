@@ -87,6 +87,12 @@ public:
 	static string UIntToString(unsigned int numero);
 
 
+	/*
+	 * recibe un archivo csv y devuelve una lista de
+	 * palabras del archivo
+	 */
+	static void levantarCSV(string ruta, list<string> *lista);
+
 
 private:
 	static string convertir(char letra);
