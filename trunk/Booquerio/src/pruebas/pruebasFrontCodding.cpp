@@ -9,6 +9,40 @@
 #include "../archivos/Bloque.h"
 #include "../util/Util.h"
 
+Bloque* deshacerFrontCoding(Bloque* unBloque) {
+
+	Bloque* bloqueDescomprimido= new Bloque();
+	bloqueDescomprimido->setAtributoBloque(unBloque->getAtributoBloque());
+	bloqueDescomprimido->setSiguiente(unBloque->getSiguiente());
+	list<Registro>* listaReg= unBloque->obtenerRegistros();
+	list<Registro>::iterator itRegistros= listaReg->begin();
+	Registro unRegistro(*itRegistros);
+	string previo= itRegistros->getString();
+	*itRegistros++;
+	bloqueDescomprimido->agregarRegistro(unRegistro);
+	unsigned int coincidencias;
+	string actual="";
+	while(itRegistros!=listaReg->end()){
+		Registro unRegistro(*itRegistros);
+		actual="";
+		if(unRegistro.getAtributosEnteros()->size()>0){
+			coincidencias= unRegistro.getAtributosEnteros()->front();
+			unRegistro.getAtributosEnteros()->pop_front();
+		}
+		else
+			coincidencias=0;
+		actual.append(previo,0,coincidencias);
+		previo=unRegistro.getString();
+		actual.append(previo);
+		unRegistro.setString(actual);
+		bloqueDescomprimido->agregarRegistro(unRegistro);
+		previo= actual;
+		itRegistros++;
+	}
+	return bloqueDescomprimido;
+}
+
+
 int main(int argc, char** argv)
 {
 
@@ -64,6 +98,7 @@ int main(int argc, char** argv)
 			unRegistro.setString(stringFront);
 			if (coincidencias>0)
 				unRegistro.agregarAtribEntero(coincidencias);
+
 			bloqueFontCoding->agregarRegistro(unRegistro);
 			itRegistros++;
 			delete []stringFront;
@@ -79,9 +114,20 @@ int main(int argc, char** argv)
 
 	for (list<Registro>::iterator it = listaR->begin(); it != listaR->end(); it++)
 	{
-		int coinsidencias = (*it).getAtributosEnteros() ? (*it).getAtributosEnteros()->front():0;
+		int coinsidencias = (*it).getAtributosEnteros()->size() > 0 ? (*it).getAtributosEnteros()->front():0;
 		cout << coinsidencias << " | " << (*it).getString() << endl;
 	}
+
+	cout << "-----------------------------------" << endl;
+	unBloque = deshacerFrontCoding(bloqueFontCoding);
+	listaR = unBloque->obtenerRegistros();
+
+	for (list<Registro>::iterator it = listaR->begin(); it != listaR->end(); it++)
+	{
+		int coinsidencias = (*it).getAtributosEnteros()->size() > 0 ? (*it).getAtributosEnteros()->front():0;
+		cout << coinsidencias << " | " << (*it).getString() << endl;
+	}
+
 
 
 	return 0;
