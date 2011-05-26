@@ -9,18 +9,18 @@
 
 ArbolBMas::ArbolBMas(string path, unsigned int tamanioBloque) {
 
-	this->archivoNodos = new ArchivoBloques(path, tamanioBloque);
-
-	this->tamanioNodo = tamanioBloque;
-
-	if (Util().existeArchivo(path)){
-		raiz = obtenerBloque(0);
-	}
-	else{
-		raiz = new Bloque();
-		guardarBloque(raiz, 0);
-	}
-	ultimaHojaVisitada = raiz;
+//	this->archivoNodos = new ArchivoBloques(path, tamanioBloque);
+//
+//	this->tamanioNodo = tamanioBloque;
+//
+//	if (Util().existeArchivo(path)){
+//		raiz = obtenerBloque(0);
+//	}
+//	else{
+//		raiz = new Bloque();
+//		guardarBloque(raiz, 0);
+//	}
+//	ultimaHojaVisitada = raiz;
 
 }
 
@@ -47,6 +47,8 @@ resultadoOperacion ArbolBMas::insertar(string clave, unsigned int valor) {
 			//grabo la nueva raiz en la pos 0
 			guardarBloque(nuevaRaiz, 0);
 			delete raiz;
+			if(ultimaHojaVisitada==raiz)
+				ultimaHojaVisitada= nuevaRaiz;
 			raiz = nuevaRaiz;
 
 		}

@@ -43,7 +43,7 @@ int Servicios::tomarTexto(string ruta)
 
 	unsigned int offset = 0;
 	offset = archivo->agregarLibro(unLibro);
-	archivo->~ArchivoLibros();
+	delete archivo;
 
 	//cout << "agrego el libro" << endl;
 
