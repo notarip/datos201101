@@ -10,6 +10,18 @@
 ArbolBMasNumerico::ArbolBMasNumerico(string path,
 		unsigned int tamanioBloque) :
 	ArbolBMas(path, tamanioBloque) {
+	this->archivoNodos = new ArchivoBloques(path, tamanioBloque);
+
+			this->tamanioNodo = tamanioBloque;
+
+			if (Util().existeArchivo(path)){
+				raiz = obtenerBloque(0);
+			}
+			else{
+				raiz = new Bloque();
+				guardarBloque(raiz, 0);
+			}
+			ultimaHojaVisitada = raiz;
 
 }
 

@@ -24,11 +24,11 @@ private:
 
 //	DESCOMENTAR EN CASO DE QUERER APLICAR FRONTCODING
 
-//	virtual float obtenerOcupacionBloque(Bloque* unBloque);
-//	virtual void guardarBloque (Bloque* unBloque, unsigned int nroBloque);
-//	virtual Bloque* obtenerBloque(unsigned int nroBloque);
-//	Bloque* aplicarFrontCoding(Bloque* unBloque);
-//	Bloque* deshacerFrontCoding(Bloque* unBloque);
+	virtual float obtenerOcupacionBloque(Bloque* unBloque);
+	virtual void guardarBloque (Bloque* unBloque, unsigned int nroBloque);
+	virtual Bloque* obtenerBloque(unsigned int nroBloque);
+	Bloque* aplicarFrontCoding(Bloque* unBloque);
+	Bloque* deshacerFrontCoding(Bloque* unBloque);
 };
 
 #endif /* ARBOLBMASALFABETICO_H_ */

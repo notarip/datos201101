@@ -48,7 +48,7 @@ public:
 	void exportar(string path);
 
 
-private:
+protected:
 	list<Registro>::iterator ultimoRegistroVisitado;
 	Bloque* raiz;
 	Bloque* ultimaHojaVisitada;
