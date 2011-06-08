@@ -140,61 +140,63 @@ void procesamiento_de_errores(int error)
 int determinar_operacion(int cant_parm, char** parm, string *parametro)
 {
 
+	string param(parm[1]+1);
+
 	//if (cant_parm > 5 || cant_parm < 2)
 	//	return ERROR_DE_LLAMADA;
 
-	if (parm[1][1] == 'i')
+	if (param == "i")
 	{
 		if (cant_parm == 3) parametro->append(parm[2]);
 		return TOMAR_TEXTO;
 	}
-	if (parm[1][1] == 'e')
+	if (param == "e")
 		return PROCESAR_EDITORIAL;
 
-	if (parm[1][1] == 'a')
+	if (param == "a")
 		return PROCESAR_AUTOR;
 
-	if (parm[1][1] == 't')
+	if (param == "t")
 		return PROCESAR_TITULO;
 
-	if (parm[1][1] == 'p')
+	if (param == "p")
 		return PROCESAR_PALABRAS;
 
-	if (parm[1][1] == 'l')
+	if (param == "l")
 		return LISTAR_ARCHIVOS_TOMADOS;
 
-	if (parm[1][1] == 'o')
+	if (param == "o")
 	{
 		if (cant_parm == 3) parametro->append(parm[2]);
 		return OBTENER_ARCHIVO;
 	}
 
-	if (parm[1][1] == 'q')
+	if (param == "q")
 	{
 		parametro->append(parm[2]);
 		return QUITAR_ARCHIVO;
 	}
 
-	if (parm[1][1] == 'z')
+	if (param == "z")
 	{
 		if (cant_parm == 3) parametro->append(parm[2]);
 		return AGREGAR_VARIOS;
 	}
 
-	if (parm[1][1]== 'q') {
-		for (int i=2; i<= cant_parm; i++) {
+	if (param[0] == 'q') {
+		for (int i=2; i< cant_parm; i++) {
 			parametro->append(parm[i]);
-			parametro+=' ';
+			parametro->append(" ");
 		}
 		parametro->erase(parametro->end()-1);
 
-		if (parm[1][2]=='e') return CONSULTAR_EDITORIAL;
-		if (parm[1][2]=='a') return CONSULTAR_AUTOR;
-		if (parm[1][2]=='t') return CONSULTAR_TITULO;
+		if (param[1]=='e') return CONSULTAR_EDITORIAL;
+		if (param[1]=='a') return CONSULTAR_AUTOR;
+		if (param[1]=='t') return CONSULTAR_TITULO;
 
 	}
 
-	if (parm[1][1] == 'v')
+	if (param == "v")
 	{
 		if (parm[2][1] == 'a')
 		{

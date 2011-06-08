@@ -17,7 +17,6 @@
 #define TAMANIO_B_LISTA_IDS 1024
 #define LISTA_VACIA 1
 
-
 using namespace std;
 
 class ListasIds {
