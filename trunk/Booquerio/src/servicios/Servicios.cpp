@@ -667,6 +667,7 @@ int Servicios::consultarEditorial(string editorialBuscada){
 	string pathArbol = Parametros().getParametro(CARPETA_DATOS);
 	pathArbol += NOMBRE_BMAS_EDITORIALES;
 	ArbolBMasAlfabetico *arbol  = new ArbolBMasAlfabetico(pathArbol, TAMANIO_BLOQUE_BMAS);
+
 	resultadoOperacion resultBusqueda(OK);
 	Registro* regEncontrado= arbol->buscarRegistro(editorialBuscada,&resultBusqueda);
 	if (resultBusqueda.getCodigo()==NO_ENCONTRADO) {
@@ -676,14 +677,12 @@ int Servicios::consultarEditorial(string editorialBuscada){
 		unsigned int offset= regEncontrado->getReferenciai(1);
 		list<unsigned int> listaIdsConsulta;
 		ListasIds().obtenerListaIds(offset,&listaIdsConsulta);
-
 		list<Libro> listadoLibros;
 		list<unsigned int>::iterator itIds = listaIdsConsulta.begin();
 		Libro* unLibro = NULL;
 
 		while (	itIds != listaIdsConsulta.end()){
 			recuperarLibro(*itIds, &unLibro);
-			//agrego un libro a la lista de libros
 			listadoLibros.push_back(*unLibro);
 			itIds++;
 		}
@@ -696,9 +695,7 @@ int Servicios::consultarEditorial(string editorialBuscada){
 			cout << (*it).toString() << endl;
 			i++;
 		}
-		cout << "Fin listado del libros: " << endl;
-
-		return 0;
+		cout << "Fin listado de libros: " << endl;
 
 	}
 
@@ -707,9 +704,80 @@ int Servicios::consultarEditorial(string editorialBuscada){
 }
 
 int Servicios::consultarAutor(string autorBuscado){
+	string pathArbol = Parametros().getParametro(CARPETA_DATOS);
+	pathArbol += NOMBRE_BMAS_AUTORES;
+	ArbolBMasAlfabetico *arbol  = new ArbolBMasAlfabetico(pathArbol, TAMANIO_BLOQUE_BMAS);
 
+	resultadoOperacion resultBusqueda(OK);
+	Registro* regEncontrado= arbol->buscarRegistro(autorBuscado,&resultBusqueda);
+	if (resultBusqueda.getCodigo()==NO_ENCONTRADO) {
+		cout<<"No se encontraron libros del autor buscado"<<endl;
+	}
+	else {
+		unsigned int offset= regEncontrado->getReferenciai(1);
+		list<unsigned int> listaIdsConsulta;
+		ListasIds().obtenerListaIds(offset,&listaIdsConsulta);
+		list<Libro> listadoLibros;
+		list<unsigned int>::iterator itIds = listaIdsConsulta.begin();
+		Libro* unLibro = NULL;
+
+		while (	itIds != listaIdsConsulta.end()){
+			recuperarLibro(*itIds, &unLibro);
+			listadoLibros.push_back(*unLibro);
+			itIds++;
+		}
+
+		cout << "Listado del libros encontrados: " << endl;
+		unsigned int i = 1;
+
+		for (list<Libro>::iterator it = listadoLibros.begin(); it != listadoLibros.end(); it++)	{
+			cout<<"**************************  "<< i << "  **************************" << endl;
+			cout << (*it).toString() << endl;
+			i++;
+		}
+		cout << "Fin listado de libros: " << endl;
+
+	}
+
+	delete arbol;
+	return 0;
 }
 
 int Servicios::consultarTitulo(string tituloBuscado){
+	string pathHash= Parametros().getParametro(CARPETA_DATOS);
+	pathHash+= NOMBRE_HASH_TITULOS;
+	Hash hashTitulos(pathHash);
+	Registro* registroTitulo= hashTitulos.buscar(tituloBuscado);
+
+	if (registroTitulo!= NULL){
+		unsigned int offset= registroTitulo->getAtributosEnteros()->front();
+		list<unsigned int> listaIdsConsulta;
+		ListasIds().obtenerListaIds(offset,&listaIdsConsulta);
+		list<Libro> listadoLibros;
+		list<unsigned int>::iterator itIds = listaIdsConsulta.begin();
+		Libro* unLibro = NULL;
+
+		while (	itIds != listaIdsConsulta.end()){
+			recuperarLibro(*itIds, &unLibro);
+			listadoLibros.push_back(*unLibro);
+			itIds++;
+		}
+
+		cout << "Listado del libros encontrados: " << endl;
+		unsigned int i = 1;
+
+		for (list<Libro>::iterator it = listadoLibros.begin(); it != listadoLibros.end(); it++)	{
+			cout<<"**************************  "<< i << "  **************************" << endl;
+			cout << (*it).toString() << endl;
+			i++;
+		}
+		cout << "Fin listado de libros: " << endl;
+
+	}
+	else{
+		cout<<"No se encontraron libros con el titulo buscado"<<endl;
+	}
+
+	return 0;
 
 }

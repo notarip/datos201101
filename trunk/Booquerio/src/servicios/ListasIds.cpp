@@ -94,8 +94,14 @@ int ListasIds::obtenerListaIds(unsigned int offset, list<unsigned int>* listaIds
 
 	unBloque = archivo->recuperarBloque(offset);
 	unRegistro = unBloque->obtenerRegistros()->back();
+	list<unsigned int> listaEnteros= *(unRegistro.getAtributosEnteros());
+	list<unsigned int>::iterator it=listaEnteros.begin();
 
-	listaIds=  unRegistro.getAtributosEnteros();
+	while (it!=listaEnteros.end()){
+		listaIds->push_back(*it);
+		it++;
+	}
+
 	if (listaIds->size() == 0){
 		delete unBloque;
 		delete archivo;
