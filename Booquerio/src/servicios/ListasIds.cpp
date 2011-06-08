@@ -85,3 +85,23 @@ int ListasIds::sacarIdDelLibro(unsigned int *offset, unsigned int id)
 
 	return 0;
 }
+
+int ListasIds::obtenerListaIds(unsigned int offset, list<unsigned int>* listaIds){
+	string archivoListas = Parametros().getParametro(ARCHIVO_LISTAS_IDS);
+	ArchivoBloques *archivo = new ArchivoBloques(archivoListas,TAMANIO_B_LISTA_IDS);
+	Bloque *unBloque;
+	Registro unRegistro;
+
+	unBloque = archivo->recuperarBloque(offset);
+	unRegistro = unBloque->obtenerRegistros()->back();
+
+	listaIds=  unRegistro.getAtributosEnteros();
+	if (listaIds->size() == 0){
+		delete unBloque;
+		delete archivo;
+		return LISTA_VACIA;
+	}
+	delete unBloque;
+	delete archivo;
+	return 0;
+}
