@@ -38,6 +38,13 @@ public:
 
 	static int sacarIdDelLibro(unsigned int *offset, unsigned int id);
 
+	/*
+	 * Obtiene la lista de Ids del bloque referenciado por el offset. La lista de retorno
+	 * se almacena en el parametro listaIds pasado.
+	 */
+
+	static int obtenerListaIds(unsigned int offset, list<unsigned int>* listaIds);
+
 };
 
 #endif /* LISTASIDS_H_ */

@@ -122,6 +122,12 @@ public:
 
 	static int agregarVarios(string cuantos);
 
+	static int consultarEditorial(string editorialBuscada);
+
+	static int consultarAutor(string autorBuscado);
+
+	static int consultarTitulo(string tituloBuscado);
+
 
 
 private:
