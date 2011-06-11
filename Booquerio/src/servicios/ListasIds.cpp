@@ -44,6 +44,12 @@ int ListasIds::agregarIdDeLibro(unsigned int *offset, unsigned int id, bool list
 	return 0;
 }
 
+int ListasIds::agregarPosPalabra(unsigned int *offset, unsigned int pos, bool listaNueva)
+
+{
+	return agregarIdDeLibro(offset, pos, listaNueva);
+}
+
 
 int ListasIds::sacarIdDelLibro(unsigned int *offset, unsigned int id)
 {
