@@ -230,14 +230,38 @@ void Parser::procesarPalabra(string palabra, set<string>* palabras)
 
 void Parser::guardarPalabra(string palabra, set<string> *palabras)
 {
-	if (palabra[0] != '0' && atoi(palabra.c_str()) == 0)
+
+	palabra = Util().trim(palabra);
+
+	if (palabra.size() > 0 && palabra[0] != '0' && atoi(palabra.c_str()) == 0)
 		if(!this->buscarStopWord(palabra))
+		{
 			palabras->insert(palabra);
+			guardarParaInvertidas(palabra);
+		}
+}
+
+void Parser::guardarParaInvertidas(string palabra)
+{
+
+	this->palInv[palabra].push_back(this->posUltPalabra);
+
+	this->posUltPalabra ++;
+
+}
+
+map<string, list<int> > Parser::obtenerPalabras2()
+{
+	return this->palInv;
 }
 
 bool Parser::buscarStopWord(string palabra)
 {
-	return (bool)this->stopWords.count(palabra);
+
+	if (this->stopWords.count(palabra) == 1)
+		return true;
+
+	return false;
 }
 
 unsigned int Parser::encontrarFinPalabra(unsigned int posIni)

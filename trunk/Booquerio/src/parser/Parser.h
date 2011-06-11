@@ -22,6 +22,7 @@
 #include <string>
 #include <list>
 #include <set>
+#include <map>
 #include <fstream>
 #include "../util/Parametros.h"
 #include "../util/Util.h"
@@ -83,10 +84,19 @@ public:
 	set<string>* obtenerPalabras();
 
 	/*
+	 *
+	 *
+	 */
+
+	map<string, list<int> > obtenerPalabras2();
+
+	/*
 	 * Metodo para pruebas
 	 * lista por consola las stop words que
 	 * levanto del archivo
 	 */
+
+
 	void listarStopWords();
 	/*
 	 * Metodo para pruebas
@@ -102,7 +112,9 @@ private:
 	string titulo;
 	string texto;
 	set<string> stopWords;
+	map<string, list<int> > palInv;
 	Libro* libro;
+	unsigned int posUltPalabra;
 
 	/*
 	 * Metodo privado que levanta las palabras
@@ -183,6 +195,13 @@ private:
 	 * por comas para guardalas en el libro
 	 */
 	void guardarPalabras();
+
+	/*
+	 * guarda las palabras
+	 * para el procesamiento de las
+	 * listas invertidas
+	 */
+	void guardarParaInvertidas(string palabra);
 };
 
 #endif /* PARSER_H_ */

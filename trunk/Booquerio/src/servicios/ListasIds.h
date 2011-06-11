@@ -14,7 +14,7 @@
 #include "../util/Parametros.h"
 
 
-#define TAMANIO_B_LISTA_IDS 1024
+#define TAMANIO_B_LISTA_IDS 4096
 #define LISTA_VACIA 1
 
 using namespace std;
@@ -28,6 +28,13 @@ public:
 	 * creo
 	 */
 	static int agregarIdDeLibro(unsigned int *offset, unsigned int id, bool listaNueva);
+
+	/*
+	 * Agrega una posicion a la lista que indica el offset, si el
+	 * si es una lista nueva devuelve con que offset la
+	 * creo
+	 */
+	static int agregarPosPalabra(unsigned int *offset, unsigned int pos, bool listaNueva);
 
 
 	/*

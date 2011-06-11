@@ -8,6 +8,9 @@
 #include "Servicios.h"
 #include "../hash/Hash.h"
 #include "../util/Util.h"
+
+
+
 int Servicios::tomarTexto(string ruta)
 {
 
@@ -25,7 +28,7 @@ int Servicios::tomarTexto(string ruta)
 
 	//cout << unLibro->toString() << endl; //BORRAR SOLO PARA PROBAR LA IMPRESION
 
-	unParser->~Parser();
+
 
 	//cout << "parsie el libro" << endl;
 
@@ -63,7 +66,52 @@ int Servicios::tomarTexto(string ruta)
 	//cout << "agrego al indice primario" << endl;
 
 
-//agregar el libro a las listas
+	/*******************AGREGADO ENTREGA II*************************/
+
+	//crear el arbol de parlabras
+	string pathArbolPalabras = Parametros().getParametro(CARPETA_DATOS);
+	pathArbolPalabras += NOMBRE_BMAS_PALABRAS;
+	pathArbolPalabras += "_" + Util().UIntToString(unLibro->getId());
+
+	ArbolBMasAlfabetico *arbolPal = new ArbolBMasAlfabetico(pathArbolPalabras, TAMANIO_BLOQUE_BMAS_PALABRAS);
+
+	map<string, list<int> > mapa = unParser->obtenerPalabras2();
+	map<string, list<int> >::iterator itMap;
+	resultadoOperacion resultado(OK);
+	string clave;
+	unsigned int idLista;
+	unsigned int posPal;
+
+	for (itMap = mapa.begin(); itMap != mapa.end(); itMap++)
+	{
+		clave  = itMap->first;
+		posPal = itMap->second.front();
+//		cout << clave << ": " ;
+//		cout << Util().UIntToString(itMap->second.size()) << endl;
+
+		ListasIds().agregarPosPalabra(&idLista,posPal,true);
+
+		arbolPal->insertar(clave,idLista);
+
+		list<int>::iterator itPos;
+		for (itPos = itMap->second.begin(); itPos != itMap->second.end() ; itPos++)
+		{
+			posPal = *itPos;
+			ListasIds().agregarIdDeLibro(&idLista,posPal,false);
+		}
+
+
+	}
+
+	arbolPal->~ArbolBMasAlfabetico();
+
+	/*******************AGREGADO ENTREGA II*************************/
+
+
+	unParser->~Parser();
+
+
+	//agregar el libro a las listas
 	SinIndice *listas = SinIndice().getInstancia();
 
 	return listas->agregarLibroPendienteATodasLasListas(unLibro->getId());
