@@ -26,8 +26,14 @@ public:
 
 private:
 	string carpetaRaiz;
+	//devuelve la lista de documentos ordenadas por relevancia decreciente
 	void consultaUnitaria(string termino);
 	float calcularPeso(string termino, unsigned int documento, float pesoGlobal);
+	float calcularPesoxProximidad(list<string> terminos, unsigned int id);
+
+	void consultaPorTerminosCercanos(list<string> listaTerminos);
+	list<unsigned int> resolverInterseccion(list<unsigned int> vieja,list<unsigned int> nueva);
+
 };
 
 #endif /* PROCESADORCONSULTAS_H_ */
