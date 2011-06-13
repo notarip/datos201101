@@ -77,17 +77,23 @@ int Servicios::tomarTexto(string ruta)
 
 	map<string, list<int> > mapa = unParser->obtenerPalabras2();
 	map<string, list<int> >::iterator itMap;
-	resultadoOperacion resultado(OK);
 	string clave;
 	unsigned int idLista;
 	unsigned int posPal;
+	string mejorP;
+	unsigned int vieja,nueva,mejor = 0;
 
 	for (itMap = mapa.begin(); itMap != mapa.end(); itMap++)
 	{
 		clave  = itMap->first;
 		posPal = itMap->second.front();
-//		cout << clave << ": " ;
-//		cout << Util().UIntToString(itMap->second.size()) << endl;
+		nueva = itMap->second.size();
+
+
+/**********************************************borrar***************************************************/
+		//cout << "palabra " << clave << ": " ;
+		//cout << Util().UIntToString(nueva) << endl;
+/**********************************************borrar***************************************************/
 
 		ListasIds().agregarPosPalabra(&idLista,posPal,true);
 
@@ -97,13 +103,24 @@ int Servicios::tomarTexto(string ruta)
 		for (itPos = itMap->second.begin(); itPos != itMap->second.end() ; itPos++)
 		{
 			posPal = *itPos;
-			ListasIds().agregarIdDeLibro(&idLista,posPal,false);
+			ListasIds().agregarPosPalabra(&idLista,posPal,false);
 		}
 
 
 	}
 
 	arbolPal->~ArbolBMasAlfabetico();
+
+	/**********************************************borrar***************************************************/
+//	list<unsigned int> *lista = new list<unsigned int>();
+//	ListasIds().obtenerListaIds(1,lista);
+//
+//	for (list<unsigned int>::iterator it = lista->begin(); it != lista->end() ; it ++)
+//		cout << *it << endl;
+
+
+
+
 
 	/*******************AGREGADO ENTREGA II*************************/
 
@@ -619,7 +636,7 @@ void Servicios::sacarDelHash(string nombreHash, string clave, unsigned int idLib
 
 	if (registro){
 		offset = registro->getAtributosEnteros()->front();
-		bool listaVacia = ListasIds().sacarIdDelLibro(&offset,idLibro);
+		bool listaVacia = ListasIds().sacarIdDelLibro(offset,idLibro);
 		if (listaVacia == LISTA_VACIA){
 			hash->borrar(clave);
 		}
@@ -644,7 +661,7 @@ void Servicios::sacarDelArbol(string nombreArbol, string clave, unsigned int idL
 	{
 		offset = registro->getReferenciai(1);
 
-		if (ListasIds().sacarIdDelLibro(&offset,idLibro) == LISTA_VACIA){
+		if (ListasIds().sacarIdDelLibro(offset,idLibro) == LISTA_VACIA){
 			resultadoOperacion resultado = arbol->eliminar(clave);
 		}
 	}

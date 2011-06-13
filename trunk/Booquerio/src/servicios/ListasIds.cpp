@@ -13,6 +13,8 @@ int ListasIds::agregarIdDeLibro(unsigned int *offset, unsigned int id, bool list
 	ArchivoBloques *archivo = new ArchivoBloques(archivoListas,TAMANIO_B_LISTA_IDS);
 	Bloque *unBloque, *unBloqueNuevo;
 	Registro *unRegistro;
+
+
 	if (listaNueva)
 	{
 		*offset = archivo->getBloqueLibre();
@@ -25,14 +27,64 @@ int ListasIds::agregarIdDeLibro(unsigned int *offset, unsigned int id, bool list
 
 	}else
 	{
-		//cout << "ya existe, en que bloque la meto?" << *offset << endl;
-		unBloque = archivo->recuperarBloque(*offset);
+		//si y tiene enlazados otros bloques voy por el ultimo
+		unsigned int ultimoBloq = recuperarUltimoBloque(*offset);
+
+		unBloque = archivo->recuperarBloque(ultimoBloq);
 		unRegistro = new Registro();
 		*unRegistro = unBloque->obtenerRegistros()->back();
 		unRegistro->agregarAtribEntero(id);
 		unBloqueNuevo = new Bloque();
 		unBloqueNuevo->agregarRegistro(*unRegistro);
-		archivo->grabarBloque(unBloqueNuevo,*offset);
+
+		try{
+
+			archivo->grabarBloque(unBloqueNuevo,ultimoBloq);
+
+
+		}catch (ExceptionBloque &e)
+		{
+			//pedir un bloque nuevo
+			unsigned int nuevoBloqNro = archivo->getBloqueLibre();
+			Registro *nuevoReg = new Registro();
+
+			//agregar al registro viejo el nro del bloque nuevo
+			unRegistro->agregarReferencia(nuevoBloqNro);
+
+
+
+			unsigned int tercero = unRegistro->getAtributosEnteros()->back();
+
+			unRegistro->getAtributosEnteros()->pop_back();
+
+			unsigned int segundo = unRegistro->getAtributosEnteros()->back();
+
+			unRegistro->getAtributosEnteros()->pop_back();
+
+			unsigned int primer = unRegistro->getAtributosEnteros()->back();
+
+			unRegistro->getAtributosEnteros()->pop_back();
+
+			nuevoReg->agregarAtribEntero(primer);
+			nuevoReg->agregarAtribEntero(segundo);
+			nuevoReg->agregarAtribEntero(tercero);
+
+
+			//grabar el bloque  viejo
+			unBloqueNuevo->~Bloque();
+			unBloqueNuevo = new Bloque();
+			unBloqueNuevo->agregarRegistro(*unRegistro);
+			archivo->grabarBloque(unBloqueNuevo,ultimoBloq);
+
+
+			//grabar el bloque nuevo
+			Bloque *nuevoBloq = new Bloque();
+			nuevoBloq->agregarRegistro(*nuevoReg);
+			archivo->grabarBloque(nuevoBloq,nuevoBloqNro);
+
+		}
+
+
 		delete unBloqueNuevo;
 
 	}
@@ -44,6 +96,58 @@ int ListasIds::agregarIdDeLibro(unsigned int *offset, unsigned int id, bool list
 	return 0;
 }
 
+unsigned int ListasIds::recuperarUltimoBloque(unsigned int primero)
+{
+
+	string archivoListas = Parametros().getParametro(ARCHIVO_LISTAS_IDS);
+	ArchivoBloques *archivo = new ArchivoBloques(archivoListas,TAMANIO_B_LISTA_IDS);
+
+	Bloque *primerBloque;
+
+	primerBloque = archivo->recuperarBloque(primero);
+	Registro unRegistro;
+
+	unRegistro = primerBloque->obtenerRegistros()->back();
+	unsigned int nroBloq;
+	int ref = 0;
+
+	bool vacio = unRegistro.getReferencias()->empty();
+
+	if (!vacio)
+		ref = unRegistro.getReferenciai(1);
+	else
+		ref = -1;
+
+	nroBloq = primero;
+
+	Bloque *otroBloque;
+
+	while (ref > 0)
+	{
+
+		otroBloque = archivo->recuperarBloque(ref);
+		nroBloq = ref;
+
+		unRegistro = otroBloque->obtenerRegistros()->front();
+		ref = 0;
+
+		bool vacia = unRegistro.getReferencias()->empty();
+
+		if (!vacia)
+			ref = unRegistro.getReferenciai(1);
+		else
+			ref = -1;
+
+	}
+
+//	primerBloque->~Bloque();
+//	otroBloque->~Bloque();
+	archivo->~ArchivoBloques();
+
+
+	return nroBloq;
+}
+
 int ListasIds::agregarPosPalabra(unsigned int *offset, unsigned int pos, bool listaNueva)
 
 {
@@ -51,48 +155,121 @@ int ListasIds::agregarPosPalabra(unsigned int *offset, unsigned int pos, bool li
 }
 
 
-int ListasIds::sacarIdDelLibro(unsigned int *offset, unsigned int id)
+int ListasIds::sacarIdDelLibro(unsigned int offset, unsigned int id)
 {
 	string archivoListas = Parametros().getParametro(ARCHIVO_LISTAS_IDS);
 	ArchivoBloques *archivo = new ArchivoBloques(archivoListas,TAMANIO_B_LISTA_IDS);
-	Bloque *unBloque, *unBloqueNuevo;
-	Registro *unRegistro, *unRegistroNuevo;
+	Bloque *unBloque;
+	Registro unRegistro;
 
-	unBloque = archivo->recuperarBloque(*offset);
-	unRegistro = new Registro();
-	*unRegistro = unBloque->obtenerRegistros()->back();
-	unRegistroNuevo = new Registro();
 
-	list<unsigned int> *lista =  unRegistro->getAtributosEnteros();
+	bool encontrado = false;
+	bool corte = false;
+	int ref;
 
-	for (list<unsigned int>::iterator it = lista->begin(); it != lista->end(); it++)
+	while (!encontrado && offset >= 0 && !corte)
 	{
-		if (*it != id)	{
-			//cout<<"C"<<*it<< endl;
-			unRegistroNuevo->agregarAtribEntero(*it);
+		unBloque = archivo->recuperarBloque(offset);
+		unRegistro = unBloque->obtenerRegistros()->back();
+
+		list<unsigned int> *lista =  unRegistro.getAtributosEnteros();
+
+		for (list<unsigned int>::iterator it = lista->begin(); it != lista->end(); it++)
+		{
+			if (*it == id)
+			{
+				unRegistro.getAtributosEnteros()->erase(it);
+				encontrado = true;
+				break;
+			}
+
 		}
+
+		if (!encontrado)
+		{
+			bool vacio = unRegistro.getReferencias()->empty();
+
+			if (!vacio)
+				ref = unRegistro.getReferenciai(1);
+			else
+				ref = -1;
+
+			if (ref >= 0)
+				offset = ref;
+			else
+				corte = true; //para que corte igual
+		}
+
 	}
 
 
-
-	if (unRegistroNuevo->getAtributosEnteros()->size() > 0)
-	{//cout<<"A"<<endl;
-		unBloqueNuevo = new Bloque();
-		unBloqueNuevo->agregarRegistro(*unRegistroNuevo);
-		archivo->grabarBloque(unBloqueNuevo,*offset);
+	if (encontrado)
+	{
+		unBloque->~Bloque();
+		unBloque = new Bloque();
+		unBloque->agregarRegistro(unRegistro);
+		archivo->grabarBloque(unBloque,offset);
 		delete archivo;
 		return 0;
-	}else
-	{//cout<<"B"<<endl;cout<<*offset<<endl;
+	}
+	/*
+	else
+	{
 		archivo->eliminarBloque(*offset);
 		delete archivo;
 		return LISTA_VACIA;
-	}
+	}*/
 
 	return 0;
 }
 
-int ListasIds::obtenerListaIds(unsigned int offset, list<unsigned int>* listaIds){
+int ListasIds::obtenerListaIds(unsigned int offset, list<unsigned int>* listaIds)
+{
+
+	string archivoListas = Parametros().getParametro(ARCHIVO_LISTAS_IDS);
+	ArchivoBloques *archivo = new ArchivoBloques(archivoListas,TAMANIO_B_LISTA_IDS);
+	Bloque *unBloque;
+
+
+	Registro unRegistro;
+
+
+	int primero = offset;
+	list<unsigned int> listaEnteros;
+
+	while (primero >= 0)
+	{
+
+		unBloque = archivo->recuperarBloque(primero);
+		unRegistro = unBloque->obtenerRegistros()->front();
+
+		listaEnteros= *(unRegistro.getAtributosEnteros());
+		list<unsigned int>::iterator it=listaEnteros.begin();
+
+		while (it!=listaEnteros.end())
+		{
+			listaIds->push_back(*it);
+			it++;
+		}
+
+		bool vacio = unRegistro.getReferencias()->empty();
+
+		if (!vacio)
+			primero = unRegistro.getReferenciai(1);
+		else
+			primero = -1;
+
+		unBloque->~Bloque();
+		//unRegistro->~Registro();
+	}
+
+
+	archivo->~ArchivoBloques();
+
+	return 0;
+
+
+/*
 	string archivoListas = Parametros().getParametro(ARCHIVO_LISTAS_IDS);
 	ArchivoBloques *archivo = new ArchivoBloques(archivoListas,TAMANIO_B_LISTA_IDS);
 	Bloque *unBloque;
@@ -116,4 +293,5 @@ int ListasIds::obtenerListaIds(unsigned int offset, list<unsigned int>* listaIds
 	delete unBloque;
 	delete archivo;
 	return 0;
+*/
 }
