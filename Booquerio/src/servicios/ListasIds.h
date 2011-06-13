@@ -14,7 +14,7 @@
 #include "../util/Parametros.h"
 
 
-#define TAMANIO_B_LISTA_IDS 4096
+#define TAMANIO_B_LISTA_IDS 64
 #define LISTA_VACIA 1
 
 using namespace std;
@@ -42,7 +42,7 @@ public:
 	 * sino 0
 	 */
 
-	static int sacarIdDelLibro(unsigned int *offset, unsigned int id);
+	static int sacarIdDelLibro(unsigned int offset, unsigned int id);
 
 	/*
 	 * Obtiene la lista de Ids del bloque referenciado por el offset. La lista de retorno
@@ -50,6 +50,11 @@ public:
 	 */
 
 	static int obtenerListaIds(unsigned int offset, list<unsigned int>* listaIds);
+
+private:
+
+	static unsigned int recuperarUltimoBloque(unsigned int primero);
+
 
 };
 
