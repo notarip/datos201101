@@ -40,6 +40,7 @@
 #include "../hash/Hash.h"
 #include "../ArbolB+/ArbolBMasAlfabetico.h"
 #include "../ArbolB+/ArbolBMasNumerico.h"
+#include "../ProcesadorConsultas/procesadorConsultas.h"
 
 using namespace std;
 
@@ -129,6 +130,8 @@ public:
 	static int consultarAutor(string autorBuscado);
 
 	static int consultarTitulo(string tituloBuscado);
+
+	static int consultarPalabras(string palabrasBuscadas);
 
 
 

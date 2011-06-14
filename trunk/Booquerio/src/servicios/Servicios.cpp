@@ -846,3 +846,11 @@ int Servicios::consultarTitulo(string tituloBuscado){
 	return 0;
 
 }
+
+int Servicios::consultarPalabras(string palabrasBuscadas){
+	list<string> listaTerminos; //ACA DEBERIA SER DEVUELTA POR UN METODO QUE PARSEE EL STRING PARAMETRO
+	listaTerminos.push_back("william");
+	listaTerminos.push_back("morris");
+	ProcesadorConsultas().procesar(listaTerminos);
+	return 0;
+}

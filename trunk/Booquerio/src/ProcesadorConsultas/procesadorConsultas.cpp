@@ -8,7 +8,7 @@
 #include "procesadorConsultas.h"
 
 ProcesadorConsultas::ProcesadorConsultas() {
-	string carpetaRaiz = Parametros().getParametro(CARPETA_DATOS);
+	carpetaRaiz = Parametros().getParametro(CARPETA_DATOS);
 }
 
 ProcesadorConsultas::~ProcesadorConsultas() {
@@ -16,7 +16,132 @@ ProcesadorConsultas::~ProcesadorConsultas() {
 }
 
 float ProcesadorConsultas::calcularPesoxProximidad(list<string> terminos, unsigned int id){
+	unsigned int cantidadTerminos = terminos.size();
+	list<unsigned int> vectorListas[cantidadTerminos];
+	list<unsigned int>::iterator vectorIteradores[cantidadTerminos];
 
+	//levanto las apariciones de terminos de cada documento
+
+
+	string pathArbolTerminos = carpetaRaiz + PREFIJO_ARBOL_TERMINOS;
+	stringstream conversor;
+	conversor << id;
+	string docId;
+	conversor >> docId;
+	pathArbolTerminos += docId;
+
+	cout << pathArbolTerminos << endl;
+
+	ArbolBMasAlfabetico* arbolDeTerminos = new ArbolBMasAlfabetico(
+				pathArbolTerminos, 6144);
+	resultadoOperacion result(OK);
+
+	cout << "levanto arbol del documento " << docId << endl;
+
+	list<string>::iterator itTerminos = terminos.begin();
+	Registro* regEncontrado;
+	unsigned int unOffset;
+	unsigned int n = 0;
+	string unTermino;
+
+	while ( itTerminos != terminos.end()){
+		unTermino = *itTerminos;
+		regEncontrado = arbolDeTerminos->buscarRegistro(unTermino, &result);
+		unOffset = regEncontrado->getReferenciai(1);
+		ListasIds().obtenerListaIds(unOffset, &vectorListas[n]);
+		n++;
+		itTerminos++;
+	}
+
+	//Tengo las listas con las ocurrencias de cada uno de los terminos
+	//Fabrico iteradores para ellos
+
+	for ( unsigned int i = 0 ; i< cantidadTerminos ; i++){
+		vectorIteradores[i] = vectorListas[i].begin();
+	}
+
+	// voy a ir calculando secuencias optimas para cada unos de las posicionse
+	// del ultimo termino
+
+	float pesoDocumento = 0;
+
+	while ( vectorIteradores[cantidadTerminos-1] != vectorListas[cantidadTerminos-1].end()){
+		list<unsigned int> unaSecuencia;
+		unaSecuencia.push_back(*vectorIteradores[cantidadTerminos-1]);
+		list<unsigned int> secOptima;
+
+		ArmarSecuenciaOptima(unaSecuencia,&secOptima,cantidadTerminos,vectorListas);
+
+		if (secOptima.size() !=0 ){
+			pesoDocumento += 1 / pow(obtenerSeparacion(secOptima),2);
+
+			//limpiar listas
+
+			for(unsigned int j=0; j<cantidadTerminos-1; j++){
+				while(vectorListas[j].front()<=(*vectorIteradores[cantidadTerminos-1])){
+					vectorListas[j].pop_front();
+				}
+			}
+		}
+		vectorIteradores[cantidadTerminos-1]++;
+	}
+
+	delete arbolDeTerminos;
+
+	return pesoDocumento;
+}
+
+void ProcesadorConsultas::ArmarSecuenciaOptima(list<unsigned int> secuencia, list<unsigned int>* max , unsigned int cantListas, list<unsigned int> vectorListas[]){
+	//salida recursion
+	if (secuencia.size() == cantListas){
+		unsigned int pesoSecuencia = this->obtenerSeparacion(secuencia);
+		if (pesoSecuencia < this->obtenerSeparacion(*max)){
+			max->clear();
+			*max= secuencia;
+		}
+		return;
+	}
+
+	unsigned int listaActual = cantListas -1 - secuencia.size();
+	unsigned int limite = secuencia.back();
+	list<unsigned int>::iterator it;
+
+	it= vectorListas[listaActual].begin();
+
+	while ( it != vectorListas[listaActual].end() && *it < limite ){
+		secuencia.push_back(*it);
+		this->ArmarSecuenciaOptima(secuencia,max,cantListas,vectorListas);
+		secuencia.pop_back();
+		it++;
+
+	}
+
+
+}
+
+unsigned int ProcesadorConsultas:: obtenerSeparacion(list<unsigned int> unaSecuencia){
+
+	if (unaSecuencia.size() == 0){
+		return UINT_MAX;
+	}
+
+	list<unsigned int>::iterator it,fin;
+	unaSecuencia.sort();
+	it = unaSecuencia.begin();
+	fin = unaSecuencia.end();
+	fin--;
+	unsigned int resultado = 0;
+	unsigned int unaResta,aux;
+
+
+	while (it != fin){
+		aux = *it;
+		it++;
+		unaResta = *it-aux;
+		resultado += unaResta;
+	}
+
+	return resultado;
 }
 
 
@@ -33,11 +158,21 @@ float ProcesadorConsultas::calcularPeso(string termino, unsigned int documento,
 
 	//Obtengo la cantidad de apariciones del termino
 
+	string pathArbolTerminos = carpetaRaiz + PREFIJO_ARBOL_TERMINOS;
+	stringstream conversor;
+	conversor << documento;
+	string docId;
+	conversor >> docId;
+	pathArbolTerminos += docId;
+
 	ArbolBMasAlfabetico* arbolDeTerminos = new ArbolBMasAlfabetico(
-			carpetaRaiz + "arbolDocJ", TAMANIO_BLOQUE); //OJOOOO!! FIJARSE CUAL PUSO PABLO
+			pathArbolTerminos, TAMANIO_BLOQUE);
 	resultadoOperacion result(OK);
 	Registro* regEncontrado = arbolDeTerminos->buscarRegistro(termino, &result);
-	unsigned int aij = regEncontrado->getAtributosEnteros()->size(); //OJOOOO, VER DONDE SE GUARDAN LAS POSICIONES
+	unsigned int offset= regEncontrado->getReferenciai(1);
+	list<unsigned int> listaPosiciones;
+	ListasIds().obtenerListaIds(offset, &listaPosiciones);
+	unsigned int aij = listaPosiciones.size();
 	delete arbolDeTerminos;
 
 	return (aij * pesoGlobal / norma);
@@ -135,7 +270,7 @@ void ProcesadorConsultas::consultaPorTerminosCercanos(
 		itTerminos++;
 		primeraVez = false;
 	}
-	//a la salida de este while tengo en idsTodos los terminos documentos que contienen a todos los terminos
+	//a la salida de este while tengo en idsTodos los documentos que contienen a todos los terminos
 	if ( idsTodos.size() == 0) {
 		//busqueda no satisfactoria
 		cout << "La Busqueda no Obtuvo Resultados con todas esas palabras" << endl;
@@ -150,10 +285,11 @@ void ProcesadorConsultas::consultaPorTerminosCercanos(
 	list<float> listaPesos;
 	list<unsigned int>::iterator itDocs;
 	list<float>::iterator itPesos;
-
+	cout<<"LLEGUE"<<endl;
 	while ( itDocsARankear != idsTodos.end()){
-		unPeso = this->calcularPesoxProximidad(listaTerminos,*itDocs);
-
+		cout<<"calculo peso del doc "<< *itDocsARankear <<endl;
+		unPeso = this->calcularPesoxProximidad(listaTerminos,*itDocsARankear);
+		cout<<"ok calculado "<< *itDocsARankear <<endl;
 		itDocs = listaDocsRankeados.begin();
 		itPesos = listaPesos.begin();
 
@@ -166,11 +302,11 @@ void ProcesadorConsultas::consultaPorTerminosCercanos(
 
 		itDocsARankear++;
 	}
+	cout<<"LLEGUE2"<<endl;
 
 	//aca tengo 2 listas con los contenidos ordenados por pesos, una de pesos y otras de doc
 
-	/*TERMINAR DE REVISAR COMO IMPRIMIOS LA INFO*/
-
+	imprimirConsulta(listaDocsRankeados);
 
 }
 
@@ -191,7 +327,6 @@ list<unsigned int> ProcesadorConsultas::resolverInterseccion(list<unsigned int> 
 		encontrado = false;
 		imposible = false;
 		aVerificar = *itViejo;
-		cout << "verifico" << aVerificar << endl;
 
 		while (!encontrado && !imposible) {
 			if (*itNuevo == aVerificar)
@@ -207,11 +342,30 @@ list<unsigned int> ProcesadorConsultas::resolverInterseccion(list<unsigned int> 
 
 		if (encontrado) {
 			resultado.push_back(*itViejo);
+			cout<<*itViejo<<endl;
 		}
 		itViejo++;
 	}
 
 	return resultado;
 
+}
+
+void ProcesadorConsultas::imprimirConsulta(list<unsigned int> docRankeados){
+	list<unsigned int>::iterator itRanking= docRankeados.begin();
+	cout<<"La consulta ha arrojado resultados en los siguientes libros, "
+			"ordenados de acuerdo a relevancia"<<endl<<endl;
+	while(itRanking!=docRankeados.end()){
+		cout<<*itRanking<<endl;
+		itRanking++;
+	}
+}
+
+void ProcesadorConsultas::procesar(list<string> terminos){
+	if (terminos.size()==0)
+		cout<<"No se encontraron resultados para la consulta"<<endl;
+	else if (terminos.size()==1)
+		consultaUnitaria(terminos.front());
+		else consultaPorTerminosCercanos(terminos);
 }
 
