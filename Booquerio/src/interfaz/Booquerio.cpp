@@ -62,6 +62,7 @@
 #define CONSULTAR_EDITORIAL 100
 #define CONSULTAR_AUTOR 101
 #define CONSULTAR_TITULO 102
+#define CONSULTAR_PALABRAS 103
 
 
 #include <iostream>
@@ -88,6 +89,9 @@ void error_de_llamada()
 	cout << "Consultar Editorial: ./ejecutable -qe “Editorial”" << endl;
 	cout <<	"Consultar Autor: ./ejecutable –qa “Autor”" << endl;
 	cout <<	"Consultar Título: ./ejecutable –qt “Título”" << endl;
+	cout << "Consultar Palabras: ./ejecutable –qp “Palabras para búsqueda por cercania“"
+			"y rankeada"<< endl;
+
 }
 
 void error_archivo_listas()
@@ -193,6 +197,7 @@ int determinar_operacion(int cant_parm, char** parm, string *parametro)
 		if (param[1]=='e') return CONSULTAR_EDITORIAL;
 		if (param[1]=='a') return CONSULTAR_AUTOR;
 		if (param[1]=='t') return CONSULTAR_TITULO;
+		if (param[1]=='p') return CONSULTAR_PALABRAS;
 
 	}
 
@@ -258,6 +263,7 @@ int main(int argc, char** argv)
 		case CONSULTAR_EDITORIAL:error = Servicios().consultarEditorial(parametro);break;
 		case CONSULTAR_AUTOR:error = Servicios().consultarAutor(parametro);break;
 		case CONSULTAR_TITULO:error = Servicios().consultarTitulo(parametro);break;
+		case CONSULTAR_PALABRAS:error = Servicios().consultarPalabras(parametro);break;
 
 		case ERROR_DE_LLAMADA:error = ERROR_DE_LLAMADA;break;
 		default:error = ERROR_DE_LLAMADA;break;
