@@ -83,7 +83,7 @@ float ProcesadorConsultas::calcularPesoxProximidad(list<string> terminos, unsign
 	}
 
 	delete arbolDeTerminos;
-
+	cout<<"salgo con "<<pesoDocumento<<endl;
 	return pesoDocumento;
 }
 
@@ -302,11 +302,10 @@ void ProcesadorConsultas::consultaPorTerminosCercanos(
 	while ( itDocsARankear != idsTodos.end()){
 		cout<<"calculo peso del doc "<< *itDocsARankear <<endl;
 		unPeso = this->calcularPesoxProximidad(listaTerminos,*itDocsARankear);
-		cout<<"ok calculado ... dio"<< unPeso << *itDocsARankear <<endl;
 		itDocs = listaDocsRankeados.begin();
 		itPesos = listaPesos.begin();
 
-		while (unPeso < *itPesos) {
+		while (itPesos!= listaPesos.end() && unPeso < *itPesos) {
 			itPesos++;
 			itDocs++;
 		}
