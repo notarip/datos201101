@@ -83,6 +83,9 @@ int Servicios::tomarTexto(string ruta)
 	string mejorP;
 	unsigned int vieja,nueva,mejor = 0;
 
+	//cout << "llego a insertar las cosas al arbol" << endl;
+	//cin.get();
+
 	for (itMap = mapa.begin(); itMap != mapa.end(); itMap++)
 	{
 		clave  = itMap->first;
@@ -109,8 +112,7 @@ int Servicios::tomarTexto(string ruta)
 
 	}
 
-	arbolPal->~ArbolBMasAlfabetico();
-
+	delete arbolPal;
 	/**********************************************borrar***************************************************/
 //	list<unsigned int> *lista = new list<unsigned int>();
 //	ListasIds().obtenerListaIds(1,lista);
@@ -849,8 +851,12 @@ int Servicios::consultarTitulo(string tituloBuscado){
 
 int Servicios::consultarPalabras(string palabrasBuscadas){
 	list<string> listaTerminos; //ACA DEBERIA SER DEVUELTA POR UN METODO QUE PARSEE EL STRING PARAMETRO
-	listaTerminos.push_back("william");
-	listaTerminos.push_back("morris");
+	listaTerminos.push_back("claros");
+	listaTerminos.push_back("ojos");
+	listaTerminos.push_back("barbaro");
+	//listaTerminos.push_back("pesadilla");
+
+
 	ProcesadorConsultas().procesar(listaTerminos);
 	return 0;
 }
