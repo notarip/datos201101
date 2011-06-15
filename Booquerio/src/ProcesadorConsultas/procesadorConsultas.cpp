@@ -144,13 +144,8 @@ unsigned int ProcesadorConsultas:: obtenerSeparacion(list<unsigned int> unaSecue
 float ProcesadorConsultas::calcularPeso(string termino, unsigned int documento,
 		float pesoGlobal) {
 
-	//Calculo la norma infinito del documento
-	fstream archNormas;
-	string pathArchNormas = carpetaRaiz + "archivoNormas"; //OJO!! FIJARSE CUAL ES EL PATH LUEGO
-	archNormas.open(pathArchNormas.c_str(), ios::in);
-	archNormas.seekg(documento * sizeof(int));
-	unsigned int norma;
-	archNormas >> norma;
+	archivoNormasInf archivoNormas;
+	unsigned int norma= archivoNormas.obtenerNorma(documento);
 
 	//Obtengo la cantidad de apariciones del termino
 

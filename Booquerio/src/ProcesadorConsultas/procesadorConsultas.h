@@ -11,6 +11,7 @@
 #include "../hash/Hash.h"
 #include "../ArbolB+/ArbolBMasAlfabetico.h"
 #include "../ArbolB+/ArbolBMasNumerico.h"
+#include "../ProcesadorConsultas/archivoNormasInf.h"
 #include "../servicios/ListasIds.h"
 #include <cmath>
 #include "limits.h"
