@@ -8,6 +8,7 @@
 #include "Servicios.h"
 #include "../hash/Hash.h"
 #include "../util/Util.h"
+#include "../ProcesadorConsultas/archivoNormasInf.h"
 
 
 
@@ -86,11 +87,19 @@ int Servicios::tomarTexto(string ruta)
 	//cout << "llego a insertar las cosas al arbol" << endl;
 	//cin.get();
 
+	unsigned int ocurrenciasMax=0;
+	string pala="";
+
 	for (itMap = mapa.begin(); itMap != mapa.end(); itMap++)
 	{
 		clave  = itMap->first;
 		posPal = itMap->second.front();
 		nueva = itMap->second.size();
+
+		if ( ocurrenciasMax < itMap->second.size() ){
+			ocurrenciasMax= itMap->second.size();
+			pala= itMap->first;
+		}
 
 
 /**********************************************borrar***************************************************/
@@ -109,8 +118,10 @@ int Servicios::tomarTexto(string ruta)
 			ListasIds().agregarPosPalabra(&idLista,posPal,false);
 		}
 
-
 	}
+	cout<<pala<<endl;
+	archivoNormasInf archivoNormas;
+	archivoNormas.escribirNorma(ocurrenciasMax);
 
 	delete arbolPal;
 	/**********************************************borrar***************************************************/
