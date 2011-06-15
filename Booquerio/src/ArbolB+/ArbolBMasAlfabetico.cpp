@@ -152,6 +152,7 @@ void ArbolBMasAlfabetico::guardarBloque(Bloque* unBloque, unsigned int nroBloque
 		delete bloqueAGrabar;
 		throw e;
 	};
+	delete bloqueAGrabar;
 }
 
 Bloque* ArbolBMasAlfabetico::obtenerBloque(unsigned int nroBloque){

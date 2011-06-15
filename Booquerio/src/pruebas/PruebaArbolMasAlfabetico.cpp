@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int main22(){
+int main44(){
 	string unPath = "ArbolBMas";
 
 	ArbolBMasAlfabetico* miArbol = new ArbolBMasAlfabetico(unPath,120);
