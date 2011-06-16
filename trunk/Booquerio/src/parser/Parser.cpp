@@ -63,6 +63,15 @@ set<string> *Parser::obtenerPalabras(Libro unLibro)
 set<string> *Parser::obtenerPalabras()
 {
 
+	this->cargarStopWords();
+
+	return this->procesarPalabras();
+
+}
+
+void Parser::cargarStopWords()
+{
+
 	fstream archStopW;
 	string path_stopW = Parametros().getParametro(TAG_PATH_STOP_WORDS);
 
@@ -72,9 +81,6 @@ set<string> *Parser::obtenerPalabras()
 		levantarCSV(&archStopW,&stopWords);
 		archStopW.close();
 	}
-
-
-	return this->procesarPalabras();
 
 }
 
@@ -170,7 +176,7 @@ set<string> *Parser::procesarPalabras()
 
 	while (posFin <= largo)
 	{
-		posFin = encontrarFinPalabra(posIni);
+		posFin = encontrarFinPalabra(posIni, this->texto);
 		palabra = this->texto.substr(posIni,posFin - posIni);
 		procesarPalabra(palabra, palabras);
 		posIni = posFin + 1;
@@ -178,6 +184,7 @@ set<string> *Parser::procesarPalabras()
 
 	return palabras;
 }
+
 
 
 void Parser::procesarPalabra(string palabra, set<string>* palabras)
@@ -264,12 +271,12 @@ bool Parser::buscarStopWord(string palabra)
 	return false;
 }
 
-unsigned int Parser::encontrarFinPalabra(unsigned int posIni)
+unsigned int Parser::encontrarFinPalabra(unsigned int posIni, string palabra)
 {
 
-	unsigned int posFinEspacio = this->texto.find(' ',posIni);
-	unsigned int posFinEndL = this->texto.find('\n',posIni);
-	unsigned int posFinEndF = this->texto.find('\0',posIni);
+	unsigned int posFinEspacio = palabra.find(' ',posIni);
+	unsigned int posFinEndL = palabra.find('\n',posIni);
+	unsigned int posFinEndF = palabra.find('\0',posIni);
 
 	if (posFinEspacio != string::npos && posFinEndL != string::npos)
 		return posFinEspacio < posFinEndL ? posFinEspacio:posFinEndL;
@@ -375,4 +382,86 @@ void Parser::listarLibro(bool conTexto)
 }
 
 
+/************AGREGADO PARA LA 2DA ENTREGA****************/
 
+list<string>* Parser::parsearFrase(string frase)
+{
+	list<string> *palabras = new list<string>();
+
+	unsigned int posIni = 0;
+	unsigned int posFin = 0;
+	unsigned int largo = frase.length();
+	string palabra;
+
+	this->cargarStopWords();
+
+	while (posFin <= largo)
+	{
+		posFin = encontrarFinPalabra(posIni, frase);
+		palabra = frase.substr(posIni,posFin - posIni);
+		procesarPalabra(palabra, palabras);
+		posIni = posFin + 1;
+	}
+
+	return palabras;
+}
+
+
+void Parser::procesarPalabra(string palabra, list<string>* palabras)
+{
+
+
+	//reemplaza los inavalidos por espacios
+	unsigned int pos = palabra.find_first_of(INVALIDOS);
+	while (pos != string::npos)
+	{
+		palabra[pos] = ' ';
+		pos = palabra.find_first_of(INVALIDOS, pos+1);
+	}
+
+	//reemplaza los  \n por espacios
+	for (unsigned int j = 0; j < palabra.size();j++)
+			if (palabra.at(j) == '\n' || palabra.at(j) == '\r' || palabra.at(j) == '\0')
+					palabra[j] = ' ';
+
+	//cambia tilde
+	palabra = Util().sinTilde(palabra);
+
+	//a minuscula
+	palabra = Util().toLower(palabra);
+
+
+	//saco espacios al pricipio y al final
+	palabra = Util().trim(palabra);
+
+	if (palabra.size() != 0)
+	{
+		//analiza si quedaron dos o mas palabras (ejemplo: www fi uba ar)
+		//quedo un espacio en el medio
+		//esto funciona por que antes hice el trim
+		unsigned int posFin = palabra.find(' ',0);
+		string palabraLimpia;
+
+		while (posFin != string::npos)
+		{
+			palabraLimpia = palabra.substr(0,posFin+1);
+			this->guardarPalabra(palabraLimpia, palabras);
+			palabra.erase(0,posFin+1);
+			posFin = palabra.find(' ',0);
+		}
+
+		this->guardarPalabra(palabra, palabras);
+	} //palabra.size() != 0
+}
+
+void Parser::guardarPalabra(string palabra, list<string> *palabras)
+{
+
+	palabra = Util().trim(palabra);
+
+	if (palabra.size() > 0 && palabra[0] != '0' && atoi(palabra.c_str()) == 0)
+		if(!this->buscarStopWord(palabra))
+		{
+			palabras->push_back(palabra);
+		}
+}
