@@ -106,6 +106,12 @@ public:
 	 */
 	void listarLibro(bool conTexto);
 
+	/*
+	 * Separa una frase en una lista de
+	 * palabras sacando stopwors, etc
+	 */
+	list<string> *parsearFrase(string frase);
+
 private:
 	string autor;
 	string editorial;
@@ -152,6 +158,14 @@ private:
 	 */
 	void procesarPalabra(string palabra, set<string>* palabras);
 
+	/*
+	 * Retira los caracteres invalidos
+	 * de @palabra, comprueba la no existencia
+	 * como stop word y la agrega en la lista
+	 * de palabras
+	 */
+	void procesarPalabra(string palabra, list<string>* palabras);
+
 
 	/*
 	 * Guarda una palabra en la lista de palabras
@@ -160,13 +174,20 @@ private:
 
 	void guardarPalabra(string palabra, set<string> *palabras);
 
+	/*
+	 * Guarda una palabra en la lista de palabras
+	 * siempre que no este en la lista de stop words
+	 */
+
+	void guardarPalabra(string palabra, list<string> *palabras);
+
 
 	/*
 	 * Desde @posIni busca en el texto
 	 * del libro donde termina la siguiente palabra
 	 *
 	 */
-	unsigned int encontrarFinPalabra(unsigned int posIni);
+	unsigned int encontrarFinPalabra(unsigned int posIni, string palabra);
 
 	/*
 	 * Busca una @palabra dentro de la lista
@@ -202,6 +223,11 @@ private:
 	 * listas invertidas
 	 */
 	void guardarParaInvertidas(string palabra);
+
+	/*
+	 * Carga las stop words a memoria
+	 */
+	void cargarStopWords();
 };
 
 #endif /* PARSER_H_ */
