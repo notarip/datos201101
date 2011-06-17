@@ -83,7 +83,7 @@ float ProcesadorConsultas::calcularPesoxProximidad(list<string> terminos, unsign
 	}
 
 	delete arbolDeTerminos;
-	cout<<"salgo con "<<pesoDocumento<<endl;
+	//cout<<"salgo con "<<pesoDocumento<<endl;
 	return pesoDocumento;
 }
 
@@ -227,6 +227,200 @@ void ProcesadorConsultas::consultaUnitaria(string termino) {
 	}
 }
 
+void ProcesadorConsultas::consultaPorTerminosCercanos2(list<string> listaTerminos){
+	unsigned int  cantTerminos = listaTerminos.size();
+	list<unsigned int> vectorDocumentos[cantTerminos];
+	string pathHash = carpetaRaiz + "hash_palabras";
+	Hash hashTerminos(pathHash);
+	list<string>::iterator itTerminos = listaTerminos.begin();
+	string unTermino;
+	unsigned int i =0, unOffset;;
+
+	/* itero sobre las palabras buscando todas las listas invertidas de cada termino*/
+	while (itTerminos != listaTerminos.end()){
+		unTermino = *itTerminos;
+		cout << "busco termino :" << *itTerminos << endl;
+		Registro* regPalabra = hashTerminos.buscar(unTermino);
+
+		if(regPalabra != NULL){
+			unOffset = regPalabra->getAtributosEnteros()->front();
+			ListasIds().obtenerListaIds(unOffset, vectorDocumentos+i);
+
+			list<unsigned int >::iterator it = vectorDocumentos[i].begin();
+			cout << "lista encontrada de esta palabra " << endl;
+			while ( it != vectorDocumentos[i].end() ){
+				cout << *it << '-';
+				it++;
+			}
+			cout << endl;
+		}
+		itTerminos++;
+		i++;
+	}
+
+	// aca ya tengo las listas de docs donde aparecen los terminos
+	list<unsigned int> idsYaRankeados, listaIdsARankear;
+	unsigned int agrupador = cantTerminos, j ,k;
+	bool primeraVez;
+	list<float> pesosDocs;
+
+	cout << "VAMOS POR LOS PESOS DE CADA DOCUMENTO EMPEZANDO POR LOS DE MAS PALABRAS COINCIDENTES" << endl;
+
+	// resuelvo intersecciones para rankear documentos
+	while (agrupador > 1){
+
+		cout << "Con " << agrupador << " palabras de las buscadas"  << endl;
+		cout<<"Los siguientes libros, ""ordenados de acuerdo a relevancia"<<endl<<endl;
+
+
+		//interseco todos los que tiene los terminos agrupados s/ agrupador
+		// j marca la posicion incial donde arranco a agrupar
+		for ( j = 0 ; j <= cantTerminos - agrupador ; j++){
+			primeraVez = true;
+
+			// armo una combinacion de terminos agrupados de a "agrupador"
+			for ( k = 1 ; k <= agrupador ; k++ ){
+				if (primeraVez){
+					listaIdsARankear = vectorDocumentos[j+k-1];
+					primeraVez = false;
+				}
+				else
+					listaIdsARankear = resolverInterseccion(vectorDocumentos[j+k-1],listaIdsARankear);
+			}
+			// aca tengo una lista de documento agrupados a "agrupar" a rankear
+			// le resto los ya rankeados
+			listaIdsARankear = this->resolverResta(listaIdsARankear,idsYaRankeados);
+
+			// calculo sus pesos
+			pesosDocs = this->calculadorPesos(listaIdsARankear,listaTerminos,agrupador,j+1);
+
+			// los peso segun la cantidad de palabras totales de la consulta que posee
+			pesosDocs = this-> pesarSegunCantPalabras(pesosDocs,agrupador);
+
+			// los rankeo
+			this->rankearDocumentos(listaIdsARankear,pesosDocs);
+
+			// los agrego a los ya rankeados
+			idsYaRankeados.splice(idsYaRankeados.begin(),listaIdsARankear);
+			listaIdsARankear.clear();
+		}
+		// en la prox iteracion buscare agrupar de a menos
+		agrupador--;
+	}
+
+
+}
+
+list<float> ProcesadorConsultas::calculadorPesos(list<unsigned int> documentos,list<string> terminos,unsigned int agrupacion, unsigned int comienzo){
+	list<string> terminosAgrupados;
+	// armo la lista de terminos segun esta agrupacion a partir de todos los terminos
+	unsigned int i,j;
+	for(i=1; i< comienzo; i++){
+		terminos.pop_front();
+	}
+	for(j=1; j<= agrupacion; j++){
+		terminosAgrupados.push_back(terminos.front());
+		terminos.pop_front();
+	}
+
+	list<float> resultado;
+
+	list<unsigned int>::iterator itDocs = documentos.begin();
+
+	// Ahora si itero por los documentos y calculo sus pesos
+	while (itDocs != documentos.end() ){
+		resultado.push_back(this->calcularPesoxProximidad(terminosAgrupados,*itDocs));
+		itDocs++;
+	}
+
+	return resultado;
+}
+
+list<unsigned int> ProcesadorConsultas::resolverResta(list<unsigned int> original, list<unsigned int> aRestar){
+	list<unsigned int> resultado;
+
+	original.sort();
+	aRestar.sort();
+
+	list<unsigned int>::iterator itOrig = original.begin(), itRestar = aRestar.begin();
+	unsigned int docARestar;
+
+	while (itOrig != original.end() && itRestar != aRestar.end()){
+		docARestar = *itRestar;
+		while ( *itOrig < docARestar){
+			resultado.push_back(*itOrig);
+			itOrig++;
+			original.pop_front();
+			itOrig = original.begin();
+		}
+		if ( *itOrig == docARestar){
+			original.pop_front();
+			itOrig = original.begin();
+		}
+
+		itRestar++;
+	}
+
+	while(itOrig != original.end()){
+		resultado.push_back(*itOrig);
+		itOrig++;
+	}
+
+	return resultado;
+
+}
+
+void ProcesadorConsultas::rankearDocumentos(list<unsigned int> documentos, list<float> pesos){
+	list<unsigned int> listaDocs;
+	list<float> listaPesos;
+	list<unsigned int>::iterator itDocsOrdenados, itDocs = documentos.begin();
+	list<float>::iterator itPesosOrdenados, itPesos = pesos.begin();
+	float unPeso;
+
+	while (itDocs != documentos.end()) {
+		unPeso = *itPesos;
+
+		itPesosOrdenados = listaPesos.begin();
+		itDocsOrdenados = listaDocs.begin();
+
+		while (unPeso < *itPesosOrdenados) {
+			itPesosOrdenados++;
+			itDocsOrdenados++;
+		}
+		listaDocs.insert(itDocsOrdenados, *itDocs);
+		listaPesos.insert(itPesosOrdenados, unPeso);
+
+		itDocs++;
+		itPesos++;
+	}
+
+	this->imprimirConsulta(listaDocs, listaPesos);
+
+//	map<unsigned int,float> miMapa;
+//	unsigned int i =1, cantidad= documentos.size();
+//	for (  ; i <= cantidad; i++){
+//		miMapa.insert( pair<unsigned int,float>(documentos.front(),pesos.front()));
+//		documentos.pop_front();
+//		pesos.pop_front();
+//	}
+//	this->imprimirConsulta(miMapa);
+}
+
+list<float> ProcesadorConsultas::pesarSegunCantPalabras(list<float> pesos, unsigned int agrupacion){
+	list<float>::iterator itPesos = pesos.begin();
+	list<float> resultado;
+
+	while ( itPesos!= pesos.end()){
+		resultado.push_back((*itPesos)*pow(10,agrupacion));
+		// REVISAR SI ESTA FORMA DE PONDERAR LES PARECE BIEN
+		itPesos++;
+	}
+
+	return resultado;
+
+}
+
+
 void ProcesadorConsultas::consultaPorTerminosCercanos(
 		list<string> listaTerminos) {
 
@@ -288,8 +482,6 @@ void ProcesadorConsultas::consultaPorTerminosCercanos(
 		cout << "La Busqueda no Obtuvo Resultados con todas esas palabras" << endl;
 		return;
 	}
-
-
 
 	//Ahora debo iterar por estos documentos y asignar un peso a cada uno de ellos
 	list<unsigned int>::iterator itDocsARankear = idsTodos.begin();
@@ -371,11 +563,46 @@ void ProcesadorConsultas::imprimirConsulta(list<unsigned int> docRankeados){
 	}
 }
 
+void ProcesadorConsultas::imprimirConsulta(map<unsigned int,float> unMapa){
+	map<unsigned int, float >::iterator itRanking = unMapa.begin();
+	//cout<<"La consulta ha arrojado resultados en los siguientes libros, "
+	//		"ordenados de acuerdo a relevancia"<<endl<<endl;
+
+	while (itRanking != unMapa.end()){
+		cout << "Doc : " << (*itRanking).first;
+		cout << "			" << "Peso" << (*itRanking).second;
+		\
+		cout << endl;
+		itRanking++;
+	}
+
+}
+
+void ProcesadorConsultas::imprimirConsulta(list<unsigned int> docsOrdenados,list<float> pesosOrdenados){
+	list<unsigned int>::iterator itRanking = docsOrdenados.begin();
+	list<float>::iterator itRanking2 = pesosOrdenados.begin();
+
+	if (docsOrdenados.size() == 0){
+		cout<< "no hay apariciones en ningun documento de esta cantidad de palabras" << endl;
+		return;
+	}
+
+
+	while (itRanking != docsOrdenados.end()){
+		cout << "Doc : " << (*itRanking);
+		cout << "			" << "Peso" << (*itRanking2);
+		cout << endl;
+		itRanking++;
+		itRanking2++;
+	}
+
+}
+
 void ProcesadorConsultas::procesar(list<string> terminos){
 	if (terminos.size()==0)
 		cout<<"No se encontraron resultados para la consulta"<<endl;
 	else if (terminos.size()==1)
 		consultaUnitaria(terminos.front());
-		else consultaPorTerminosCercanos(terminos);
+		else consultaPorTerminosCercanos2(terminos);
 }
 

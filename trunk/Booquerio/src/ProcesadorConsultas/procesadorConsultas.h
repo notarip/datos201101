@@ -15,6 +15,7 @@
 #include "../servicios/ListasIds.h"
 #include <cmath>
 #include "limits.h"
+#include <map>
 
 #define TAMANIO_BLOQUE_BMAS_NUMERICO 1024
 #define PREFIJO_ARBOL_TERMINOS "bmas_palabras_"
@@ -35,11 +36,23 @@ private:
 	float calcularPesoxProximidad(list<string> terminos, unsigned int id);
 	void ArmarSecuenciaOptima(list<unsigned int> secuencia, list<unsigned int>* max , unsigned int cantListas, list<unsigned int>[]);
 	unsigned int obtenerSeparacion(list<unsigned int> unaSecuencia);
+	void consultaPorTerminosCercanos2(list<string> listaTerminos);
+	list<float> calculadorPesos(list<unsigned int> documentos,list<string> terminos, unsigned int agrupacion, unsigned int comienzo);
+	void rankearDocumentos(list<unsigned int> documentos, list<float> pesos);
+	list<float> pesarSegunCantPalabras(list<float> pesos, unsigned int agrupacion);
+
+
 
 	void consultaPorTerminosCercanos(list<string> listaTerminos);
 	list<unsigned int> resolverInterseccion(list<unsigned int> vieja,list<unsigned int> nueva);
+public:
+	list<unsigned int> resolverResta(list<unsigned int> original, list<unsigned int> aRestar);
 
 	void imprimirConsulta(list<unsigned int> docRankeados);
+	void imprimirConsulta(map<unsigned int,float> unMapa);
+	void imprimirConsulta(list<unsigned int> docsOrdenados,list<float> pesosOrdenados);
+
+
 };
 
 #endif /* PROCESADORCONSULTAS_H_ */

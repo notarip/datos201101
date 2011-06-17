@@ -881,13 +881,22 @@ int Servicios::consultarTitulo(string tituloBuscado){
 }
 
 int Servicios::consultarPalabras(string palabrasBuscadas){
-	list<string> listaTerminos; //ACA DEBERIA SER DEVUELTA POR UN METODO QUE PARSEE EL STRING PARAMETRO
-	listaTerminos.push_back("claros");
-	listaTerminos.push_back("ojos");
-	listaTerminos.push_back("barbaro");
+	list<string>* listaTerminos = Parser().parsearFrase(palabrasBuscadas);
+
+	//ACA DEBERIA SER DEVUELTA POR UN METODO QUE PARSEE EL STRING PARAMETRO
+	//listaTerminos.push_back("claros");
+	//listaTerminos.push_back("ojos");
+	//listaTerminos.push_back("barbaro");
 	//listaTerminos.push_back("pesadilla");
 
+	list<string>::iterator it = listaTerminos->begin();
+	cout << "palabras en la busqueda: " << endl;
+	while (it != listaTerminos->end()){
+		cout << *it << endl;
+		it++;
+	}
+	ProcesadorConsultas().procesar(*listaTerminos);
 
-	ProcesadorConsultas().procesar(listaTerminos);
+	delete listaTerminos;
 	return 0;
 }
