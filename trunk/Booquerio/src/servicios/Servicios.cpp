@@ -87,8 +87,26 @@ int Servicios::tomarTexto(string ruta)
 	//cout << "llego a insertar las cosas al arbol" << endl;
 	//cin.get();
 
-	unsigned int ocurrenciasMax=0;
-	string pala="";
+	///////////////////////  agrego la funcionalidad para guardar normas infinito   ///////
+
+	string pathArbolPrim = Parametros().getParametro(CARPETA_DATOS);
+	pathArbolPrim+= NOMBRE_BMAS_PRIMARIO;
+	ArbolBMasNumerico* arbolPrimario = new ArbolBMasNumerico(pathArbolPrim,
+			TAMANIO_BLOQUE_BMAS_NUMERICO);
+
+	resultadoOperacion result(OK);
+	Registro* regActual = arbolPrimario->buscarRegistroNumerico(0, &result);
+	unsigned int N = 1;
+	while (regActual != NULL) {
+		regActual = arbolPrimario->siguiente();
+		N++;
+	}
+
+
+	delete arbolPrimario;
+
+
+	double acumuladoNormaInf=0;
 
 	for (itMap = mapa.begin(); itMap != mapa.end(); itMap++)
 	{
@@ -96,35 +114,51 @@ int Servicios::tomarTexto(string ruta)
 		posPal = itMap->second.front();
 		nueva = itMap->second.size();
 
-		if ( ocurrenciasMax < itMap->second.size() ){
-			ocurrenciasMax= itMap->second.size();
-			pala= itMap->first;
+		list<unsigned int> listaIds;
+
+		double aij = itMap->second.size();
+		string rutahash= Parametros().getParametro(CARPETA_DATOS);
+		rutahash+=NOMBRE_HASH_PALABRAS;
+		Hash hash(rutahash);
+		Registro* registro= hash.buscar(itMap->first);
+
+		double ni= 1;
+
+
+		if (registro!= NULL){
+
+			offset= registro->getAtributosEnteros()->front();
+			ListasIds().obtenerListaIds(offset, &listaIds);
+			ni= listaIds.size();
+
 		}
 
-
-/**********************************************borrar***************************************************/
-		//cout << "palabra " << clave << ": " ;
-		//cout << Util().UIntToString(nueva) << endl;
-/**********************************************borrar***************************************************/
+		double pesoGlobal= log10(N/ni);
+		double peso= aij*pesoGlobal;
+		acumuladoNormaInf+= pow(peso,2);
 
 		ListasIds().agregarPosPalabra(&idLista,posPal,true);
-
 		arbolPal->insertar(clave,idLista);
 
 		list<int>::iterator itPos;
 		for (itPos = itMap->second.begin(); itPos != itMap->second.end() ; itPos++)
+
 		{
 			posPal = *itPos;
 			ListasIds().agregarPosPalabra(&idLista,posPal,false);
+
 		}
 
+		delete registro;
 	}
-	cout<<pala<<endl;
+
+	cout<<acumuladoNormaInf<<endl;
+
 	archivoNormasInf archivoNormas;
-	archivoNormas.escribirNorma(ocurrenciasMax);
+	archivoNormas.escribirNorma(acumuladoNormaInf);
 
 	delete arbolPal;
-	/**********************************************borrar***************************************************/
+/**********************************************borrar***************************************************/
 //	list<unsigned int> *lista = new list<unsigned int>();
 //	ListasIds().obtenerListaIds(1,lista);
 //
@@ -144,10 +178,11 @@ int Servicios::tomarTexto(string ruta)
 	//agregar el libro a las listas
 	SinIndice *listas = SinIndice().getInstancia();
 
+	//ProcesadorConsultas().actualizarPesos();
+
 	return listas->agregarLibroPendienteATodasLasListas(unLibro->getId());
 
 	//cout << "agrego a las listas no procesadas" << endl;
-
 
 }
 
@@ -911,4 +946,79 @@ int Servicios::consultarPalabras(string palabrasBuscadas){
 
 	delete listaTerminos;
 	return error;
+}
+
+int Servicios::actualizarNormasInf(){
+
+	string pathArbolPrim = Parametros().getParametro(CARPETA_DATOS);
+	pathArbolPrim+= "bmas_primario";
+	ArbolBMasNumerico* arbolPrimario = new ArbolBMasNumerico(pathArbolPrim,
+			TAMANIO_BLOQUE_BMAS_NUMERICO);
+
+	resultadoOperacion result(OK);
+	Registro* regActual = arbolPrimario->buscarRegistroNumerico(0, &result);
+	unsigned int N = 0;
+
+	while (regActual != NULL) {
+		regActual = arbolPrimario->siguiente();
+		N++;
+	}
+	unsigned int i=0;
+
+	while (i < N) {
+
+		string pathArbolTerminos= Parametros().getParametro(CARPETA_DATOS);
+
+		stringstream conversor;
+		conversor<<i;
+		string nroDoc;
+		conversor>>nroDoc;
+		pathArbolTerminos+= PREFIJO_ARBOL_TERMINOS+nroDoc;
+
+		ArbolBMasAlfabetico* arbolDeTerminos = new ArbolBMasAlfabetico(
+					pathArbolTerminos, 6144);
+
+		Registro* regArbolTerm= arbolDeTerminos->buscarRegistro("0", &result);
+
+		double acumuladoNormaInf= 0;
+
+		while (regArbolTerm != NULL) {
+
+			unsigned int offset= regArbolTerm->getReferenciai(1);
+
+			list<unsigned int> listaPosiciones;
+			ListasIds().obtenerListaIds(offset, &listaPosiciones);
+			unsigned int aij = listaPosiciones.size();
+
+			string rutahash= Parametros().getParametro(CARPETA_DATOS);
+			rutahash+="hash_palabras";
+			Hash hash(rutahash);
+			Registro* regTermino = hash.buscar(regArbolTerm->getString());
+			cout<<"eeee"<<endl;
+			double ni= 1;
+
+			if (regTermino!= NULL){
+
+				list<unsigned int> listaIds;
+				offset= regTermino->getAtributosEnteros()->front();
+				ListasIds().obtenerListaIds(offset, &listaIds);
+				ni= listaIds.size();
+
+			}
+
+			double pesoGlobal= log10(N/ni);
+			double peso= aij*pesoGlobal;
+			acumuladoNormaInf+= pow(peso,2);
+
+			delete regTermino;
+			regArbolTerm= arbolDeTerminos->siguiente();
+		}
+
+		archivoNormasInf archivoNormas;
+		archivoNormas.actualizarNorma(acumuladoNormaInf, i);
+		cout<<acumuladoNormaInf<<endl;
+		i++;
+		delete regArbolTerm;
+	}
+	return 0;
 }

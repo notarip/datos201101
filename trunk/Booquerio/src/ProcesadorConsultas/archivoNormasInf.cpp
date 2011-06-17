@@ -6,12 +6,23 @@
  */
 
 #include "archivoNormasInf.h"
+#include "procesadorConsultas.h"
 
 archivoNormasInf::archivoNormasInf() {
 	this->normaInf=0;
 }
 
-void archivoNormasInf::escribirNorma(unsigned int normaInfinitoArch){
+void archivoNormasInf::escribirNorma(double normaInfinito){
+	this->escribir(normaInfinito, 0);
+
+}
+
+void archivoNormasInf::actualizarNorma(double normainfinitoArch,unsigned int nroDoc){
+	this->escribir(normainfinitoArch, nroDoc);
+
+}
+
+void archivoNormasInf::escribir(double normaInfinitoArch,unsigned int nro){
 
 	this->normaInf= normaInfinitoArch;
 	fstream normasInfinito;
@@ -19,7 +30,12 @@ void archivoNormasInf::escribirNorma(unsigned int normaInfinitoArch){
 	string ruta= Parametros().getParametro(CARPETA_DATOS);
 	ruta+= RUTA_ARCHIVO_NORMAS;
 
-	normasInfinito.open(ruta.c_str(),ios::out | ios::app | ios::in);
+	if (nro==0) normasInfinito.open(ruta.c_str(),ios::out | ios::app | ios::in);
+
+	else{
+		normasInfinito.open(ruta.c_str(),ios::out | ios::in);
+		normasInfinito.seekp(sizeof(unsigned int)*nro);
+	}
 
 	char* valor=new char[4];
 

@@ -130,6 +130,8 @@ public:
 
 	static int consultarPalabras(string palabrasBuscadas);
 
+	static int actualizarNormasInf();
+
 
 
 private:
