@@ -13,30 +13,36 @@
 #include "../ArbolB+/ArbolBMasNumerico.h"
 #include "../ProcesadorConsultas/archivoNormasInf.h"
 #include "../servicios/ListasIds.h"
+#include "../util/Util.h"
 #include <cmath>
 #include "limits.h"
 #include <map>
 
 #define TAMANIO_BLOQUE_BMAS_NUMERICO 1024
+#define TAMANIO_BLOQUE_BMAS_PALABRAS 6144
 #define PREFIJO_ARBOL_TERMINOS "bmas_palabras_"
+#define NOMBRE_HASH_PALABRAS "hash_palabras"
+#define NOMBRE_BMAS_PRIMARIO "bmas_primario"
+
+#define ERROR_FALTANTE_HASH -70
 
 using namespace std;
 
 class ProcesadorConsultas {
 public:
 	ProcesadorConsultas();
-	void procesar(list<string> terminos);
+	int procesar(list<string> terminos);
 	~ProcesadorConsultas();
 
 private:
 	string carpetaRaiz;
 	//devuelve la lista de documentos ordenadas por relevancia decreciente
-	void consultaUnitaria(string termino);
+	int consultaUnitaria(string termino);
 	float calcularPeso(string termino, unsigned int documento, float pesoGlobal);
 	float calcularPesoxProximidad(list<string> terminos, unsigned int id);
 	void ArmarSecuenciaOptima(list<unsigned int> secuencia, list<unsigned int>* max , unsigned int cantListas, list<unsigned int>[]);
 	unsigned int obtenerSeparacion(list<unsigned int> unaSecuencia);
-	void consultaPorTerminosCercanos2(list<string> listaTerminos);
+	int consultaPorTerminosCercanos2(list<string> listaTerminos);
 	list<float> calculadorPesos(list<unsigned int> documentos,list<string> terminos, unsigned int agrupacion, unsigned int comienzo);
 	void rankearDocumentos(list<unsigned int> documentos, list<float> pesos);
 	list<float> pesarSegunCantPalabras(list<float> pesos, unsigned int agrupacion);

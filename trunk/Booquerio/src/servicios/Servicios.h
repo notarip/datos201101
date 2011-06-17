@@ -19,15 +19,12 @@
 #define INDICE_PALABRAS 3
 
 #define NOMBRE_HASH_TITULOS "hash_titulos"
-#define NOMBRE_HASH_PALABRAS "hash_palabras"
 #define NOMBRE_BMAS_AUTORES "bmas_autores"
 #define NOMBRE_BMAS_EDITORIALES "bmas_editoriales"
-#define NOMBRE_BMAS_PRIMARIO "bmas_primario"
 #define NOMBRE_BMAS_PALABRAS "bmas_palabras"
 
 #define TAMANIO_BLOQUE_BMAS 1024
 #define TAMANIO_BLOQUE_BMAS_NUMERICO 1024
-#define TAMANIO_BLOQUE_BMAS_PALABRAS 6144
 
 
 #include <string>
