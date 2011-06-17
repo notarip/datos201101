@@ -882,12 +882,23 @@ int Servicios::consultarTitulo(string tituloBuscado){
 
 int Servicios::consultarPalabras(string palabrasBuscadas){
 	list<string>* listaTerminos = Parser().parsearFrase(palabrasBuscadas);
+	SinIndice *listas = SinIndice().getInstancia();
 
-	//ACA DEBERIA SER DEVUELTA POR UN METODO QUE PARSEE EL STRING PARAMETRO
-	//listaTerminos.push_back("claros");
-	//listaTerminos.push_back("ojos");
-	//listaTerminos.push_back("barbaro");
-	//listaTerminos.push_back("pesadilla");
+	if (listas->getPendientesPalabras()->size() != 0){
+		//mira que no tenes todas las palabras procesadas las busqueda puede arrojar datos que vos no busques
+		cout << " Warning: Ud no tiene procesado las palabras de todos los libros ingresados"
+				", puede que la busqueda no de los resultados buscados. Procese las palabras"
+				" con la opcion -p para asegurarse que la busqueda se realize correctamente "
+				"Esta seguro que desea seguir(Y/N)" << endl;
+
+		string respuesta = "0";
+		cin >> respuesta;
+		while (respuesta != "Y" && respuesta != "N" && respuesta != "n" && respuesta != "y"){
+			cout << "Esta seguro que desea seguir(Y/N)" << endl;
+			cin >> respuesta;
+		}
+		if (respuesta == "N" || respuesta == "n") return 0;
+	}
 
 	list<string>::iterator it = listaTerminos->begin();
 	cout << "palabras en la busqueda: " << endl;
@@ -895,8 +906,9 @@ int Servicios::consultarPalabras(string palabrasBuscadas){
 		cout << *it << endl;
 		it++;
 	}
-	ProcesadorConsultas().procesar(*listaTerminos);
+	int error = 0;
+	error = ProcesadorConsultas().procesar(*listaTerminos);
 
 	delete listaTerminos;
-	return 0;
+	return error;
 }

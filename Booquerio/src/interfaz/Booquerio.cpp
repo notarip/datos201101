@@ -119,6 +119,11 @@ void error_libro_inexsistente()
 	cout << "Error: el libro que se quiere eliminar es inexistente" << endl;
 }
 
+void error_faltante_hash(){
+	cout << "Error: 	no se encontro el hash con el vocabulario, probablemente le falto procesar las palabras" << endl;
+	cout << "	probablemente utilizando el comando Booquerio -p se solucione" << endl;
+}
+
 void sin_errores()
 {
 	cout << "Satisfactorio." << endl;
@@ -137,6 +142,7 @@ void procesamiento_de_errores(int error)
 		case ERROR_RUTA_ARCHIVO_LIBROS:error_ruta_archivo_libros();break;
 		case ERROR_RUTA_BMAS_PRIMARIO:error_ruta_b_mas_primario();break;
 		case ERROR_LIBRO_INEXISTENTE:error_libro_inexsistente();break;
+		case ERROR_FALTANTE_HASH:error_faltante_hash();break;
 	}
 }
 

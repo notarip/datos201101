@@ -31,7 +31,7 @@ float ProcesadorConsultas::calcularPesoxProximidad(list<string> terminos, unsign
 	pathArbolTerminos += docId;
 
 	ArbolBMasAlfabetico* arbolDeTerminos = new ArbolBMasAlfabetico(
-				pathArbolTerminos, 6144);
+				pathArbolTerminos, TAMANIO_BLOQUE_BMAS_PALABRAS);
 	resultadoOperacion result(OK);
 
 	list<string>::iterator itTerminos = terminos.begin();
@@ -157,7 +157,7 @@ float ProcesadorConsultas::calcularPeso(string termino, unsigned int documento,
 	pathArbolTerminos += docId;
 
 	ArbolBMasAlfabetico* arbolDeTerminos = new ArbolBMasAlfabetico(
-			pathArbolTerminos, TAMANIO_BLOQUE);
+			pathArbolTerminos, TAMANIO_BLOQUE_BMAS_PALABRAS);
 	resultadoOperacion result(OK);
 	Registro* regEncontrado = arbolDeTerminos->buscarRegistro(termino, &result);
 	unsigned int offset= regEncontrado->getReferenciai(1);
@@ -169,15 +169,24 @@ float ProcesadorConsultas::calcularPeso(string termino, unsigned int documento,
 	return (aij * pesoGlobal / norma);
 }
 
-void ProcesadorConsultas::consultaUnitaria(string termino) {
+int ProcesadorConsultas::consultaUnitaria(string termino) {
 	float pesoGlobal;
-	string pathHash = carpetaRaiz + "hash_palabras";
+	string pathHash = carpetaRaiz + NOMBRE_HASH_PALABRAS;
+	string pathVerificar = pathHash+".hash";
+
+	if (!(Util().existeArchivo(pathVerificar))){
+		return ERROR_FALTANTE_HASH;
+	}
+
 	Hash hashTerminos(pathHash);
 	Registro* regPalabra = hashTerminos.buscar(termino);
+
+
+
 	if (regPalabra == NULL) {
 		cout << "La Busqueda no Obtuvo Resultados" << endl;
 	} else {
-		string pathArbolPrim = carpetaRaiz + "bmas_primario";
+		string pathArbolPrim = carpetaRaiz + NOMBRE_BMAS_PRIMARIO;
 		ArbolBMasNumerico* arbolPrimario = new ArbolBMasNumerico(pathArbolPrim,
 				TAMANIO_BLOQUE_BMAS_NUMERICO);
 		resultadoOperacion result(OK);
@@ -202,6 +211,7 @@ void ProcesadorConsultas::consultaUnitaria(string termino) {
 		list<float>::iterator itPesos;
 
 		pesoGlobal = log10(N / ni);
+
 		while (it != listaIdsConsulta.end()) {
 			unPeso = calcularPeso(termino, *it, pesoGlobal);
 
@@ -223,15 +233,20 @@ void ProcesadorConsultas::consultaUnitaria(string termino) {
 		//aca tengo 2 listas con los contenidos ordenados por pesos, una de pesos y otras de doc
 
 		/*TERMINAR DE REVISAR COMO IMPRIMIOS LA INFO*/
-
+		this->imprimirConsulta(listaDocs,listaPesos);
 	}
 }
 
-void ProcesadorConsultas::consultaPorTerminosCercanos2(list<string> listaTerminos){
+int ProcesadorConsultas::consultaPorTerminosCercanos2(list<string> listaTerminos){
 	unsigned int  cantTerminos = listaTerminos.size();
 	list<unsigned int> vectorDocumentos[cantTerminos];
-	string pathHash = carpetaRaiz + "hash_palabras";
+	string pathHash = carpetaRaiz + NOMBRE_HASH_PALABRAS;
+	string pathVerificar = pathHash+".hash";
+	if (!(Util().existeArchivo(pathVerificar))){
+		return ERROR_FALTANTE_HASH;
+	}
 	Hash hashTerminos(pathHash);
+
 	list<string>::iterator itTerminos = listaTerminos.begin();
 	string unTermino;
 	unsigned int i =0, unOffset;;
@@ -434,7 +449,7 @@ void ProcesadorConsultas::consultaPorTerminosCercanos(
 
 	while (itTerminos != listaTerminos.end()) {
 		unTermino = *itTerminos;
-		string pathHash = carpetaRaiz + "hash_palabras";
+		string pathHash = carpetaRaiz + NOMBRE_HASH_PALABRAS;
 		Hash hashTerminos(pathHash);
 		cout << "busco termino :" << unTermino << endl;
 		Registro* regPalabra = hashTerminos.buscar(unTermino);
@@ -598,11 +613,14 @@ void ProcesadorConsultas::imprimirConsulta(list<unsigned int> docsOrdenados,list
 
 }
 
-void ProcesadorConsultas::procesar(list<string> terminos){
+int ProcesadorConsultas::procesar(list<string> terminos){
+	int error = 0;
 	if (terminos.size()==0)
 		cout<<"No se encontraron resultados para la consulta"<<endl;
 	else if (terminos.size()==1)
-		consultaUnitaria(terminos.front());
-		else consultaPorTerminosCercanos2(terminos);
+		error =consultaUnitaria(terminos.front());
+		else error = consultaPorTerminosCercanos2(terminos);
+
+	return error;
 }
 
