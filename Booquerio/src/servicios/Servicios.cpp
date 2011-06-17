@@ -369,11 +369,31 @@ int Servicios::quitarArchivo(string unId)
 //quitar de la lista de libros sin procesar
 	//cout << "SACO DE LOS INDICES SIN PROCESAR" <<endl;
 	SinIndice *listas  = SinIndice().getInstancia();
-	return listas->sacarLibroDeTodasLasListas(id);
-
+	listas->sacarLibroDeTodasLasListas(id);
 
 	delete archivo;
+
+	/*******************AGREGADO ENTREGA II*************************/
+
+
+//	string pathArbolPalabras = Parametros().getParametro(CARPETA_DATOS);
+//	pathArbolPalabras += NOMBRE_BMAS_PALABRAS;
+//	pathArbolPalabras += "_" + Util().UIntToString(Id);
+//
+//	ArbolBMasAlfabetico *arbolPal = new ArbolBMasAlfabetico(pathArbolPalabras, TAMANIO_BLOQUE_BMAS_PALABRAS);
+//
+//
+//	//recorrer el arbol de palabras
+//
+//	ListasIds().
+
+
+	/*******************AGREGADO ENTREGA II*************************/
+
+
 	return 0;
+
+
 }
 
 int Servicios::verEstructuraAutor(string path)
