@@ -15,12 +15,14 @@ using namespace std;
 class archivoNormasInf {
 public:
 	archivoNormasInf();
-	void escribirNorma(unsigned int normaInfinito);
+	void escribirNorma(double normaInfinito);
+	void actualizarNorma(double normaInfinito,unsigned int nrodoc);
 	unsigned int obtenerNorma(unsigned int id);
 	virtual ~archivoNormasInf();
 
 private:
-	unsigned int normaInf;
+	double normaInf;
+	void escribir(double normaInfinito,unsigned int nrodoc);
 };
 
 #endif /* ARCHIVONORMASINF_H_ */

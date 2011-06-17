@@ -63,6 +63,7 @@
 #define CONSULTAR_AUTOR 101
 #define CONSULTAR_TITULO 102
 #define CONSULTAR_PALABRAS 103
+#define ACTUALIZAR_NORMAS_INF 200
 
 
 #include <iostream>
@@ -193,6 +194,10 @@ int determinar_operacion(int cant_parm, char** parm, string *parametro)
 		return AGREGAR_VARIOS;
 	}
 
+	if (param == "u"){
+		return ACTUALIZAR_NORMAS_INF;
+	}
+
 	if (param[0] == 'q') {
 		for (int i=2; i< cant_parm; i++) {
 			parametro->append(parm[i]);
@@ -270,6 +275,8 @@ int main(int argc, char** argv)
 		case CONSULTAR_AUTOR:error = Servicios().consultarAutor(parametro);break;
 		case CONSULTAR_TITULO:error = Servicios().consultarTitulo(parametro);break;
 		case CONSULTAR_PALABRAS:error = Servicios().consultarPalabras(parametro);break;
+
+		case ACTUALIZAR_NORMAS_INF:error= Servicios().actualizarNormasInf();break;
 
 		case ERROR_DE_LLAMADA:error = ERROR_DE_LLAMADA;break;
 		default:error = ERROR_DE_LLAMADA;break;
