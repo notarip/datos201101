@@ -1072,3 +1072,127 @@ int Servicios::actualizarNormasInf(){
 
 	return 0;
 }
+
+int Servicios::verEstructArchTerminos(string path){
+	string pathExport;
+	if (path == "")
+	{
+		pathExport = Parametros().getParametro(CARPETA_SALIDA);
+		pathExport += "Arch_Terminos";
+	}
+	else
+	{
+		pathExport = path+"_Terminos";
+	}
+	string pathHash = Parametros().getParametro(CARPETA_DATOS);
+	pathHash += NOMBRE_HASH_PALABRAS;
+
+	Hash hash_palabras(pathHash);
+
+	hash_palabras.mostrar2(pathExport);
+
+	return 0;
+}
+
+int Servicios::verEstructArchNormasInf(string path){
+	string pathExport;
+	if (path == "")
+	{
+		pathExport = Parametros().getParametro(CARPETA_SALIDA);
+		pathExport += "Arch_NormaInfinito";
+	}
+	else
+	{
+		pathExport = path+"_NormaInfinito";
+	}
+	string pathPrimario= Parametros().getParametro(CARPETA_DATOS);
+	pathPrimario+= NOMBRE_BMAS_PRIMARIO;
+	ArbolBMasNumerico arbolPrimario(pathPrimario, TAMANIO_BLOQUE_BMAS_NUMERICO);
+	resultadoOperacion result(OK);
+	list<unsigned int> idLibros;
+	Registro* regEncontrado= arbolPrimario.buscarRegistroNumerico(0,&result);
+	while (regEncontrado!=NULL){
+		idLibros.push_back(regEncontrado->getAtributosEnteros()->front());
+		regEncontrado= arbolPrimario.siguiente();
+	}
+	archivoNormasInf normasInf;
+	normasInf.imprimirNormasInf(pathExport,idLibros);
+	return 0;
+}
+
+int Servicios::verEstructArchOcurrPos(string path, unsigned int nroArbol){
+	string pathExport;
+	if (path == "")
+	{
+		pathExport = Parametros().getParametro(CARPETA_SALIDA);
+		pathExport += "DOC_"+Util().UIntToString(nroArbol)+"_OcurrenciaPosicional";
+	}
+	else
+	{
+		pathExport = path+"_DOC_"+Util().UIntToString(nroArbol)+"_OcurrenciaPosicional";
+	}
+	string pathTerminos= Parametros().getParametro(CARPETA_DATOS);
+	pathTerminos+= PREFIJO_ARBOL_TERMINOS+Util().UIntToString(nroArbol);
+	if(Util().existeArchivo(pathTerminos)==false){
+		return ERROR_LIBRO_INEXISTENTE;
+	}
+	fstream archivoSalida(pathExport.c_str(),ios::out);
+	archivoSalida<<"A continuacion se imprimen los terminos presentes en el libro, ";
+			archivoSalida<< "seguidos de las posiciones en las q aparecen en el mismo"<<endl<<endl;
+	ArbolBMasAlfabetico arbolterminos(pathTerminos,TAMANIO_BLOQUE_BMAS_PALABRAS);
+	resultadoOperacion result(OK);
+	Registro* regEncontrado= arbolterminos.buscarRegistro("0",&result);
+	unsigned int offset;
+	while(regEncontrado!=NULL){
+		offset= regEncontrado->getReferenciai(1);
+		list<unsigned int> listaPos;
+		ListasIds().obtenerListaIds(offset,&listaPos);
+		archivoSalida<<regEncontrado->getString()<<": ";
+		list<unsigned int>::iterator it= listaPos.begin();
+		//archivoSalida<<"tamanio "<<listaPos.size()<<" ";
+		while(it!=listaPos.end()){
+			archivoSalida<<*it<<", ";
+			it++;
+		}
+		archivoSalida<<endl;
+		regEncontrado= arbolterminos.siguiente();
+	}
+	return 0;
+}
+
+int Servicios::verEstructListasInvert(string path){
+	string pathExport;
+	if (path == "")
+	{
+		pathExport = Parametros().getParametro(CARPETA_SALIDA);
+		pathExport += "Arch_Listas_ListasInvertidas";
+	}
+	else
+	{
+		pathExport = path+"_ListasInvertidas";
+	}
+	fstream archivoSalida(pathExport.c_str(),ios::out);
+	archivoSalida<<"A continuacion se imprimen los terminos presentes en todos los doc";
+	archivoSalida<<" seguidos de los libros en los cuales aparecen"<<endl<<endl;
+	string pathHash= Parametros().getParametro(CARPETA_DATOS);
+	pathHash+= NOMBRE_HASH_PALABRAS;
+	Hash hashTerminos(pathHash);
+	unsigned int offset;
+	map<string,unsigned int>* listaTerminos=hashTerminos.recuperacionComprensiva();
+	map<string, unsigned int>::iterator itTerminos= listaTerminos->begin();
+	while(itTerminos!=listaTerminos->end()){
+		offset= itTerminos->second;
+		list<unsigned int> listaIds;
+		ListasIds().obtenerListaIds(offset,&listaIds);
+		archivoSalida<<itTerminos->first<<": ";
+		list<unsigned int>::iterator it= listaIds.begin();
+		while(it!=listaIds.end()){
+			archivoSalida<<*it<<", ";
+			it++;
+		}
+		archivoSalida<<endl;
+		itTerminos++;
+	}
+	delete listaTerminos;
+	return 0;
+}

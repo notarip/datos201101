@@ -19,6 +19,10 @@ public:
 	void actualizarNorma(double normaInfinito,unsigned int nrodoc);
 	double obtenerNorma(unsigned int id);
 	void estadoActualizacion(char c);
+	
+	
+	
+	void imprimirNormasInf(string path, list<unsigned int> idLibros);
 	virtual ~archivoNormasInf();
 	bool estaActualizado();
 
