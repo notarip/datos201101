@@ -31,10 +31,10 @@ static void f2(Hash* hash,unsigned int cant){
 }
 
 
-int main323(){
+int main35(){
 	Hash hash("unhash");
-	/*
-	char c=' ';
+
+/*	char c=' ';
 	string str;
 	while(c!='q'){
 
@@ -83,10 +83,10 @@ int main323(){
 		cout<<endl;cout<<endl;
 		hash.mostrar();
 
-	}
-	hash.mostrar2("res.txt");*/
-	f(&hash,20000);
-	hash.mostrar();
+	}*/
+	//hash.mostrar2("res.txt");
+	f(&hash,100);
+	//hash.mostrar();
 }
 
 
