@@ -611,6 +611,48 @@ void Hash::mostrar(){
 }
 
 
+map<string,unsigned int>* Hash::recuperacionComprensiva(){
+
+	ArchivoBloques archivo(this->pathHash,TAMANIO_BLOQUE);
+	unsigned int max=0;
+
+	for(unsigned int i=0; i<this->tamanioTabla; i++){
+
+		if (this->tabla[i] > max) max=this->tabla[i];
+	}
+
+	list<unsigned int> lista;
+	for (unsigned int i=0;i<this->tamanioTabla;i++){
+		lista.push_back(this->tabla[i]);
+	}
+	lista.sort();
+	lista.unique();
+	map<string,unsigned int>* mapaTerminos=new map<string,unsigned int>();
+
+	list<unsigned int>::iterator it=lista.begin();
+
+	while(it!=lista.end()){
+		Bloque* bloque=NULL;
+		bloque= archivo.recuperarBloque((*it));
+		list<Registro>::iterator it2= bloque->obtenerRegistros()->begin();
+
+		while(it2!=bloque->obtenerRegistros()->end() ){
+			 pair < string,unsigned int > par;
+			 par.first= it2->getString();
+			 par.second= it2->getAtributosEnteros()->front();
+
+			 mapaTerminos->insert(par);
+			it2++;
+		}
+
+		it++;
+		delete bloque;
+	}
+
+	return &*mapaTerminos;
+}
+
+
 void Hash::mostrar2(string nombre){
 	ArchivoBloques archivo(this->pathHash,TAMANIO_BLOQUE);
 	stringstream conversor;
