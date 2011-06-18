@@ -132,6 +132,14 @@ public:
 
 	static int actualizarNormasInf();
 
+	static int verEstructArchTerminos(string path);
+
+	static int verEstructArchNormasInf(string path);
+
+	static int verEstructArchOcurrPos(string path, unsigned int nroArbol);
+
+	static int verEstructListasInvert(string path);
+
 
 
 private:

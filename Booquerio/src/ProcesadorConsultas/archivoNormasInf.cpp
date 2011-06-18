@@ -69,13 +69,36 @@ double archivoNormasInf::obtenerNorma(unsigned int id){
 
 	fstream archNormas;
 	string pathArchNormas = Parametros().getParametro(CARPETA_DATOS);
-	pathArchNormas=+ RUTA_ARCHIVO_NORMAS; //OJO!! FIJARSE CUAL ES EL PATH LUEGO
+	pathArchNormas+= RUTA_ARCHIVO_NORMAS; //OJO!! FIJARSE CUAL ES EL PATH LUEGO
 	archNormas.open(pathArchNormas.c_str(), ios::in);
-	archNormas.seekg(id * sizeof(double) + 1);
+	archNormas.seekg(id * sizeof(double)+sizeof(char));
 	double norma;
-	archNormas >> norma;
+	archNormas.read((char*)&norma, sizeof(double));
 	archNormas.close();
 	return norma;
+}
+
+void archivoNormasInf::imprimirNormasInf(string path, list<unsigned int> idLibros){
+	fstream archivo (path.c_str(), ios::in | ios::out | ios::app);
+	list<unsigned int>::iterator it= idLibros.begin();
+	archivo<<endl;
+	archivo<<"ID Libro"<<"		";
+	while(it!=idLibros.end()){
+		archivo<<*it<<"		";
+		it++;
+	}
+	archivo<<endl;
+	archivo<<"Norma Infinito"<<"		";
+	it= idLibros.begin();
+	while(it!=idLibros.end()){
+		archivo<<this->obtenerNorma(*it)<<"		";
+		it++;
+	}
+	archivo<<endl<<endl;
+	for(int i= 0; i< idLibros.size(); i++){
+		archivo<<"*********************";
+	}
+	archivo<<endl;
 }
 
 void archivoNormasInf::estadoActualizacion(char c){
@@ -126,7 +149,6 @@ bool archivoNormasInf::estaActualizado(){
 	else return false;
 
 }
-
 
 archivoNormasInf::~archivoNormasInf() {
 	// TODO Auto-generated destructor stub

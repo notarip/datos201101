@@ -215,7 +215,7 @@ int ProcesadorConsultas::consultaUnitaria(string termino) {
 		while (it != listaIdsConsulta.end()) {
 			unPeso = calcularPeso(termino, *it, pesoGlobal);
 
-			//CHEKEAR SI NO HACE FALTA HACER OTRA MULTIPLICACION EN LA FORMULA
+			unPeso= unPeso*pesoGlobal;
 
 			itDocs = listaDocs.begin();
 			itPesos = listaPesos.begin();

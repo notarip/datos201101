@@ -35,11 +35,18 @@
  * Consultar Autor: ./ejecutable –qa “Autor”
  * Consultar Título: ./ejecutable –qt “Título”
  *
+ * Actualizar Normas Infinito: ./ejecutable -u
+ *
+ * Ver Estructuras: /ejecutable -v [-at Archivo de Términos, -ani Archivo de Norma
+ * Infinito, -aop Archivo de ocurrencia posicional, -li Listas Invertidas]
+ * "Nombre Archivo"
+ *
  */
 
-
+#define ERROR_NO_NUMERICO -80
 #define ERROR_DE_LLAMADA -10
 #define SUCCESS	0
+
 
 
 
@@ -65,6 +72,10 @@
 #define CONSULTAR_PALABRAS 103
 #define ACTUALIZAR_NORMAS_INF 200
 
+#define VER_ESTRUCTURA_ARCH_TERMINOS 210
+#define VER_ESTRUCTURA_NORMA_INF 211
+#define VER_ESTRUCTURA_ARCH_OCURR_POS 212
+#define VER_ESTRUCTURA_ARCH_LISTAS_INVERTIDAS 213
 
 #include <iostream>
 #include "../servicios/Servicios.h"
@@ -86,12 +97,16 @@ void error_de_llamada()
 	cout << "Obtener Archivo: ./ejecutable -o ID_Archivo" << endl;
 	cout << "Quita Archivo: ./ejecutable -q ID_Archivo (se elminan las entradas en los otros indices)" << endl;
 	cout << "Ver Estructura: ./ejecutable -v [-e árbol de Editorial, -a árbol de Autor, -t hash de" << endl;
-	cout << "Título, -p hash de Palabra -i indice primario] \"Nombre Archivo\"" << endl;
+	cout << "Título, -p hash de Palabra, -i indice primario, -at archivo de Terminos, -ani archivo de"<<endl;
+	cout << "normas infinito,  -li archivo de Listas Invertidas]"<<endl;
+	cout << "\"Nombre Archivo\"" << endl;
+	cout << "Ver Archivo de Ocurrencias Posicionales: ./ejecutable -v -aop 'idLibro' ""Nombre Archivo"""<<endl;
 	cout << "Consultar Editorial: ./ejecutable -qe “Editorial”" << endl;
 	cout <<	"Consultar Autor: ./ejecutable –qa “Autor”" << endl;
 	cout <<	"Consultar Título: ./ejecutable –qt “Título”" << endl;
 	cout << "Consultar Palabras: ./ejecutable –qp “Palabras para búsqueda por cercania“"
 			"y rankeada"<< endl;
+	cout << "Actualizar Normas Infinito: ./ejecutable -u"<<endl;
 
 }
 
@@ -124,11 +139,15 @@ void error_faltante_hash(){
 	cout << "Error: 	no se encontro el hash con el vocabulario, probablemente le falto procesar las palabras" << endl;
 	cout << "	probablemente utilizando el comando Booquerio -p se solucione" << endl;
 }
+void error_no_numerico(){
+	cout << "Error: el 3er argumento no es un numero" << endl;
 
+}
 void sin_errores()
 {
 	cout << "Satisfactorio." << endl;
 }
+
 
 void procesamiento_de_errores(int error)
 {
@@ -144,11 +163,12 @@ void procesamiento_de_errores(int error)
 		case ERROR_RUTA_BMAS_PRIMARIO:error_ruta_b_mas_primario();break;
 		case ERROR_LIBRO_INEXISTENTE:error_libro_inexsistente();break;
 		case ERROR_FALTANTE_HASH:error_faltante_hash();break;
+		case ERROR_NO_NUMERICO:error_no_numerico();break;
 	}
 }
 
 
-int determinar_operacion(int cant_parm, char** parm, string *parametro)
+int determinar_operacion(int cant_parm, char** parm, string *parametro, unsigned int *nroArbol)
 {
 
 	string param(parm[1]+1);
@@ -214,7 +234,35 @@ int determinar_operacion(int cant_parm, char** parm, string *parametro)
 
 	if (param == "v")
 	{
-		if (parm[2][1] == 'a')
+		if (strcmp(parm[2]+1,"at")==0){
+			if (cant_parm == 4)  parametro->append(parm[3]);
+			return VER_ESTRUCTURA_ARCH_TERMINOS;
+		}
+
+		if (strcmp(parm[2]+1,"ani")==0){
+			if (cant_parm == 4)  parametro->append(parm[3]);
+			return VER_ESTRUCTURA_NORMA_INF;
+		}
+
+		if (strcmp(parm[2]+1,"aop")==0){
+			if (cant_parm == 5) parametro->append(parm[4]);
+			if (*parm[3] == '0'){
+				*nroArbol = 0;
+				return VER_ESTRUCTURA_ARCH_OCURR_POS;
+			}
+			*nroArbol= atoi(parm[3]);
+			if ( *nroArbol == 0)
+				return ERROR_NO_NUMERICO;
+
+		return VER_ESTRUCTURA_ARCH_OCURR_POS;
+		}
+
+		if (strcmp(parm[2]+1,"li")==0){
+			if (cant_parm == 4)  parametro->append(parm[3]);
+			return VER_ESTRUCTURA_ARCH_LISTAS_INVERTIDAS;
+		}
+
+		if (strcmp(parm[2]+1,"a")==0)
 		{
 			if (cant_parm == 4)  parametro->append(parm[3]);
 			return VER_ESTRUCTURA_AUTOR;
@@ -239,6 +287,7 @@ int determinar_operacion(int cant_parm, char** parm, string *parametro)
 			if (cant_parm == 4)  parametro->append(parm[3]);
 			return VER_ESTRUCTURA_PRIMARIO;
 		}
+
 	}
 
 	return ERROR_DE_LLAMADA;
@@ -249,7 +298,8 @@ int main(int argc, char** argv)
 {
 
 	string parametro;
-	int operacion =	determinar_operacion(argc, argv, &parametro);
+	unsigned int nroArbol;
+	int operacion =	determinar_operacion(argc, argv, &parametro, &nroArbol);
 	int error = 0;
 
 	switch(operacion)
@@ -278,12 +328,16 @@ int main(int argc, char** argv)
 
 		case ACTUALIZAR_NORMAS_INF:error= Servicios().actualizarNormasInf();break;
 
+		case VER_ESTRUCTURA_ARCH_TERMINOS: error= Servicios().verEstructArchTerminos(parametro);break;
+		case VER_ESTRUCTURA_NORMA_INF: error= Servicios().verEstructArchNormasInf(parametro); break;
+		case VER_ESTRUCTURA_ARCH_OCURR_POS: error= Servicios().verEstructArchOcurrPos(parametro, nroArbol); break;
+		case VER_ESTRUCTURA_ARCH_LISTAS_INVERTIDAS: Servicios().verEstructListasInvert(parametro); break;
+
 		case ERROR_DE_LLAMADA:error = ERROR_DE_LLAMADA;break;
+		case ERROR_NO_NUMERICO:error = ERROR_NO_NUMERICO;break;
 		default:error = ERROR_DE_LLAMADA;break;
 	}
 	procesamiento_de_errores(error);
 
 	return 0;
-
-
 }
