@@ -185,6 +185,7 @@ int ProcesadorConsultas::consultaUnitaria(string termino) {
 
 	if (regPalabra == NULL) {
 		cout << "La Busqueda no Obtuvo Resultados" << endl;
+		return 0;
 	} else {
 		string pathArbolPrim = carpetaRaiz + NOMBRE_BMAS_PRIMARIO;
 		ArbolBMasNumerico* arbolPrimario = new ArbolBMasNumerico(pathArbolPrim,
@@ -232,9 +233,13 @@ int ProcesadorConsultas::consultaUnitaria(string termino) {
 		}
 		//aca tengo 2 listas con los contenidos ordenados por pesos, una de pesos y otras de doc
 
-		/*TERMINAR DE REVISAR COMO IMPRIMIOS LA INFO*/
+		cout<<"Se encontraron los siguientes libros, ""ordenados de acuerdo a relevancia"<<endl<<endl;
+
 		this->imprimirConsulta(listaDocs,listaPesos);
+
+		return 0;
 	}
+
 }
 
 int ProcesadorConsultas::consultaPorTerminosCercanos2(list<string> listaTerminos){
@@ -254,7 +259,7 @@ int ProcesadorConsultas::consultaPorTerminosCercanos2(list<string> listaTerminos
 	/* itero sobre las palabras buscando todas las listas invertidas de cada termino*/
 	while (itTerminos != listaTerminos.end()){
 		unTermino = *itTerminos;
-		cout << "busco termino :" << *itTerminos << endl;
+		//cout << "busco termino :" << *itTerminos << endl;
 		Registro* regPalabra = hashTerminos.buscar(unTermino);
 
 		if(regPalabra != NULL){
@@ -262,12 +267,12 @@ int ProcesadorConsultas::consultaPorTerminosCercanos2(list<string> listaTerminos
 			ListasIds().obtenerListaIds(unOffset, vectorDocumentos+i);
 
 			list<unsigned int >::iterator it = vectorDocumentos[i].begin();
-			cout << "lista encontrada de esta palabra " << endl;
-			while ( it != vectorDocumentos[i].end() ){
-				cout << *it << '-';
-				it++;
-			}
-			cout << endl;
+			//cout << "lista encontrada de esta palabra " << endl;
+			//while ( it != vectorDocumentos[i].end() ){
+			//	cout << *it << '-';
+			//	it++;
+			//}
+			//cout << endl;
 		}
 		itTerminos++;
 		i++;
@@ -277,24 +282,29 @@ int ProcesadorConsultas::consultaPorTerminosCercanos2(list<string> listaTerminos
 	list<unsigned int> idsYaRankeados, listaIdsARankear;
 	unsigned int agrupador = cantTerminos, j ,k;
 	bool primeraVez;
-	list<float> pesosDocs;
+	list<float> pesosDocs,pesosPaFinal;
+	list<unsigned int> docsPaFinal;
 
-	cout << "VAMOS POR LOS PESOS DE CADA DOCUMENTO EMPEZANDO POR LOS DE MAS PALABRAS COINCIDENTES" << endl;
 
 	// resuelvo intersecciones para rankear documentos
 	while (agrupador > 1){
 
 		cout << "Con " << agrupador << " palabras de las buscadas"  << endl;
-		cout<<"Los siguientes libros, ""ordenados de acuerdo a relevancia"<<endl<<endl;
-
 
 		//interseco todos los que tiene los terminos agrupados s/ agrupador
 		// j marca la posicion incial donde arranco a agrupar
 		for ( j = 0 ; j <= cantTerminos - agrupador ; j++){
 			primeraVez = true;
-
+			itTerminos = listaTerminos.begin();
+			for ( unsigned int l =0 ; l< j ; l++){
+				itTerminos++;
+			}
+			cout << "	Buscando con los terminos: (";
 			// armo una combinacion de terminos agrupados de a "agrupador"
 			for ( k = 1 ; k <= agrupador ; k++ ){
+				cout<< *itTerminos << ";";
+				itTerminos++;
+
 				if (primeraVez){
 					listaIdsARankear = vectorDocumentos[j+k-1];
 					primeraVez = false;
@@ -302,6 +312,8 @@ int ProcesadorConsultas::consultaPorTerminosCercanos2(list<string> listaTerminos
 				else
 					listaIdsARankear = resolverInterseccion(vectorDocumentos[j+k-1],listaIdsARankear);
 			}
+			cout << ")" << endl;
+			cout<<"	Los siguientes libros, ""ordenados de acuerdo a relevancia, exceptuando los ya incluidos previamente"<<endl<<endl;
 			// aca tengo una lista de documento agrupados a "agrupar" a rankear
 			// le resto los ya rankeados
 			listaIdsARankear = this->resolverResta(listaIdsARankear,idsYaRankeados);
@@ -315,14 +327,23 @@ int ProcesadorConsultas::consultaPorTerminosCercanos2(list<string> listaTerminos
 			// los rankeo
 			this->rankearDocumentos(listaIdsARankear,pesosDocs);
 
+			// los agrego para el listado final
+			pesosPaFinal.splice(pesosPaFinal.begin(),pesosDocs);
+
 			// los agrego a los ya rankeados
 			idsYaRankeados.splice(idsYaRankeados.begin(),listaIdsARankear);
 			listaIdsARankear.clear();
+			pesosDocs.clear();
+
 		}
 		// en la prox iteracion buscare agrupar de a menos
 		agrupador--;
 	}
 
+	cout << "De esta manera el listado final rankeado es " << endl << endl;
+	this->rankearDocumentos(idsYaRankeados,pesosPaFinal);
+	cout << endl;
+	return 0;
 
 }
 
@@ -391,14 +412,13 @@ void ProcesadorConsultas::rankearDocumentos(list<unsigned int> documentos, list<
 	list<unsigned int>::iterator itDocsOrdenados, itDocs = documentos.begin();
 	list<float>::iterator itPesosOrdenados, itPesos = pesos.begin();
 	float unPeso;
-
 	while (itDocs != documentos.end()) {
 		unPeso = *itPesos;
 
 		itPesosOrdenados = listaPesos.begin();
 		itDocsOrdenados = listaDocs.begin();
 
-		while (unPeso < *itPesosOrdenados) {
+		while ( itPesosOrdenados != listaPesos.end() && unPeso < *itPesosOrdenados ) {
 			itPesosOrdenados++;
 			itDocsOrdenados++;
 		}
@@ -408,7 +428,6 @@ void ProcesadorConsultas::rankearDocumentos(list<unsigned int> documentos, list<
 		itDocs++;
 		itPesos++;
 	}
-
 	this->imprimirConsulta(listaDocs, listaPesos);
 
 //	map<unsigned int,float> miMapa;
@@ -598,18 +617,19 @@ void ProcesadorConsultas::imprimirConsulta(list<unsigned int> docsOrdenados,list
 	list<float>::iterator itRanking2 = pesosOrdenados.begin();
 
 	if (docsOrdenados.size() == 0){
-		cout<< "no hay apariciones en ningun documento de esta cantidad de palabras" << endl;
+		cout<< "		En ningun documento no rankeado previamente hay apariciones de estas palabras" << endl <<endl;
 		return;
 	}
 
 
 	while (itRanking != docsOrdenados.end()){
-		cout << "Doc : " << (*itRanking);
-		cout << "			" << "Peso" << (*itRanking2);
+		cout << "		Doc : " << (*itRanking);
+		cout << "			" << "Peso: " << (*itRanking2);
 		cout << endl;
 		itRanking++;
 		itRanking2++;
 	}
+	cout << endl;
 
 }
 
