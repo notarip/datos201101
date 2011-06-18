@@ -140,8 +140,9 @@ int Servicios::tomarTexto(string ruta)
 		ListasIds().agregarPosPalabra(&idLista,posPal,true);
 		arbolPal->insertar(clave,idLista);
 
-		list<int>::iterator itPos;
-		for (itPos = itMap->second.begin(); itPos != itMap->second.end() ; itPos++)
+		list<int>::iterator itPos = itMap->second.begin();
+		itPos++; //para salir del front por que ya se cargo antes
+		for ( ; itPos != itMap->second.end() ; itPos++)
 
 		{
 			posPal = *itPos;
@@ -171,7 +172,7 @@ int Servicios::tomarTexto(string ruta)
 	/*******************AGREGADO ENTREGA II*************************/
 
 
-	unParser->~Parser();
+	delete unParser;
 
 
 	//agregar el libro a las listas
@@ -179,7 +180,11 @@ int Servicios::tomarTexto(string ruta)
 
 	//ProcesadorConsultas().actualizarPesos();
 
-	return listas->agregarLibroPendienteATodasLasListas(unLibro->getId());
+	unsigned int id = unLibro->getId();
+
+	delete unLibro;
+
+	return listas->agregarLibroPendienteATodasLasListas(id);
 
 	//cout << "agrego a las listas no procesadas" << endl;
 

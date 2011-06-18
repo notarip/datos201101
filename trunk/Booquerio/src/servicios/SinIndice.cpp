@@ -38,12 +38,14 @@ SinIndice::SinIndice(void)
 		unBloque->agregarRegistro(*listaP); //palabras
 
 		manejador->grabarBloque(unBloque,nroBloque);
-		listaA->~Registro();
-		listaE->~Registro();
-		listaT->~Registro();
-		listaP->~Registro();
 
-		unBloque->~Bloque();
+		delete listaA;
+		delete listaE;
+		delete listaT;
+		delete listaP;
+
+		delete unBloque;
+		delete manejador;
 	}
 
 }

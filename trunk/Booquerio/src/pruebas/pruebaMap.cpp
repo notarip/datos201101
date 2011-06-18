@@ -17,7 +17,7 @@
 
 using namespace std;
 
-int main_pppp(int argc, char** argv)
+int main_pepepe(int argc, char** argv)
 {
 
 //	map<string, list<int> > mapa;
@@ -35,7 +35,7 @@ int main_pppp(int argc, char** argv)
 
 	ListasIds().agregarPosPalabra(&offset,1,true);
 
-	for (int i = 2; i < 16; i++)
+	for (int i = 2; i < 100; i++)
 		ListasIds().agregarPosPalabra(&offset,i,false);
 
 
@@ -56,7 +56,8 @@ int main_pppp(int argc, char** argv)
 	for (list<unsigned int>::iterator it = lista->begin(); it != lista->end() ; it ++)
 		cout << *it << endl;
 
-
+	lista->clear();
+	delete lista;
 	return 0;
 
 }

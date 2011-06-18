@@ -97,9 +97,9 @@ unsigned int ArchivoLibros::agregarLibro(Libro* unLibro){
 
 	}
 	archivo.close();
-	return posicion_escritura;
-	delete tiraBytes;
+	delete [] tiraBytes;
 
+	return posicion_escritura;
 
 }
 
