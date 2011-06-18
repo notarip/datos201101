@@ -963,6 +963,14 @@ int Servicios::consultarPalabras(string palabrasBuscadas){
 
 int Servicios::actualizarNormasInf(){
 
+	archivoNormasInf archivoNormas;
+
+	if (archivoNormas.estaActualizado()){
+		cout<<"Las Normas Infinito ya se encuentran actualizadas."<<endl;
+		return 0;
+	}
+	cout << " voy a actualizar " << endl;
+
 	string pathArbolPrim = Parametros().getParametro(CARPETA_DATOS);
 	pathArbolPrim+= "bmas_primario";
 	ArbolBMasNumerico* arbolPrimario = new ArbolBMasNumerico(pathArbolPrim,
@@ -1029,11 +1037,14 @@ int Servicios::actualizarNormasInf(){
 		}
 		double normaInfinito= sqrt(acumuladoNormaInf);
 
-		archivoNormasInf archivoNormas;
 		archivoNormas.actualizarNorma(normaInfinito, i);
+
 		cout<<"actualizado:"<<normaInfinito<<endl;
 		i++;
 		delete regArbolTerm;
 	}
+	cout << "!llegue" << endl;
+	archivoNormas.estadoActualizacion('A');
+
 	return 0;
 }
