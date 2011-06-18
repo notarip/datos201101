@@ -151,11 +151,10 @@ int Servicios::tomarTexto(string ruta)
 
 		delete registro;
 	}
-
-	cout<<acumuladoNormaInf<<endl;
-
+	double normaInfinito= sqrt(acumuladoNormaInf);
+	cout<<normaInfinito<<endl;
 	archivoNormasInf archivoNormas;
-	archivoNormas.escribirNorma(acumuladoNormaInf);
+	archivoNormas.escribirNorma(normaInfinito);
 
 	delete arbolPal;
 /**********************************************borrar***************************************************/
@@ -977,6 +976,7 @@ int Servicios::actualizarNormasInf(){
 		regActual = arbolPrimario->siguiente();
 		N++;
 	}
+	cout<<"N:"<<N<<endl;
 	unsigned int i=0;
 
 	while (i < N) {
@@ -1008,7 +1008,7 @@ int Servicios::actualizarNormasInf(){
 			rutahash+="hash_palabras";
 			Hash hash(rutahash);
 			Registro* regTermino = hash.buscar(regArbolTerm->getString());
-			cout<<"eeee"<<endl;
+
 			double ni= 1;
 
 			if (regTermino!= NULL){
@@ -1027,10 +1027,11 @@ int Servicios::actualizarNormasInf(){
 			delete regTermino;
 			regArbolTerm= arbolDeTerminos->siguiente();
 		}
+		double normaInfinito= sqrt(acumuladoNormaInf);
 
 		archivoNormasInf archivoNormas;
-		archivoNormas.actualizarNorma(acumuladoNormaInf, i);
-		cout<<acumuladoNormaInf<<endl;
+		archivoNormas.actualizarNorma(normaInfinito, i);
+		cout<<"actualizado:"<<normaInfinito<<endl;
 		i++;
 		delete regArbolTerm;
 	}
