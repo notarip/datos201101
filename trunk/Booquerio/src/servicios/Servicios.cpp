@@ -411,17 +411,31 @@ int Servicios::quitarArchivo(string unId)
 	/*******************AGREGADO ENTREGA II*************************/
 
 
-//	string pathArbolPalabras = Parametros().getParametro(CARPETA_DATOS);
-//	pathArbolPalabras += NOMBRE_BMAS_PALABRAS;
-//	pathArbolPalabras += "_" + Util().UIntToString(Id);
-//
-//	ArbolBMasAlfabetico *arbolPal = new ArbolBMasAlfabetico(pathArbolPalabras, TAMANIO_BLOQUE_BMAS_PALABRAS);
-//
-//
-//	//recorrer el arbol de palabras
-//
-//	ListasIds().
+	string pathArbolPalabras = Parametros().getParametro(CARPETA_DATOS);
+	pathArbolPalabras += NOMBRE_BMAS_PALABRAS;
+	pathArbolPalabras += "_" + Util().UIntToString(id);
 
+	resultadoOperacion resultadoOp(OK);
+
+
+	ArbolBMasAlfabetico *arbolPal = new ArbolBMasAlfabetico(pathArbolPalabras, TAMANIO_BLOQUE_BMAS_PALABRAS);
+
+
+
+	//recorrer el arbol de palabras
+	Registro *reg = arbolPal->buscarRegistro("a",&resultadoOp);
+	unsigned int lista;
+
+	while (reg != NULL)
+	{
+		lista = reg->getReferenciai(1);
+		ListasIds().eliminarLista(lista);
+		reg = arbolPal->siguiente();
+	}
+
+	arbolPal->~ArbolBMasAlfabetico();
+
+	Util().eliminarArchivo(pathArbolPalabras);
 
 	/*******************AGREGADO ENTREGA II*************************/
 
