@@ -23,6 +23,7 @@ typedef unsigned int elemLista;
 #include "../archivos/ArchivoBloques.h"
 #include "../archivos/Bloque.h"
 #include "../archivos/ExceptionBloque.h"
+#include <map>
 using namespace std;
 
 
@@ -86,6 +87,8 @@ public:
 	void mostrar();
 
 	void mostrar2(string s);
+
+	map<string,unsigned int>* recuperacionComprensiva();
 
 	//
 	// Guarda la tabla hash en el disco para que posteriormente pueda ser recuperada.
