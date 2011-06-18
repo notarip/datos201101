@@ -584,8 +584,8 @@ int Servicios::procesarLibro(int indice)
 		cout <<"Titulo: "<< libro->getTitulo() <<endl;
 		cout <<"Id: "<< libro->getId() <<endl;
 		cout <<"Cant.palabras: " << libro->getCantPalabras() << endl;
-		cout << "Presione ENTER para continuar...." << endl;
-		cin.get();
+		//cout << "Presione ENTER para continuar...." << endl;
+		//cin.get();
 
 		switch(indice)
 		{
@@ -948,6 +948,26 @@ int Servicios::consultarPalabras(string palabrasBuscadas){
 		if (respuesta == "N" || respuesta == "n") return 0;
 	}
 
+	archivoNormasInf archivoNormas;
+	if (!archivoNormas.estaActualizado()){
+		//mira que no tenes las normas actualizadas la busqueda puede ser mala
+		cout << " Warning: Ud no tiene el archivo de normas actualizado"
+		", puede que la busqueda no de los resultados buscados. Puede actualizarlo"
+		" con la opcion -u para asegurarse que la busqueda se realize correctamente. "
+		" Tenga en cuenta que es un proceso que puede tardar varios minutos"
+		"Esta seguro que desea seguir(Y/N)" << endl;
+
+		string respuesta = "0";
+		cin >> respuesta;
+		while (respuesta != "Y" && respuesta != "N" && respuesta != "n" && respuesta != "y"){
+			cout << "Esta seguro que desea seguir(Y/N)" << endl;
+			cin >> respuesta;
+		}
+		if (respuesta == "N" || respuesta == "n") return 0;
+
+	}
+
+
 	list<string>::iterator it = listaTerminos->begin();
 	cout << "palabras en la busqueda: " << endl;
 	while (it != listaTerminos->end()){
@@ -1039,11 +1059,10 @@ int Servicios::actualizarNormasInf(){
 
 		archivoNormas.actualizarNorma(normaInfinito, i);
 
-		cout<<"actualizado:"<<normaInfinito<<endl;
+		cout<<"norma inf. actualizada:"<<normaInfinito<<endl;
 		i++;
 		delete regArbolTerm;
 	}
-	cout << "!llegue" << endl;
 	archivoNormas.estadoActualizacion('A');
 
 	return 0;

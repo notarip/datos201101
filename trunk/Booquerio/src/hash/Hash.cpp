@@ -301,6 +301,7 @@ Registro* Hash::buscar(string que){
 	else {
 		Registro *reg_encontrado= new Registro(registro);
 		//delete registro;
+		delete bloque;
 		return reg_encontrado;
 	}
 	if (bloque!=NULL) delete bloque;
