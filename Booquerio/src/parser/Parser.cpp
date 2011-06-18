@@ -49,6 +49,9 @@ void Parser::guardarPalabras()
 	}
 	this->libro->setPalabras(palabrasComa,palabras->size());
 
+	palabras->clear();
+	delete palabras;
+
 }
 
 

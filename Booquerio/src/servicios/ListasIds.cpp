@@ -71,7 +71,7 @@ int ListasIds::agregarIdDeLibro(unsigned int *offset, unsigned int id, bool list
 
 
 			//grabar el bloque  viejo
-			unBloqueNuevo->~Bloque();
+			delete unBloqueNuevo;
 			unBloqueNuevo = new Bloque();
 			unBloqueNuevo->agregarRegistro(*unRegistro);
 			archivo->grabarBloque(unBloqueNuevo,ultimoBloq);
@@ -81,6 +81,8 @@ int ListasIds::agregarIdDeLibro(unsigned int *offset, unsigned int id, bool list
 			Bloque *nuevoBloq = new Bloque();
 			nuevoBloq->agregarRegistro(*nuevoReg);
 			archivo->grabarBloque(nuevoBloq,nuevoBloqNro);
+			delete nuevoBloq;
+			delete nuevoReg;
 
 		}
 
@@ -138,11 +140,12 @@ unsigned int ListasIds::recuperarUltimoBloque(unsigned int primero)
 		else
 			ref = -1;
 
+		delete otroBloque;
 	}
 
-//	primerBloque->~Bloque();
-//	otroBloque->~Bloque();
-	archivo->~ArchivoBloques();
+	delete primerBloque;
+	//delete otroBloque;
+	delete archivo;
 
 
 	return nroBloq;
@@ -228,25 +231,20 @@ int ListasIds::sacarIdDelLibro(unsigned int offset, unsigned int id)
 				corte = true; //para que corte igual
 		}
 
+		delete unBloque;
 	}
 
 
 	if (encontrado)
 	{
-		unBloque->~Bloque();
 		unBloque = new Bloque();
 		unBloque->agregarRegistro(unRegistro);
 		archivo->grabarBloque(unBloque,offset);
 		delete archivo;
+		delete unBloque;
 		return 0;
 	}
-	/*
-	else
-	{
-		archivo->eliminarBloque(*offset);
-		delete archivo;
-		return LISTA_VACIA;
-	}*/
+
 
 	return 0;
 }
@@ -287,12 +285,12 @@ int ListasIds::obtenerListaIds(unsigned int offset, list<unsigned int>* listaIds
 		else
 			primero = -1;
 
-		unBloque->~Bloque();
-		//unRegistro->~Registro();
+		delete unBloque;
+
 	}
 
 
-	archivo->~ArchivoBloques();
+	delete archivo;
 
 	return 0;
 
