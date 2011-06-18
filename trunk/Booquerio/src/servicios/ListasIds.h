@@ -51,6 +51,13 @@ public:
 
 	static int obtenerListaIds(unsigned int offset, list<unsigned int>* listaIds);
 
+	/*
+	 * Elimina una lista entera
+	 */
+
+	static int eliminarLista(unsigned int offset);
+
+
 private:
 
 	static unsigned int recuperarUltimoBloque(unsigned int primero);

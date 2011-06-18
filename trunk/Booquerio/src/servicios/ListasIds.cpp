@@ -148,6 +148,34 @@ unsigned int ListasIds::recuperarUltimoBloque(unsigned int primero)
 	return nroBloq;
 }
 
+
+int ListasIds::eliminarLista(unsigned int offset)
+{
+
+	string archivoListas = Parametros().getParametro(ARCHIVO_LISTAS_IDS);
+	ArchivoBloques *archivo = new ArchivoBloques(archivoListas,TAMANIO_B_LISTA_IDS);
+
+	Bloque *bloque;
+
+	bloque = archivo->recuperarBloque(offset);
+	Registro unRegistro;
+
+	unRegistro = bloque->obtenerRegistros()->back();
+	unsigned int nroBloq;
+	int ref = 0;
+
+	bool vacio = unRegistro.getReferencias()->empty();
+
+	if (!vacio)
+		eliminarLista(unRegistro.getReferenciai(1));
+
+	archivo->eliminarBloque(offset);
+
+
+	return 0;
+
+}
+
 int ListasIds::agregarPosPalabra(unsigned int *offset, unsigned int pos, bool listaNueva)
 
 {
