@@ -974,11 +974,11 @@ int Servicios::consultarPalabras(string palabrasBuscadas){
 
 
 	list<string>::iterator it = listaTerminos->begin();
-	cout << "palabras en la busqueda: " << endl;
-	while (it != listaTerminos->end()){
-		cout << *it << endl;
-		it++;
-	}
+	//cout << "palabras en la busqueda: " << endl;
+	//while (it != listaTerminos->end()){
+	//	cout << *it << endl;
+	//	it++;
+	//}
 	int error = 0;
 	error = ProcesadorConsultas().procesar(*listaTerminos);
 
@@ -994,7 +994,7 @@ int Servicios::actualizarNormasInf(){
 		cout<<"Las Normas Infinito ya se encuentran actualizadas."<<endl;
 		return 0;
 	}
-	cout << " voy a actualizar " << endl;
+	//cout << " voy a actualizar " << endl;
 
 	string pathArbolPrim = Parametros().getParametro(CARPETA_DATOS);
 	pathArbolPrim+= "bmas_primario";
@@ -1009,7 +1009,7 @@ int Servicios::actualizarNormasInf(){
 		regActual = arbolPrimario->siguiente();
 		N++;
 	}
-	cout<<"N:"<<N<<endl;
+	//cout<<"N:"<<N<<endl;
 	unsigned int i=0;
 
 	while (i < N) {
@@ -1064,7 +1064,7 @@ int Servicios::actualizarNormasInf(){
 
 		archivoNormas.actualizarNorma(normaInfinito, i);
 
-		cout<<"norma inf. actualizada:"<<normaInfinito<<endl;
+		//cout<<"norma inf. actualizada:"<<normaInfinito<<endl;
 		i++;
 		delete regArbolTerm;
 	}
