@@ -7,6 +7,8 @@
 
 #ifndef UTIL_H_
 #define UTIL_H_
+
+#include <stdio.h>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -94,6 +96,11 @@ public:
 	static void levantarCSV(string ruta, list<string> *lista);
 
 
+	/*
+	 * Elimina un archivo de manera permanente
+	 * ojo !
+	 */
+	static void eliminarArchivo(string archivo);
 private:
 	static string convertir(char letra);
 };

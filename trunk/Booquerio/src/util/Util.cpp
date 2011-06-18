@@ -273,3 +273,11 @@ void Util::levantarCSV(string ruta , list<string> *lista)
     archivo.close();
 
 }
+
+
+void Util::eliminarArchivo(string archivo)
+{
+
+	remove(archivo.c_str());
+
+}
