@@ -17,12 +17,14 @@ public:
 	archivoNormasInf();
 	void escribirNorma(double normaInfinito);
 	void actualizarNorma(double normaInfinito,unsigned int nrodoc);
-	unsigned int obtenerNorma(unsigned int id);
+	double obtenerNorma(unsigned int id);
+	void estadoActualizacion(char c);
 	virtual ~archivoNormasInf();
+	bool estaActualizado();
 
 private:
 	double normaInf;
-	void escribir(double normaInfinito,unsigned int nrodoc);
+	void escribir(double normaInfinito,int nrodoc);
 };
 
 #endif /* ARCHIVONORMASINF_H_ */
