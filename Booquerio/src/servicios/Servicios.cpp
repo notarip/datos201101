@@ -1014,7 +1014,7 @@ int Servicios::actualizarNormasInf(){
 
 	while (i < N) {
 
-		cout << "Actualizo norma del doc: " << N << endl;
+		cout << "Actualizo norma del doc: " << i << endl;
 
 		string pathArbolTerminos= Parametros().getParametro(CARPETA_DATOS);
 
