@@ -415,20 +415,20 @@ void Parser::procesarPalabra(string palabra, list<string>* palabras)
 
 
 	//reemplaza los inavalidos por espacios
-	unsigned int pos = palabra.find_first_of(INVALIDOS);
-	while (pos != string::npos)
-	{
-		palabra[pos] = ' ';
-		pos = palabra.find_first_of(INVALIDOS, pos+1);
-	}
-
-	//reemplaza los  \n por espacios
-	for (unsigned int j = 0; j < palabra.size();j++)
-			if (palabra.at(j) == '\n' || palabra.at(j) == '\r' || palabra.at(j) == '\0')
-					palabra[j] = ' ';
+//	unsigned int pos = palabra.find_first_of(INVALIDOS);
+//	while (pos != string::npos)
+//	{
+//		palabra[pos] = ' ';
+//		pos = palabra.find_first_of(INVALIDOS, pos+1);
+//	}
+//
+//	//reemplaza los  \n por espacios
+//	for (unsigned int j = 0; j < palabra.size();j++)
+//			if (palabra.at(j) == '\n' || palabra.at(j) == '\r' || palabra.at(j) == '\0')
+//					palabra[j] = ' ';
 
 	//cambia tilde
-	palabra = Util().sinTilde(palabra);
+	palabra = Util().sinTilde2(palabra);
 
 	//a minuscula
 	palabra = Util().toLower(palabra);

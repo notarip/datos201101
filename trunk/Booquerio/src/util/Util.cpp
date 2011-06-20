@@ -73,6 +73,71 @@ string Util::sinTilde(string cadena)
 	return cadena;
 }
 
+string Util::sinTilde2(string cadena)
+{
+
+
+	string invalidos("");
+	string invalidos2("áéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜñÑ");
+	string reemp;
+
+	unsigned int pos = -1;
+	int salto = 1;
+
+
+	pos = cadena.find_first_of(invalidos);
+
+	if (pos == string::npos)
+	{
+		pos = cadena.find_first_of(invalidos2);
+		salto = 2;
+	}
+
+	while (pos != string::npos)
+	{
+		reemp.clear();
+		reemp.append(cadena.substr(0,pos));
+		reemp.append(convertir2(cadena.substr(pos,salto)));
+		reemp.append(cadena.substr(pos+salto,cadena.size() - pos - 1));
+		cadena  = reemp;
+		pos = cadena.find_first_of(invalidos);
+	}
+
+
+
+	return cadena;
+}
+
+string Util::convertir2(string letra)
+{
+	if (letra == "á" || letra == "à" || letra == "ä") //a
+		return "a";
+	if (letra == "é" || letra == "è" || letra == "ë") //e
+		return "e";
+	if (letra == "í" || letra == "ì" || letra == "ï") //i
+		return "i";
+	if (letra == "ó" || letra == "ò" || letra == "ö") //o
+		return "o";
+	if (letra == "ú" || letra == "ù" || letra == "ü") //u
+		return "u";
+
+
+	if (letra == "Á" || letra == "À" || letra == "Ä") //A
+			return "A";
+	if (letra == "É" || letra == "È" || letra == "Ë") //E
+			return "E";
+	if (letra == "Í" || letra == "Ì" || letra == "Ï") //I
+			return "I";
+	if (letra == "Ó" || letra == "Ò" || letra == "Ö") //O
+			return "O";
+	if (letra == "Ú" || letra == "Ù" || letra == "Ü") //U
+			return "U";
+
+	if (letra == "ñ" || letra == "Ñ") //ñ
+		return "n";
+
+}
+
 bool Util::existeArchivo(string archivo)
 {
 	fstream arc;
