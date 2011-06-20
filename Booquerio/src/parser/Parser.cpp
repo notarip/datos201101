@@ -415,12 +415,12 @@ void Parser::procesarPalabra(string palabra, list<string>* palabras)
 
 
 	//reemplaza los inavalidos por espacios
-//	unsigned int pos = palabra.find_first_of(INVALIDOS);
-//	while (pos != string::npos)
-//	{
-//		palabra[pos] = ' ';
-//		pos = palabra.find_first_of(INVALIDOS, pos+1);
-//	}
+	unsigned int pos = palabra.find_first_of(INVALIDOS2);
+	while (pos != string::npos)
+	{
+		palabra[pos] = ' ';
+		pos = palabra.find_first_of(INVALIDOS2, pos+1);
+	}
 //
 //	//reemplaza los  \n por espacios
 //	for (unsigned int j = 0; j < palabra.size();j++)
