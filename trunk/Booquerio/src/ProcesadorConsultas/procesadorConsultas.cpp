@@ -316,24 +316,31 @@ int ProcesadorConsultas::consultaPorTerminosCercanos2(list<string> listaTerminos
 			cout<<"	Los siguientes libros, ""ordenados de acuerdo a relevancia, exceptuando los ya incluidos previamente"<<endl<<endl;
 			// aca tengo una lista de documento agrupados a "agrupar" a rankear
 			// le resto los ya rankeados
+
+			//cout << "resuelvo resta" << endl;
 			listaIdsARankear = this->resolverResta(listaIdsARankear,idsYaRankeados);
 
+			//cout << "calculo pesos" << endl;
 			// calculo sus pesos
 			pesosDocs = this->calculadorPesos(listaIdsARankear,listaTerminos,agrupador,j+1);
 
+			//cout << "los peso" << endl;
 			// los peso segun la cantidad de palabras totales de la consulta que posee
 			pesosDocs = this-> pesarSegunCantPalabras(pesosDocs,agrupador);
 
+			//cout << "rankeo" << endl;
 			// los rankeo
 			this->rankearDocumentos(listaIdsARankear,pesosDocs);
 
+			//cout << "agrego al listado final" << endl;
 			// los agrego para el listado final
 			pesosPaFinal.splice(pesosPaFinal.begin(),pesosDocs);
 
+			//cout << "agrego a los ya rankeados" << endl;
 			// los agrego a los ya rankeados
 			idsYaRankeados.splice(idsYaRankeados.begin(),listaIdsARankear);
-			listaIdsARankear.clear();
-			pesosDocs.clear();
+			//listaIdsARankear.clear();
+			//pesosDocs.clear();
 
 		}
 		// en la prox iteracion buscare agrupar de a menos

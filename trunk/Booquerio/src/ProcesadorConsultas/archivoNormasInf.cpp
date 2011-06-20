@@ -44,8 +44,6 @@ void archivoNormasInf::escribir(double normaInfinitoArch, int nro){
 	string ruta= Parametros().getParametro(CARPETA_DATOS);
 	ruta+= RUTA_ARCHIVO_NORMAS;
 
-	cout << "nro" << nro << endl;
-
 	if (nro==-1) normasInfinito.open(ruta.c_str(),ios::out | ios::app | ios::in);
 
 	else{
@@ -107,8 +105,6 @@ void archivoNormasInf::estadoActualizacion(char c){
 	pathArchNormas+= RUTA_ARCHIVO_NORMAS;
 
 	archNormas.open(pathArchNormas.c_str(),ios::out | ios::in);
-	cout << "path: " << pathArchNormas << endl;
-	cout << boolalpha << archNormas.good() << endl;
 	if (archNormas.good()){
 
 		char leido;
@@ -117,7 +113,6 @@ void archivoNormasInf::estadoActualizacion(char c){
 		archNormas.read(&leido,sizeof(char));
 
 		if ( ((leido == 'A') && (c == 'D')) || ((leido == 'D') && (c == 'A')) ){
-			cout << "entre " << endl;
 			archNormas.seekp(0,ios::beg);
 			archNormas.write(&c, sizeof(char));
 			if (c== 'A') cout <<"Normas Infinito actualizadas."<<endl;
