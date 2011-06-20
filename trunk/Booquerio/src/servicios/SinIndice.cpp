@@ -341,12 +341,14 @@ int SinIndice::vaciarLista(int lista)
 
 	manejador->grabarBloque(nuevoBloque, 0);
 
-	//unRegistro->~Registro();
-	//nuevoRegistro->~Registro();
-	unBloque->~Bloque();
-	nuevoBloque->~Bloque();
+	delete manejador;
+	delete unBloque;
+	delete nuevoBloque;
+	//delete unRegistro;
+	//delete nuevoRegistro;
 
-	manejador->~ArchivoBloques();
+
+
 
 	return 0;
 }

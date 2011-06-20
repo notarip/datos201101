@@ -324,6 +324,10 @@ void ArchivoLibros::deserializar(char* tiraBytes,Libro** obtenido){
 
 	*obtenido= libro;
 
+
+	delete []editorial;
+	delete []autor;
+	delete []titulo;
 	delete []tiraBytes;
 	delete []texto;
 	delete []palabras;
