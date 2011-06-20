@@ -86,27 +86,28 @@ using namespace std;
 void error_de_llamada()
 {
 
+	cout << endl << endl;
 	cout << "No se reconoce el comando, ¿ necesita ayuda ?: "  << endl;
-	cout << "Tomar Texto: ./ejecutable -i \"archivo de texto\"" <<endl;
-	cout << "Procesar Editorial: ./ejecutable -e (procesa los no procesados)"<<endl;
-	cout << "Procesar Autor: ./ejecutable –a" << endl;
-	cout << "Procesa Título: ./ejecutable –t" << endl;
-	cout << "Procesa Palabras: ./ejecutable –p" << endl;
-	cout << "Listar Archivos Tomados: ./ejecutable –l (muestra identificador, Título, Autor," << endl;
-	cout <<	" Editorial y cantidad de palabras registradas para ese libro)." << endl;
-	cout << "Obtener Archivo: ./ejecutable -o ID_Archivo" << endl;
-	cout << "Quita Archivo: ./ejecutable -q ID_Archivo (se elminan las entradas en los otros indices)" << endl;
-	cout << "Ver Estructura: ./ejecutable -v [-e árbol de Editorial, -a árbol de Autor, -t hash de" << endl;
-	cout << "Título, -p hash de Palabra, -i indice primario, -at archivo de Terminos, -ani archivo de"<<endl;
-	cout << "normas infinito,  -li archivo de Listas Invertidas]"<<endl;
-	cout << "\"Nombre Archivo\"" << endl;
-	cout << "Ver Archivo de Ocurrencias Posicionales: ./ejecutable -v -aop 'idLibro' ""Nombre Archivo"""<<endl;
-	cout << "Consultar Editorial: ./ejecutable -qe “Editorial”" << endl;
-	cout <<	"Consultar Autor: ./ejecutable –qa “Autor”" << endl;
-	cout <<	"Consultar Título: ./ejecutable –qt “Título”" << endl;
-	cout << "Consultar Palabras: ./ejecutable –qp “Palabras para búsqueda por cercania“"
-			"y rankeada"<< endl;
-	cout << "Actualizar Normas Infinito: ./ejecutable -u"<<endl;
+	cout << "********************************************************************************************" << endl;
+	cout << "Tomar Texto: ./ejecutable -i \"archivo de texto\"											" << endl;
+	cout << "Procesar Editorial: ./ejecutable -e (procesa los no procesados)							" << endl;
+	cout << "Procesar Autor: ./ejecutable –a															" << endl;
+	cout << "Procesa Título: ./ejecutable –t															" << endl;
+	cout << "Procesa Palabras: ./ejecutable –p															" << endl;
+	cout << "Listar Archivos Tomados: ./ejecutable –l (muestra identificador, Título, Autor,			" << endl;
+	cout <<	" Editorial y cantidad de palabras registradas para ese libro).								" << endl;
+	cout << "Obtener Archivo: ./ejecutable -o ID_Archivo												" << endl;
+	cout << "Quita Archivo: ./ejecutable -q ID_Archivo (se elminan las entradas en los otros indices)	" << endl;
+	cout << "Ver Estructura: ./ejecutable -v [-e árbol de Editorial, -a árbol de Autor, -t hash de		" << endl;
+	cout << "Título, -p hash de Palabra, -i indice primario, -at archivo de Terminos, -ani archivo de	" << endl;
+	cout << "normas infinito,  -li archivo de Listas Invertidas] \"Nombre Archivo\"						" << endl;
+	cout << "Ver Archivo de Ocurrencias Posicionales: ./ejecutable -v -aop 'idLibro' ""Nombre Archivo""	" << endl;
+	cout << "Consultar Editorial: ./ejecutable -qe “Editorial”											" << endl;
+	cout <<	"Consultar Autor: ./ejecutable –qa “Autor”													" << endl;
+	cout <<	"Consultar Título: ./ejecutable –qt “Título”												" << endl;
+	cout << "Consultar Palabras: ./ejecutable –qp “Palabras para búsqueda por cercania y rankeada“		" << endl;
+	cout << "Actualizar Normas Infinito: ./ejecutable -u												" << endl;
+	cout << "********************************************************************************************" << endl;
 
 }
 
@@ -171,10 +172,13 @@ void procesamiento_de_errores(int error)
 int determinar_operacion(int cant_parm, char** parm, string *parametro, unsigned int *nroArbol)
 {
 
-	string param(parm[1]+1);
+	if (cant_parm < 2) return ERROR_DE_LLAMADA;
 
-	//if (cant_parm > 5 || cant_parm < 2)
-	//	return ERROR_DE_LLAMADA;
+	for (int i = 0; i < cant_parm;i++)
+		if (parm[i][0] == ' ')
+			return ERROR_DE_LLAMADA;
+
+	string param(parm[1]+1);
 
 	if (param == "i")
 	{
