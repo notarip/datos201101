@@ -133,7 +133,7 @@ int Servicios::tomarTexto(string ruta)
 
 		}
 
-		double pesoGlobal= log10(N/ni);
+		double pesoGlobal= log10((double)N/(double)ni);
 		double peso= aij*pesoGlobal;
 		acumuladoNormaInf+= pow(peso,2);
 
@@ -330,6 +330,8 @@ int Servicios::quitarArchivo(string unId)
 {
 	unsigned int id = atoi(unId.c_str());
 	unsigned int offset = 0;
+
+	cout<<"Eliminando libro "<<id<<"..."<<endl;
 
 	//recuperar el offset del primario
 
@@ -939,15 +941,15 @@ int Servicios::consultarPalabras(string palabrasBuscadas){
 
 	if (listas->getPendientesPalabras()->size() != 0){
 		//mira que no tenes todas las palabras procesadas las busqueda puede arrojar datos que vos no busques
-		cout << " Warning: Ud no tiene procesado las palabras de todos los libros ingresados"
+		cout << " Warning: Ud no tiene procesadas las palabras de todos los libros ingresados"
 				", puede que la busqueda no de los resultados buscados. Procese las palabras"
-				" con la opcion -p para asegurarse que la busqueda se realize correctamente "
-				"Esta seguro que desea seguir(Y/N)" << endl;
+				" con la opcion -p para asegurarse que la busqueda se realice correctamente. "
+				"Esta seguro que desea continuar? (Y/N)" << endl;
 
 		string respuesta = "0";
 		cin >> respuesta;
 		while (respuesta != "Y" && respuesta != "N" && respuesta != "n" && respuesta != "y"){
-			cout << "Esta seguro que desea seguir(Y/N)" << endl;
+			cout << "Esta seguro que desea continuar? (Y/N)" << endl;
 			cin >> respuesta;
 		}
 		if (respuesta == "N" || respuesta == "n") return 0;
@@ -958,14 +960,14 @@ int Servicios::consultarPalabras(string palabrasBuscadas){
 		//mira que no tenes las normas actualizadas la busqueda puede ser mala
 		cout << " Warning: Ud no tiene el archivo de normas actualizado"
 		", puede que la busqueda no de los resultados buscados. Puede actualizarlo"
-		" con la opcion -u para asegurarse que la busqueda se realize correctamente. "
-		" Tenga en cuenta que es un proceso que puede tardar varios minutos"
-		"Esta seguro que desea seguir(Y/N)" << endl;
+		" con la opcion -u para asegurarse que la busqueda se realice correctamente. "
+		" Tenga en cuenta que es un proceso que puede tardar varios minutos. "
+		"Esta seguro que desea continuar? (Y/N)" << endl;
 
 		string respuesta = "0";
 		cin >> respuesta;
 		while (respuesta != "Y" && respuesta != "N" && respuesta != "n" && respuesta != "y"){
-			cout << "Esta seguro que desea seguir(Y/N)" << endl;
+			cout << "Esta seguro que desea continuar? (Y/N)" << endl;
 			cin >> respuesta;
 		}
 		if (respuesta == "N" || respuesta == "n") return 0;
@@ -1055,7 +1057,7 @@ int Servicios::actualizarNormasInf(){
 
 			}
 
-			double pesoGlobal= log10(N/ni);
+			double pesoGlobal= log10((double)N/(double)ni);
 			double peso= aij*pesoGlobal;
 			acumuladoNormaInf+= pow(peso,2);
 

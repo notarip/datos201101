@@ -38,14 +38,14 @@ private:
 	string carpetaRaiz;
 	//devuelve la lista de documentos ordenadas por relevancia decreciente
 	int consultaUnitaria(string termino);
-	float calcularPeso(string termino, unsigned int documento, float pesoGlobal);
+	double calcularPeso(string termino, unsigned int documento, float pesoGlobal);
 	float calcularPesoxProximidad(list<string> terminos, unsigned int id);
 	void ArmarSecuenciaOptima(list<unsigned int> secuencia, list<unsigned int>* max , unsigned int cantListas, list<unsigned int>[]);
 	unsigned int obtenerSeparacion(list<unsigned int> unaSecuencia);
 	int consultaPorTerminosCercanos2(list<string> listaTerminos);
-	list<float> calculadorPesos(list<unsigned int> documentos,list<string> terminos, unsigned int agrupacion, unsigned int comienzo);
-	void rankearDocumentos(list<unsigned int> documentos, list<float> pesos);
-	list<float> pesarSegunCantPalabras(list<float> pesos, unsigned int agrupacion, unsigned int totalPalabras);
+	list<double> calculadorPesos(list<unsigned int> documentos,list<string> terminos, unsigned int agrupacion, unsigned int comienzo);
+	void rankearDocumentos(list<unsigned int> documentos, list<double> pesos);
+	list<double> pesarSegunCantPalabras(list<double> pesos, unsigned int agrupacion, unsigned int totalPalabras);
 
 
 
@@ -55,8 +55,8 @@ public:
 	list<unsigned int> resolverResta(list<unsigned int> original, list<unsigned int> aRestar);
 
 	void imprimirConsulta(list<unsigned int> docRankeados);
-	void imprimirConsulta(map<unsigned int,float> unMapa);
-	void imprimirConsulta(list<unsigned int> docsOrdenados,list<float> pesosOrdenados);
+	void imprimirConsulta(map<unsigned int,double> unMapa);
+	void imprimirConsulta(list<unsigned int> docsOrdenados,list<double> pesosOrdenados);
 
 
 };
