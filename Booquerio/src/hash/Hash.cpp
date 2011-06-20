@@ -104,6 +104,8 @@ int Hash::abrir(){
 
 	while (bloqueSiguiente > 0){
 
+		delete bloqueTabla;
+
 		bloqueTabla = archivoLista.recuperarBloque(bloqueSiguiente);
 
 		regTabla = bloqueTabla->obtenerRegistros()->front();
