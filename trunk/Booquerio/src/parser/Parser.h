@@ -16,6 +16,7 @@
 
 #define TAG_PATH_STOP_WORDS "path_stopWords"
 #define INVALIDOS ".:,;¡!'?¿\"“”(){}[]-"
+#define INVALIDOS2 "!?.:,;"
 
 #include <stdio.h>
 #include <stdlib.h>

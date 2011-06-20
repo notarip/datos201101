@@ -11,12 +11,12 @@
 #include <list>
 #include "../parser/Parser.h"
 
-int main_kkkk(int argc, char** argv)
+int main_llpl(int argc, char** argv)
 {
 
 	Parser *p = new Parser();
 
-	list<string> *l= p->parsearFrase("conversasion extraña");
+	list<string> *l= p->parsearFrase("!conversación, pá. extraña?");
 
 
 	for (list<string>::iterator it = l->begin(); it != l->end(); it++)
