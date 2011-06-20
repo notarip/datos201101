@@ -66,19 +66,24 @@ float ProcesadorConsultas::calcularPesoxProximidad(list<string> terminos, unsign
 		unaSecuencia.push_back(*vectorIteradores[cantidadTerminos-1]);
 		list<unsigned int> secOptima;
 
+
 		ArmarSecuenciaOptima(unaSecuencia,&secOptima,cantidadTerminos,vectorListas);
+
 
 		if (secOptima.size() !=0 ){
 			pesoDocumento += 1 / pow(obtenerSeparacion(secOptima),2);
-
 			//limpiar listas
 
 			for(unsigned int j=0; j<cantidadTerminos-1; j++){
-				while(vectorListas[j].front()<=(*vectorIteradores[cantidadTerminos-1])){
+
+				while(vectorListas[j].size() !=0 && vectorListas[j].front()<=(*vectorIteradores[cantidadTerminos-1])){
 					vectorListas[j].pop_front();
+
 				}
+
 			}
 		}
+
 		vectorIteradores[cantidadTerminos-1]++;
 	}
 
@@ -317,30 +322,30 @@ int ProcesadorConsultas::consultaPorTerminosCercanos2(list<string> listaTerminos
 			// aca tengo una lista de documento agrupados a "agrupar" a rankear
 			// le resto los ya rankeados
 
-			//cout << "resuelvo resta" << endl;
+			cout << "resuelvo resta" << endl;
 			listaIdsARankear = this->resolverResta(listaIdsARankear,idsYaRankeados);
 
-			//cout << "calculo pesos" << endl;
+			cout << "calculo pesos" << endl;
 			// calculo sus pesos
 			pesosDocs = this->calculadorPesos(listaIdsARankear,listaTerminos,agrupador,j+1);
 
-			//cout << "los peso" << endl;
+			cout << "los peso" << endl;
 			// los peso segun la cantidad de palabras totales de la consulta que posee
 			pesosDocs = this-> pesarSegunCantPalabras(pesosDocs,agrupador);
 
-			//cout << "rankeo" << endl;
+			cout << "rankeo" << endl;
 			// los rankeo
 			this->rankearDocumentos(listaIdsARankear,pesosDocs);
 
-			//cout << "agrego al listado final" << endl;
+			cout << "agrego al listado final" << endl;
 			// los agrego para el listado final
 			pesosPaFinal.splice(pesosPaFinal.begin(),pesosDocs);
 
-			//cout << "agrego a los ya rankeados" << endl;
+			cout << "agrego a los ya rankeados" << endl;
 			// los agrego a los ya rankeados
 			idsYaRankeados.splice(idsYaRankeados.begin(),listaIdsARankear);
-			//listaIdsARankear.clear();
-			//pesosDocs.clear();
+			listaIdsARankear.clear();
+			pesosDocs.clear();
 
 		}
 		// en la prox iteracion buscare agrupar de a menos
@@ -630,7 +635,7 @@ void ProcesadorConsultas::imprimirConsulta(list<unsigned int> docsOrdenados,list
 
 
 	while (itRanking != docsOrdenados.end()){
-		cout << "		Doc : " << (*itRanking);
+		cout << "		Doc: " << (*itRanking);
 		cout << "			" << "Peso: " << (*itRanking2);
 		cout << endl;
 		itRanking++;
