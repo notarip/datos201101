@@ -421,6 +421,9 @@ void Parser::procesarPalabra(string palabra, list<string>* palabras)
 		palabra[pos] = ' ';
 		pos = palabra.find_first_of(INVALIDOS2, pos+1);
 	}
+
+	//saco espacios al pricipio y al final
+	palabra = Util().trim(palabra);
 //
 //	//reemplaza los  \n por espacios
 //	for (unsigned int j = 0; j < palabra.size();j++)
