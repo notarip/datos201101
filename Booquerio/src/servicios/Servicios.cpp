@@ -153,7 +153,7 @@ int Servicios::tomarTexto(string ruta)
 		delete registro;
 	}
 	double normaInfinito= sqrt(acumuladoNormaInf);
-	cout<<normaInfinito<<endl;
+	//cout<<normaInfinito<<endl;
 	archivoNormasInf archivoNormas;
 	archivoNormas.escribirNorma(normaInfinito);
 
@@ -995,7 +995,7 @@ int Servicios::actualizarNormasInf(){
 		return 0;
 	}
 	//cout << " voy a actualizar " << endl;
-
+	cout << "Actualizando..." << endl;
 	string pathArbolPrim = Parametros().getParametro(CARPETA_DATOS);
 	pathArbolPrim+= "bmas_primario";
 	ArbolBMasNumerico* arbolPrimario = new ArbolBMasNumerico(pathArbolPrim,
@@ -1013,6 +1013,8 @@ int Servicios::actualizarNormasInf(){
 	unsigned int i=0;
 
 	while (i < N) {
+
+		cout << "Actualizo norma del doc: " << N << endl;
 
 		string pathArbolTerminos= Parametros().getParametro(CARPETA_DATOS);
 
