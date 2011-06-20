@@ -81,21 +81,14 @@ void archivoNormasInf::imprimirNormasInf(string path, list<unsigned int> idLibro
 	list<unsigned int>::iterator it= idLibros.begin();
 	archivo<<endl;
 	archivo<<"ID Libro"<<"		";
+	archivo<<"Norma Infinito"<<endl<<endl;
 	while(it!=idLibros.end()){
-		archivo<<*it<<"		";
+		archivo<<*it<<"			";
+		archivo<<this->obtenerNorma(*it)<<endl;
 		it++;
 	}
 	archivo<<endl;
-	archivo<<"Norma Infinito"<<"		";
-	it= idLibros.begin();
-	while(it!=idLibros.end()){
-		archivo<<this->obtenerNorma(*it)<<"		";
-		it++;
-	}
-	archivo<<endl<<endl;
-	for(int i= 0; i< idLibros.size(); i++){
-		archivo<<"*********************";
-	}
+	archivo<<"******************************************************";
 	archivo<<endl;
 }
 
