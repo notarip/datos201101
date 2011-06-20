@@ -322,26 +322,26 @@ int ProcesadorConsultas::consultaPorTerminosCercanos2(list<string> listaTerminos
 			// aca tengo una lista de documento agrupados a "agrupar" a rankear
 			// le resto los ya rankeados
 
-			cout << "resuelvo resta" << endl;
+			//cout << "resuelvo resta" << endl;
 			listaIdsARankear = this->resolverResta(listaIdsARankear,idsYaRankeados);
 
-			cout << "calculo pesos" << endl;
+			//cout << "calculo pesos" << endl;
 			// calculo sus pesos
 			pesosDocs = this->calculadorPesos(listaIdsARankear,listaTerminos,agrupador,j+1);
 
-			cout << "los peso" << endl;
+			//cout << "los peso" << endl;
 			// los peso segun la cantidad de palabras totales de la consulta que posee
-			pesosDocs = this-> pesarSegunCantPalabras(pesosDocs,agrupador);
+			pesosDocs = this-> pesarSegunCantPalabras(pesosDocs,agrupador,cantTerminos);
 
-			cout << "rankeo" << endl;
+			//cout << "rankeo" << endl;
 			// los rankeo
 			this->rankearDocumentos(listaIdsARankear,pesosDocs);
 
-			cout << "agrego al listado final" << endl;
+			//cout << "agrego al listado final" << endl;
 			// los agrego para el listado final
 			pesosPaFinal.splice(pesosPaFinal.begin(),pesosDocs);
 
-			cout << "agrego a los ya rankeados" << endl;
+			//cout << "agrego a los ya rankeados" << endl;
 			// los agrego a los ya rankeados
 			idsYaRankeados.splice(idsYaRankeados.begin(),listaIdsARankear);
 			listaIdsARankear.clear();
@@ -452,12 +452,16 @@ void ProcesadorConsultas::rankearDocumentos(list<unsigned int> documentos, list<
 //	this->imprimirConsulta(miMapa);
 }
 
-list<float> ProcesadorConsultas::pesarSegunCantPalabras(list<float> pesos, unsigned int agrupacion){
+list<float> ProcesadorConsultas::pesarSegunCantPalabras(list<float> pesos, unsigned int agrupacion, unsigned int totalPalabras){
 	list<float>::iterator itPesos = pesos.begin();
 	list<float> resultado;
+	unsigned int diferenciaBusqueda = totalPalabras-agrupacion;
+	float ponderacion =(10/(pow(10,diferenciaBusqueda)));
+
 
 	while ( itPesos!= pesos.end()){
-		resultado.push_back((*itPesos)*pow(10,agrupacion));
+		//resultado.push_back((*itPesos)*pow(10,agrupacion));
+		resultado.push_back((*itPesos)+ ponderacion);
 		// REVISAR SI ESTA FORMA DE PONDERAR LES PARECE BIEN
 		itPesos++;
 	}

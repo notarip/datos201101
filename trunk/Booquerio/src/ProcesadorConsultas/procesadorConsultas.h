@@ -45,7 +45,7 @@ private:
 	int consultaPorTerminosCercanos2(list<string> listaTerminos);
 	list<float> calculadorPesos(list<unsigned int> documentos,list<string> terminos, unsigned int agrupacion, unsigned int comienzo);
 	void rankearDocumentos(list<unsigned int> documentos, list<float> pesos);
-	list<float> pesarSegunCantPalabras(list<float> pesos, unsigned int agrupacion);
+	list<float> pesarSegunCantPalabras(list<float> pesos, unsigned int agrupacion, unsigned int totalPalabras);
 
 
 
