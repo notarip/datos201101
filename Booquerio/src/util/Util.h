@@ -47,6 +47,13 @@ public:
 	static string sinTilde(string cadena);
 
 	/*
+	 * Retorna @cadena sin tilde
+	 */
+
+	static string sinTilde2(string cadena);
+
+
+	/*
 	 * Retorna la lista de archivos que hay en
 	 * @carpeta
 	 */
@@ -103,6 +110,7 @@ public:
 	static void eliminarArchivo(string archivo);
 private:
 	static string convertir(char letra);
+	static string convertir2(string letra);
 };
 
 #endif /* UTIL_H_ */
